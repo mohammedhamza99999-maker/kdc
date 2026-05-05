@@ -13,7 +13,7 @@
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
     
- <script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
+<script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
 <script>
   window.OneSignalDeferred = window.OneSignalDeferred || [];
   OneSignalDeferred.push(async function(OneSignal) {
@@ -187,8 +187,8 @@
             </div>
         </div>
         
-      <a href="#" onclick="OneSignalDeferred.push(function(OneSignal) { OneSignal.Slidedown.promptPush(); }); return false;" style="cursor: pointer; display: block; text-decoration: none;">
-     تفعيل تنبيهات الأهداف
+     <a href="#" onclick="OneSignalDeferred.push(function(OneSignal) { OneSignal.InAppMessages.addTrigger('prompt_push', 'true'); OneSignal.User.PushSubscription.optIn(); }); return false;" class="btn-subscribe" style="display: block; width: 100%; padding: 12px; background: rgba(0, 123, 255, 0.1); border: 1px solid #007bff; border-radius: 8px; color: #fff; text-align: center; text-decoration: none; font-weight: bold; margin-bottom: 20px;">
+   <i class="fas fa-bell"></i> تفعيل تنبيهات احداث المباراة
 </a>
 </button>
 
