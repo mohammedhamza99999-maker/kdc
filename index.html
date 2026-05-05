@@ -1,0 +1,1164 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>بطولة دوائر خانقين</title>
+    <!-- استدعاء خط Cairo للجمهور -->
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&display=swap" rel="stylesheet">
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#3b82f6">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+    
+   <script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
+<script>
+  window.OneSignalDeferred = window.OneSignalDeferred || [];
+  OneSignalDeferred.push(async function(OneSignal) {
+    await OneSignal.init({
+      appId: "d29380b0-23f9-4f35-b262-4a9a3102cf56",
+      safari_web_id: "web.onesignal.auto.184299bc-1c91-4dec-a5d4-b75cfd155372",
+      notifyButton: { enable: true },
+    });
+  });
+</script>
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <style>
+        :root { --bg: #0e1318; --card: #1a222b; --primary: #3b82f6; --accent: #4ade80; --text: #ffffff; --muted: #8a95a5; --border: #26303d; --live: #ef4444; }
+        body { background-color: var(--bg); color: var(--text); font-family: 'Cairo', Tahoma, sans-serif; margin: 0; padding: 0; display: flex; justify-content: center; -webkit-tap-highlight-color: transparent; transition: background-color 0.5s ease; }
+        .app { width: 100%; max-width: 480px; min-height: 100vh; position: relative; padding-bottom: 100px; background: var(--bg); overflow-x: hidden; transition: background-color 0.5s ease;}
+        .header { padding: 15px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 50; background: var(--bg); border-bottom: 1px solid var(--primary); transition: all 0.5s ease; }
+        .header h1 { margin: 0; font-size: 22px; font-weight: 900; letter-spacing: 1px; color: var(--primary);}
+        .header-date { background: rgba(255,255,255,0.1); padding: 4px 10px; border-radius: 12px; font-size: 13px; font-weight: bold; color: var(--text); display:flex; align-items:center; gap:8px;}
+        .notify-btn { background: transparent; color: var(--text); border: 1px solid var(--primary); padding: 10px; width: 90%; margin: 15px auto; display: block; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 14px; transition: 0.3s; font-family:'Cairo';}
+        .page { display: none; padding: 10px 15px; animation: fadeUp 0.3s ease forwards; opacity: 0; transform: translateY(5px); }
+        .page.active { display: block; }
+        @keyframes fadeUp { to { opacity: 1; transform: translateY(0); } }
+        .card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; margin-bottom: 15px; overflow: hidden; position: relative; transition: all 0.5s ease;}
+        .card-header { background: rgba(0,0,0,0.2); padding: 10px 15px; display: flex; justify-content: space-between; font-size: 12px; border-bottom: 1px solid var(--border); font-weight: bold; color: var(--muted);}
+        .card-body { padding: 20px 15px; display: flex; justify-content: space-between; align-items: center; }
+        .team { display: flex; flex-direction: column; align-items: center; width: 30%; gap: 8px;}
+        .team-name { font-size: 14px; font-weight: bold; text-align: center; line-height: 1.3;}
+        .logo-ph { width: 50px; height: 50px; background: transparent; display: flex; justify-content: center; align-items: center; font-size: 24px; color: var(--muted);}
+        .logo-ph img { width: 100%; height: 100%; object-fit: contain; }
+        .score-info { display: flex; flex-direction: column; align-items: center; width: 40%;}
+        .live-timer { font-size: 14px; font-weight: bold; color: var(--live); margin-bottom: 5px; }
+        .score { font-size: 36px; font-weight: 900; margin: 0; letter-spacing: 2px; color: var(--accent);}
+        .status { font-size: 12px; color: var(--muted); margin-top: 5px;}
+        .events-container { border-top: 1px solid var(--border); padding: 12px 15px; font-size: 13px; color: var(--muted); line-height: 2; background: rgba(0,0,0,0.1);}
+        .title-section { font-size: 14px; color: var(--primary); margin: 20px 5px 10px; font-weight: bold; display: flex; align-items: center; gap: 8px;}
+        .title-section::before, .title-section::after { content: ""; flex: 1; height: 1px; background: var(--primary); opacity:0.3; }
+        table { width: 100%; border-collapse: collapse; font-size: 13px; text-align: center; }
+        th { padding: 12px 5px; color: var(--primary); font-weight: bold; font-size: 11px; border-bottom: 1px solid var(--border);}
+        td { padding: 14px 5px; border-bottom: 1px solid var(--border); font-weight: bold; color: var(--text);}
+        .clickable-player { cursor: pointer; transition: 0.2s; } .clickable-player:hover { background: rgba(255,255,255,0.02); }
+        .team-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .team-btn { background: var(--card); border: 1px solid var(--primary); border-radius: 12px; padding: 15px 10px; text-align: center; cursor: pointer; transition: all 0.2s ease;}
+        .team-btn:hover { transform: translateY(-3px); box-shadow: 0 5px 15px rgba(59,130,246,0.3); }
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg); overflow-y: auto; padding: 0; box-sizing: border-box;}
+        .modal-header-nav { padding: 15px; display: flex; justify-content: space-between; border-bottom: 1px solid var(--primary); background: var(--card); position: sticky; top: 0; z-index: 60;}
+        .close-btn { background: transparent; color: var(--text); border: none; font-size: 20px; cursor: pointer;}
+        .stat-box { background: var(--bg); padding: 15px 10px; border-radius: 10px; width: 45%; margin-bottom: 10px; border: 1px solid var(--primary);}
+        .stat-box-num { font-size: 24px; font-weight: 900; margin-bottom: 5px; color: var(--text);} 
+        .stat-box-label { font-size: 12px; color: var(--muted); display: flex; justify-content: center; gap: 4px;}
+        .footer { text-align: center; padding: 20px; font-size: 12px; color: var(--muted); border-top: 1px solid var(--border); margin-top: 30px;}
+        .footer-social { display: flex; justify-content: center; gap: 15px; margin-top: 15px; }
+        .footer-social a { color: var(--primary); font-size: 20px; text-decoration: none; transition: 0.3s;}
+        .footer-social a:hover { color: var(--text); }
+        .nav { position: fixed; bottom: 0; width: 100%; max-width: 480px; background: var(--card); border-top: 1px solid var(--primary); display: flex; padding: 10px 0 15px; z-index: 50;}
+        .nav-item { flex: 1; text-align: center; color: var(--muted); font-size: 12px; font-weight: bold; cursor: pointer; transition: 0.2s;}
+        .nav-icon { font-size: 18px; display: block; margin-bottom: 4px; color: var(--muted);}
+        .nav-item.active { color: var(--primary); } .nav-item.active .nav-icon { color: var(--primary); }
+        .share-actions { display: flex; gap: 10px; padding: 10px 15px; background: rgba(0,0,0,0.2); border-top: 1px solid var(--border);}
+        .export-btn { flex:1; background: transparent; border: 1px solid var(--primary); color: var(--primary); padding: 10px; border-radius: 8px; font-size: 13px; cursor: pointer; font-family:'Cairo'; font-weight:bold; transition: 0.2s;}
+        .export-btn:hover { background: var(--primary); color: #fff; }
+        .os-notification { position: fixed; top: -100px; left: 50%; transform: translateX(-50%); background: var(--card); border: 1px solid var(--primary); border-radius: 12px; padding: 15px; display: flex; align-items: center; gap: 15px; z-index: 1000; box-shadow: 0 10px 30px rgba(0,0,0,0.8); transition: 0.5s; width: 90%; max-width: 350px; color: var(--text); }
+        .os-notification.show { top: 20px; }
+        .btn-enter-match { background: transparent; border: 1px solid var(--primary); color: var(--primary); padding: 10px; border-radius: 8px; width: 100%; margin-top: 12px; cursor: pointer; font-size: 13px; font-weight: bold; transition: 0.3s; font-family:'Cairo';}
+        .btn-enter-match:hover { background: var(--primary); color: #fff; }
+        .team-clickable { cursor: pointer; transition: 0.2s; }
+        .team-clickable:hover { transform: scale(1.05); }
+        
+        .image-viewer { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 110; align-items: center; justify-content: center; flex-direction: column; }
+        .image-viewer img { max-width: 95%; max-height: 85vh; object-fit: contain; border-radius: 8px; box-shadow: 0 5px 25px rgba(0,0,0,0.5); transition: transform 0.3s ease; }
+        .image-viewer .close-btn { position: absolute; top: 20px; left: 20px; color: white; font-size: 30px; cursor: pointer; background: transparent; border: none; }
+        
+        /* كلاس البوستر الاحترافي (عند التحميل كصورة) */
+        .premium-poster {
+            background: linear-gradient(135deg, var(--bg) 0%, #000000 100%) !important;
+            border: 2px solid var(--primary) !important;
+            border-radius: 20px !important;
+            padding: 30px 20px !important;
+            box-shadow: inset 0 0 30px rgba(0, 0, 0, 0.5) !important;
+        }
+        .premium-poster .title-section, .premium-poster .card-header { background: transparent !important; border-color: var(--primary) !important; color: var(--primary) !important; }
+        .premium-poster .export-btn, .premium-poster .btn-enter-match, .premium-poster .close-btn { display: none !important; }
+
+        /* ستايل إظهار أول 5 مراكز فقط عند تصدير الإحصائيات */
+        .premium-poster.stats-export-mode tbody tr { display: none !important; }
+        .premium-poster.stats-export-mode tbody tr:nth-child(-n+5) { display: table-row !important; }
+        
+        .modern-referees {
+            display: flex; justify-content: space-around; padding: 12px; margin-top: 15px;
+            background: rgba(0,0,0,0.3); border: 1px solid var(--border); border-bottom: 2px solid var(--primary); border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.4); font-size: 13px;
+        }
+        .modern-referees span { color: var(--muted); display: flex; align-items: center; gap: 6px; }
+        .modern-referees span span { color: #fff; font-weight: bold; font-size: 14px; display:flex; align-items:center; gap:5px;}
+
+        /* ملعب التشكيلة العصري المطور (أخضر غامق - 7 ضد 7) */
+        .pitch-container {
+            width: 100%; max-width: 450px; height: 550px; margin: 0 auto;
+            background-color: #14381f; /* أخضر غامق جداً */
+            background-image: repeating-linear-gradient(0deg, transparent, transparent 10%, rgba(0,0,0,0.15) 10%, rgba(0,0,0,0.15) 20%);
+            border: 3px solid rgba(255,255,255,0.7);
+            position: relative; overflow: hidden; border-radius: 12px; box-shadow: inset 0 0 50px rgba(0,0,0,0.8);
+        }
+        .p-center-line { position: absolute; top: 50%; left: 0; width: 100%; height: 3px; background: rgba(255,255,255,0.5); transform: translateY(-50%); }
+        .p-center-circle { position: absolute; top: 50%; left: 50%; width: 90px; height: 90px; border: 3px solid rgba(255,255,255,0.5); border-radius: 50%; transform: translate(-50%, -50%); }
+        .p-center-dot { position: absolute; top: 50%; left: 50%; width: 8px; height: 8px; background: rgba(255,255,255,0.8); border-radius: 50%; transform: translate(-50%, -50%); }
+        .p-pen-top { position: absolute; top: 0; left: 20%; width: 60%; height: 16%; border: 3px solid rgba(255,255,255,0.5); border-top: none; }
+        .p-pen-bottom { position: absolute; bottom: 0; left: 20%; width: 60%; height: 16%; border: 3px solid rgba(255,255,255,0.5); border-bottom: none; }
+        .p-corner-tl { position:absolute; top:-15px; left:-15px; width:30px; height:30px; border:3px solid rgba(255,255,255,0.7); border-radius:50%; }
+        .p-corner-tr { position:absolute; top:-15px; right:-15px; width:30px; height:30px; border:3px solid rgba(255,255,255,0.7); border-radius:50%; }
+        .p-corner-bl { position:absolute; bottom:-15px; left:-15px; width:30px; height:30px; border:3px solid rgba(255,255,255,0.7); border-radius:50%; }
+        .p-corner-br { position:absolute; bottom:-15px; right:-15px; width:30px; height:30px; border:3px solid rgba(255,255,255,0.7); border-radius:50%; }
+        
+        .pitch-half { height: 50%; width: 100%; position: relative; z-index: 10; }
+        .pitch-player { 
+            position: absolute; display: flex; flex-direction: column; align-items: center; justify-content: center; 
+            gap: 4px; cursor: pointer; transition: transform 0.2s, z-index 0s; 
+            transform: translate(-50%, -50%); /* التوسيط بالملي على النقطة */
+            width: 80px; z-index: 10;
+        }
+        .pitch-player:hover { transform: translate(-50%, -50%) scale(1.15); z-index: 20; }
+        .pitch-player img, .pitch-player .p-placeholder { 
+            width: 45px; height: 45px; border-radius: 50%; border: 2px solid #fff; 
+            object-fit: cover; background: var(--primary); color: #fff; 
+            display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 10px rgba(0,0,0,0.8); 
+        }
+        .pitch-player span { 
+            background: rgba(0,0,0,0.85); color: #fff; padding: 3px 6px; border-radius: 6px; 
+            font-size: 11px; font-weight: bold; width: 100%; overflow: hidden; text-overflow: ellipsis; 
+            white-space: nowrap; text-align: center; border: 1px solid rgba(255,255,255,0.2); 
+            font-family:'Cairo'; line-height: 1.2;
+        }
+        .pitch-player .team-tag { font-size: 9px; color: var(--muted); margin-top:-2px; display:block;}
+
+        /* بوستر أفقي للمجموعات */
+        .export-horizontal-mode {
+            display: grid !important;
+            grid-template-columns: repeat(2, 1fr) !important;
+            gap: 20px !important;
+            padding: 40px !important;
+            background: linear-gradient(135deg, #0f172a 0%, #000000 100%) !important;
+            border: 2px solid var(--primary) !important;
+            border-radius: 20px !important;
+            width: 1000px !important; 
+            max-width: none !important;
+        }
+        .export-horizontal-mode .title-section { color: #d4af37 !important; font-size: 20px !important; justify-content: center !important;}
+        .export-horizontal-mode .title-section button { display: none !important; }
+        .export-horizontal-mode .card { background: rgba(0,0,0,0.5) !important; border-color: var(--primary) !important;}
+    </style>
+</head>
+<body>
+
+    <audio id="crowdSound" src="https://assets.mixkit.co/active_storage/sfx/2000/2000-preview.mp3" preload="auto"></audio>
+
+    <div id="osNotification" class="os-notification">
+        <div style="font-size:24px; color:var(--primary);"><i class="fa-solid fa-futbol"></i></div>
+        <div><strong id="notifTitle" style="font-size:14px; font-family:'Cairo';">تحديث</strong><div id="notifText" style="font-size:12px; color:var(--muted); margin-top:3px;"></div></div>
+    </div>
+
+    <div id="imageViewerModal" class="image-viewer">
+        <button class="close-btn" onclick="closeImageViewer()"><i class="fa-solid fa-xmark"></i></button>
+        <img id="fullSizeImg" src="">
+    </div>
+
+    <div class="app">
+        <div class="header">
+            <h1 id="displayTourneyName">تحميل...</h1>
+            <div class="header-date">
+                <span id="todayDate">اليوم</span>
+            </div>
+        </div>
+        
+       <button id="enablePushBtn" class="notify-btn" onclick="window.open('https://onesignal.com/subscribe?appId=d29380b0-23f9-4f35-b262-4a9a3102cf56', 'OneSignal', 'width=500,height=600')">
+    <i class="fa-regular fa-bell"></i> تفعيل تنبيهات الأهداف
+</button>
+
+        <div id="page-matches" class="page active">
+            <div class="title-section">أبرز المباريات (مباشر)</div>
+            
+            <div id="testModePlaceholder" style="display:none; text-align:center; padding:40px 20px; background:var(--card); border-radius:12px; border:2px dashed var(--primary); color:var(--text); margin-bottom:15px;">
+                <i class="fa-solid fa-clock" style="font-size:40px; color:var(--primary); margin-bottom:15px; display:block;"></i>
+                <div style="font-size:16px; font-weight:bold;">لا توجد مباراة مباشرة حالياً</div>
+                <div style="font-size:12px; color:var(--muted); margin-top:5px;">يرجى الانتظار حتى انطلاق المباراة القادمة</div>
+            </div>
+
+            <div class="card" id="liveMatchCard">
+                <div class="card-header">
+                    <span id="lContext"><i class="fa-regular fa-futbol"></i> جاري التحميل...</span>
+                    <span style="color:var(--live); font-weight:bold;">مباشر <i class="fa-solid fa-circle" style="font-size:8px; animation: pulse 1.5s infinite;"></i></span>
+                </div>
+                <div class="card-body">
+                    <div class="team team-clickable" id="lTeam1Container"><div class="logo-ph" id="lLogo1"></div><div class="team-name" id="lTeam1">--</div></div>
+                    <div class="score-info"><div class="live-timer" id="lTimer">00:00</div><div class="score" id="lScore">- : -</div><div class="status" id="lStatus">انتظار</div></div>
+                    <div class="team team-clickable" id="lTeam2Container"><div class="logo-ph" id="lLogo2"></div><div class="team-name" id="lTeam2">--</div></div>
+                </div>
+
+                <div id="lReferees" class="modern-referees" style="display:none; margin: 0 15px 15px;">
+                    <span>حكم الساحة: <span id="lRef1Txt">--</span></span>
+                    <span>مساعد الحكم: <span id="lRef2Txt">--</span></span>
+                </div>
+
+                <div id="lStats" style="display:none; padding: 15px; border-top: 1px solid var(--border); background: rgba(0,0,0,0.15);">
+                    <div style="font-size: 12px; color: var(--muted); text-align: center; margin-bottom: 5px;">الاستحواذ</div>
+                    <div style="display: flex; justify-content: space-between; font-size: 13px; font-weight: bold; margin-bottom: 5px;">
+                        <span id="pos1Txt" style="color: var(--primary);">50%</span>
+                        <span id="pos2Txt" style="color: var(--accent);">50%</span>
+                    </div>
+                    <div style="display: flex; height: 8px; border-radius: 4px; overflow: hidden; margin-bottom: 15px; background: var(--border);">
+                        <div id="pos1Bar" style="width: 50%; background: var(--primary); transition: width 0.5s;"></div>
+                        <div id="pos2Bar" style="width: 50%; background: var(--accent); transition: width 0.5s;"></div>
+                    </div>
+                    
+                    <div style="display: flex; justify-content: space-between; text-align: center; font-size: 12px;">
+                        <div style="flex: 1;">
+                            <div style="color: #facc15; margin-bottom: 3px;">التسديدات</div>
+                            <div style="font-size: 16px; font-weight: bold;"><span id="shots1Txt">0</span> - <span id="shots2Txt">0</span></div>
+                        </div>
+                        <div style="flex: 1;">
+                            <div style="color: #a8a29e; margin-bottom: 3px;">الركنيات</div>
+                            <div style="font-size: 16px; font-weight: bold;"><span id="corn1Txt">0</span> - <span id="corn2Txt">0</span></div>
+                        </div>
+                        <div style="flex: 1;">
+                            <div style="color: #ef4444; margin-bottom: 3px;">الفاولات</div>
+                            <div style="font-size: 16px; font-weight: bold;"><span id="fouls1Txt">0</span> - <span id="fouls2Txt">0</span></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="lEvents" class="events-container">لا توجد أحداث</div>
+                
+                <div class="share-actions" style="display:flex; gap:10px;">
+                    <button class="export-btn" id="liveSquadBtn" style="flex:1;"><i class="fa-solid fa-users"></i> التشكيلة</button>
+                    <button class="export-btn" onclick="shareAsImage('liveMatchCard')" style="flex:1; background:var(--primary); color:#fff; border:none;"><i class="fa-solid fa-camera"></i> بوستر</button>
+                </div>
+            </div>
+            
+            <div class="title-section">المباريات القادمة</div>
+            <div id="scheduleList"></div>
+
+            <div class="title-section">مواجهات المجموعات (غير محددة الموعد)</div>
+            <div id="groupMatchupsList"></div>
+            
+            <div class="title-section" style="color:var(--primary);"><i class="fa-solid fa-trophy"></i> مباريات الحسم (الأدوار الإقصائية)</div>
+            <div id="knockoutList"></div>
+
+            <div class="title-section">نتائج دور المجموعات</div>
+            <div id="archiveList"></div>
+        </div>
+        
+        <div id="page-groups" class="page">
+            <button onclick="exportAllGroupsHorizontal()" class="btn-enter-match" style="margin-bottom:15px; margin-top:5px;"><i class="fa-solid fa-images"></i> حفظ جميع المجموعات كصورة</button>
+            <div id="groupsContainer"></div>
+        </div>
+        <div id="page-teams" class="page"><div class="team-grid" id="teamsContainer"></div></div>
+        
+        <div id="page-stats" class="page">
+            <div id="roundStarsContainer" style="display:none; margin-bottom:20px; gap:10px;">
+                <div id="potwContainer" class="card" style="flex:1; text-align:center; padding:10px; display:none; border-color:var(--accent);">
+                    <div style="font-size:14px; color:var(--accent); font-weight:bold; margin-bottom:5px;"><i class="fa-solid fa-star"></i> لاعب الجولة</div>
+                    <img id="potwImgDisplay" src="" style="width:100%; border-radius:8px; cursor:pointer; object-fit:contain;" onclick="openImageViewer(this.src)">
+                </div>
+                <div id="totwContainer" class="card" style="flex:1; text-align:center; padding:10px; display:none; border-color:var(--primary);">
+                    <div style="font-size:14px; color:var(--primary); font-weight:bold; margin-bottom:5px;"><i class="fa-solid fa-users"></i> تشكيلة الجولة</div>
+                    <img id="totwImgDisplay" src="" style="width:100%; border-radius:8px; cursor:pointer; object-fit:contain;" onclick="openImageViewer(this.src)">
+                </div>
+            </div>
+
+            <div id="stats-team">
+                <div class="title-section" style="justify-content:space-between;"><span>إحصائيات الفرق (هجوم ودفاع)</span><button onclick="shareAsImage('stats-team')" style="background:transparent; color:var(--primary); border:none; cursor:pointer;"><i class="fa-solid fa-camera"></i></button></div>
+                <div class="card" style="padding:0;"><table><thead><tr><th style="text-align:right; padding-right:15px;">الفريق</th><th>له</th><th>عليه</th><th>الفرق</th></tr></thead><tbody id="teamStatsList"></tbody></table></div>
+            </div>
+            
+            <div id="stats-scorers">
+                <div class="title-section" style="justify-content:space-between;"><span>الهدافين</span><button onclick="shareAsStatsImage('stats-scorers')" style="background:transparent; color:var(--primary); border:none; cursor:pointer;"><i class="fa-solid fa-camera"></i></button></div>
+                <div class="card" style="padding:0;"><table><thead><tr><th>#</th><th style="text-align:right;">اللاعب</th><th>⚽</th></tr></thead><tbody id="topScorersList"></tbody></table></div>
+            </div>
+
+            <div id="stats-assists">
+                <div class="title-section" style="justify-content:space-between;"><span>صناع اللعب</span><button onclick="shareAsStatsImage('stats-assists')" style="background:transparent; color:var(--primary); border:none; cursor:pointer;"><i class="fa-solid fa-camera"></i></button></div>
+                <div class="card" style="padding:0;"><table><thead><tr><th>#</th><th style="text-align:right;">اللاعب</th><th><i class="fa-solid fa-handshake-angle"></i></th></tr></thead><tbody id="topAssistsList"></tbody></table></div>
+            </div>
+
+            <div id="stats-motm">
+                <div class="title-section" style="justify-content:space-between;"><span>نجوم المباريات (MOTM)</span><button onclick="shareAsStatsImage('stats-motm')" style="background:transparent; color:var(--primary); border:none; cursor:pointer;"><i class="fa-solid fa-camera"></i></button></div>
+                <div class="card" style="padding:0;"><table><thead><tr><th>#</th><th style="text-align:right;">اللاعب</th><th><i class="fa-solid fa-star"></i></th></tr></thead><tbody id="topMotmList"></tbody></table></div>
+            </div>
+
+            <div id="stats-cards">
+                <div class="title-section" style="justify-content:space-between;"><span>السجل التأديبي</span><button onclick="shareAsStatsImage('stats-cards')" style="background:transparent; color:var(--primary); border:none; cursor:pointer;"><i class="fa-solid fa-camera"></i></button></div>
+                <div class="card" style="padding:0;"><table><thead><tr><th style="text-align:right; padding-right:15px;">اللاعب</th><th><i class="fa-solid fa-square" style="color: #facc15;"></i></th><th><i class="fa-solid fa-square" style="color: #ef4444;"></i></th></tr></thead><tbody id="cardsList"></tbody></table></div>
+            </div>
+        </div>
+        
+        <div id="teamModal" class="modal" style="z-index: 105;">
+            <div class="modal-header-nav"><button class="close-btn" onclick="closeModal('teamModal')"><i class="fa-solid fa-arrow-right"></i></button><div style="font-weight:bold; font-size:16px;">تفاصيل الفريق</div><div style="width:20px;"></div></div>
+            <div style="padding:20px;">
+                <div style="text-align:center; margin-bottom:20px;">
+                    <div class="logo-ph" id="modalLogo" style="width:90px; height:90px; margin:0 auto 10px;"></div>
+                    <h2 id="modalTeamName" style="margin:0 0 10px; font-size:24px;">الفريق</h2>
+                    <div style="display:flex; gap:10px; justify-content:center; margin-bottom:15px;">
+                        <div style="background:var(--card); border:1px solid var(--primary); padding:10px 20px; border-radius:8px;"><div id="modalGf" style="font-size:18px; font-weight:bold; color:var(--text);">0</div><div style="font-size:11px; color:var(--primary);">أهداف له</div></div>
+                        <div style="background:var(--card); border:1px solid #ef4444; padding:10px 20px; border-radius:8px;"><div id="modalGa" style="font-size:18px; font-weight:bold; color:var(--text);">0</div><div style="font-size:11px; color:#ef4444;">أهداف عليه</div></div>
+                    </div>
+                    <div id="modalStaffArea" style="display:flex; gap:10px; justify-content:center; flex-wrap:wrap;"></div>
+                </div>
+                <div class="card" style="padding:0;">
+                    <table><thead><tr><th style="text-align:right; padding-right:15px;">اللاعب</th><th>⚽</th><th>🌟</th><th>🟨</th><th>🟥</th></tr></thead><tbody id="modalPlayers"></tbody></table>
+                </div>
+            </div>
+        </div>
+
+        <div id="playerModal" class="modal" style="z-index: 106;">
+            <div class="modal-header-nav"><button class="close-btn" onclick="closeModal('playerModal')"><i class="fa-solid fa-arrow-right"></i></button><div style="font-weight:bold; font-size:16px;">إحصائيات اللاعب</div><div style="width:20px;"></div></div>
+            <div style="padding:30px 20px; text-align:center;">
+                <div class="logo-ph" id="pModalLogo" style="width:110px; height:110px; margin:0 auto 15px; border-radius:50%; overflow:hidden; background:var(--card); border:2px solid var(--primary);"></div>
+                <h2 id="pModalName" style="margin:0; font-size:26px;">الاسم</h2>
+                <div id="pModalTeam" class="team-clickable" style="color:var(--primary); font-weight:bold; font-size:15px; margin-top:5px; cursor:pointer;">الفريق</div>
+                
+                <div style="display:flex; flex-wrap:wrap; gap:10px; margin-top:30px; justify-content:center;">
+                    <div class="stat-box" style="width:30%; border-color:var(--border);"><div id="pModalMatches" class="stat-box-num">0</div><div class="stat-box-label">لعب</div></div>
+                    <div class="stat-box" style="width:30%; border-color:var(--primary);"><div id="pModalGoals" class="stat-box-num">0</div><div class="stat-box-label">أهداف</div></div>
+                    <div class="stat-box" style="width:30%; border-color:var(--accent);"><div id="pModalAssists" class="stat-box-num">0</div><div class="stat-box-label">صناعة</div></div>
+                    <div class="stat-box" style="width:30%; border-color:#facc15;"><div id="pModalMotm" class="stat-box-num">0</div><div class="stat-box-label">نجومية</div></div>
+                    <div class="stat-box" style="width:30%; border-color:#facc15;"><div id="pModalY" class="stat-box-num">0</div><div class="stat-box-label">🟨</div></div>
+                    <div class="stat-box" style="width:30%; border-color:#ef4444;"><div id="pModalR" class="stat-box-num">0</div><div class="stat-box-label">🟥</div></div>
+                </div>
+            </div>
+        </div>
+
+        <div id="matchDetailsModal" class="modal" style="z-index: 102;">
+            <div class="modal-header-nav">
+                <button class="close-btn" onclick="closeModal('matchDetailsModal')"><i class="fa-solid fa-arrow-right"></i></button>
+                <div style="font-weight:bold; font-size:16px;">تفاصيل المباراة</div>
+                <button class="export-btn" onclick="shareAsImage('mdContentArea')" style="background:transparent; color:var(--primary); border:none; font-size:18px; cursor:pointer; padding:0;"><i class="fa-solid fa-camera"></i></button>
+            </div>
+            <div style="padding:20px;" id="mdContentArea">
+                <div class="card" style="background:var(--card); text-align:center;">
+                    <div style="font-size:13px; color:var(--primary); font-weight:bold; margin-bottom:15px; background:rgba(255,255,255,0.05); padding:8px; border-radius:8px; border:1px solid var(--primary);" id="mdRound"></div>
+                    <div style="display:flex; justify-content:space-between; align-items:center;">
+                        <div class="team-clickable" style="width:30%; font-weight:bold; font-size:15px; display:flex; flex-direction:column; align-items:center;" id="mdTeam1Container">
+                            <div class="logo-ph" id="mdLogo1" style="width:45px; height:45px; margin-bottom:5px;"></div><span id="mdT1Name"></span>
+                        </div>
+                        <div style="width:40%; font-size:40px; font-weight:900; letter-spacing:2px; color:var(--accent);" id="mdScore"></div>
+                        <div class="team-clickable" style="width:30%; font-weight:bold; font-size:15px; display:flex; flex-direction:column; align-items:center;" id="mdTeam2Container">
+                            <div class="logo-ph" id="mdLogo2" style="width:45px; height:45px; margin-bottom:5px;"></div><span id="mdT2Name"></span>
+                        </div>
+                    </div>
+                    
+                    <div id="mdReferees" class="modern-referees" style="display:none; margin: 15px 10px 10px;">
+                        <span>حكم الساحة: <span id="mdRef1Txt">--</span></span>
+                        <span>مساعد الحكم: <span id="mdRef2Txt">--</span></span>
+                    </div>
+                </div>
+
+                <div class="card" id="mdStats" style="display:none; padding:15px; background:rgba(0,0,0,0.2);">
+                    <div style="font-size: 12px; color: var(--muted); text-align: center; margin-bottom: 5px;">الاستحواذ</div>
+                    <div style="display: flex; justify-content: space-between; font-size: 12px; font-weight: bold; margin-bottom: 5px;">
+                        <span id="mdPos1Txt" style="color: var(--primary);">50%</span>
+                        <span id="mdPos2Txt" style="color: var(--accent);">50%</span>
+                    </div>
+                    <div style="display: flex; height: 8px; border-radius: 4px; overflow: hidden; margin-bottom: 15px; background: var(--border);">
+                        <div id="mdPos1Bar" style="width: 50%; background: var(--primary);"></div>
+                        <div id="mdPos2Bar" style="width: 50%; background: var(--accent);"></div>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; text-align: center; font-size: 12px;">
+                        <div style="flex: 1;">
+                            <div style="color: #facc15; margin-bottom: 3px;">التسديدات</div>
+                            <div style="font-size: 16px; font-weight: bold;"><span id="mdShots1Txt">0</span> - <span id="mdShots2Txt">0</span></div>
+                        </div>
+                        <div style="flex: 1;">
+                            <div style="color: #a8a29e; margin-bottom: 3px;">الركنيات</div>
+                            <div style="font-size: 16px; font-weight: bold;"><span id="mdCorn1Txt">0</span> - <span id="mdCorn2Txt">0</span></div>
+                        </div>
+                        <div style="flex: 1;">
+                            <div style="color: #ef4444; margin-bottom: 3px;">الفاولات</div>
+                            <div style="font-size: 16px; font-weight: bold;"><span id="mdFouls1Txt">0</span> - <span id="mdFouls2Txt">0</span></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="title-section" id="mdEventsTitle">أحداث المباراة</div>
+                <div class="card" id="mdEvents" style="font-size:13px; color:var(--text); line-height:2.2; text-align:right;"></div>
+                <div id="mdMotm" class="team-clickable" style="margin-top:15px; text-align:center; font-size:14px; color:#facc15; font-weight:bold;"></div>
+                
+                <div class="export-btn" style="display:flex; gap:10px; margin-top:20px; border:none; padding:0;">
+                    <button id="mdSquadBtn" style="flex:1; padding:12px; background:transparent; color:var(--primary); border:1px solid var(--primary); border-radius:10px; font-weight:bold; font-size:14px; cursor:pointer; font-family:'Cairo';"><i class="fa-solid fa-users"></i> التشكيلة</button>
+                    <button onclick="shareAsImage('mdContentArea')" style="flex:1; padding:12px; background:var(--primary); color:#fff; border:none; border-radius:10px; font-weight:bold; font-size:14px; cursor:pointer; font-family:'Cairo';"><i class="fa-solid fa-camera"></i> حفظ بوستر</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ساحة التشكيلة الذكية (7 ضد 7) -->
+        <div id="squadsModal" class="modal" style="z-index: 108; background:#000;">
+            <div class="modal-header-nav" style="border-bottom:none; background:transparent;">
+                <button class="close-btn" onclick="closeModal('squadsModal')" style="color:#fff;"><i class="fa-solid fa-arrow-right"></i></button>
+                <div style="font-weight:bold; font-size:15px; color:#fff;">التشكيلة الأساسية</div>
+                <button class="export-btn" onclick="shareAsImage('pitchExportArea')" style="background:transparent; color:var(--primary); border:none; font-size:20px; cursor:pointer; padding:0;"><i class="fa-solid fa-camera"></i></button>
+            </div>
+            <div style="padding:15px;" id="pitchExportArea">
+                <div style="display:flex; justify-content:space-between; margin-bottom:15px; background:rgba(0,0,0,0.5); padding:10px; border-radius:12px; align-items:center;">
+                    <div id="sqT1Header" class="team-clickable" onclick="toggleSquadView(1)" style="text-align:center; flex:1;">
+                        <div id="sqLogo1" style="width:40px;height:40px;margin:0 auto 5px;"></div>
+                        <div id="sqT1Name" style="font-weight:bold; font-size:14px; color:#fff;">فريق 1</div>
+                    </div>
+                    <div style="display:flex; align-items:center; color:var(--primary); font-size:12px; font-weight:bold;">VS</div>
+                    <div id="sqT2Header" class="team-clickable" onclick="toggleSquadView(2)" style="text-align:center; flex:1;">
+                        <div id="sqLogo2" style="width:40px;height:40px;margin:0 auto 5px;"></div>
+                        <div id="sqT2Name" style="font-weight:bold; font-size:14px; color:#fff;">فريق 2</div>
+                    </div>
+                </div>
+
+                <div class="pitch-container" id="pitchContainer">
+                    <div class="p-corner-tl"></div><div class="p-corner-tr"></div>
+                    <div class="p-corner-bl"></div><div class="p-corner-br"></div>
+                    <div class="p-center-line"></div>
+                    <div class="p-center-circle"></div>
+                    <div class="p-center-dot"></div>
+                    <div class="p-pen-top"></div>
+                    <div class="p-pen-bottom"></div>
+                    <div id="pitchPlayersContainer" style="position:absolute; width:100%; height:100%; top:0; left:0;"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer">
+            <div style="margin-bottom:10px; font-weight:bold; font-size:13px; color:var(--text);">بطولة دوائر خانقين • 2026</div>
+            <div style="font-weight:bold; color:var(--primary); font-size:12px;"><i class="fa-solid fa-code"></i> محمد حمزة</div>
+            <div class="footer-social">
+                <a href="https://www.facebook.com/share/1AnD5a4oY1/" target="_blank"><i class="fab fa-facebook"></i></a>
+                <a href="https://www.instagram.com/moe_hz9?igsh=MW01NDBlMjF3anlxZQ==" target="_blank"><i class="fab fa-instagram"></i></a>
+                <a href="https://wa.me/9647717007839" target="_blank"><i class="fab fa-whatsapp"></i></a>
+                <a href="tel:+9647717007839"><i class="fas fa-phone"></i></a>
+            </div>
+            
+            <!-- الزر الجديد للجمهور لتبديل البطولة يدوياً -->
+            <div style="margin-top:20px;">
+                <button onclick="changeAudienceDB()" style="background:transparent; border:1px solid var(--border); color:var(--muted); padding:5px 15px; border-radius:20px; font-size:11px; font-family:'Cairo'; cursor:pointer;"><i class="fa-solid fa-database"></i> تبديل بيانات البطولة</button>
+            </div>
+        </div>
+
+        <div class="nav">
+            <div class="nav-item active" onclick="nav('matches', this)"><i class="fa-regular fa-futbol nav-icon"></i>النتائج</div>
+            <div class="nav-item" onclick="nav('groups', this)"><i class="fa-solid fa-list-ol nav-icon"></i>المجموعات</div>
+            <div class="nav-item" onclick="nav('teams', this)"><i class="fa-solid fa-shield-halved nav-icon"></i>الفرق</div>
+            <div class="nav-item" onclick="nav('stats', this)"><i class="fa-regular fa-chart-bar nav-icon"></i>إحصائيات</div>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('todayDate').innerText = new Date().toLocaleDateString('ar-IQ', { day: 'numeric', month: 'short' });
+        
+        const firebaseConfig = { 
+            apiKey: "AIzaSyC05TqAcGRExjLwBqwwFLrjGA-t3jI0UdQ", 
+            authDomain: "kdcc-85139.firebaseapp.com", 
+            databaseURL: "https://kdcc-85139-default-rtdb.firebaseio.com",
+            projectId: "kdcc-85139", 
+            storageBucket: "kdcc-85139.firebasestorage.app", 
+            messagingSenderId: "743548860238", 
+            appId: "1:743548860238:web:66b66fe49cf32da352101f" 
+        }; 
+        if (!firebase.apps.length) { firebase.initializeApp(firebaseConfig); }
+        const db = firebase.database(); 
+        
+        // تعديل: قراءة مسار البطولة من الرابط أو من الذاكرة المحلية
+        const urlParams = new URLSearchParams(window.location.search);
+        let dbPath = urlParams.get('db') || localStorage.getItem('audienceDbPath') || "Khanaqin_Tournament_Official";
+        if (urlParams.get('db')) { localStorage.setItem('audienceDbPath', dbPath); }
+
+        // دالة تغيير البطولة للجمهور
+        window.changeAudienceDB = function() {
+            let newDb = prompt("أدخل معرف البطولة (كما تمت كتابته في لوحة التحكم):", dbPath);
+            if(newDb && newDb.trim() !== "") {
+                let cleanDb = newDb.trim().replace(/\s+/g, '_');
+                localStorage.setItem('audienceDbPath', cleanDb);
+                window.location.href = window.location.pathname + "?db=" + cleanDb;
+            }
+        };
+
+        let visualName = localStorage.getItem('visualName') || "بطولة دوائر خانقين";
+        document.getElementById('displayTourneyName').innerText = visualName;
+
+        function closeModal(id) { document.getElementById(id).style.display = 'none'; }
+        
+        window.openImageViewer = function(src) {
+            if(!src) return;
+            document.getElementById('fullSizeImg').src = src;
+            document.getElementById('imageViewerModal').style.display = 'flex';
+            history.pushState({ modal: 'imageViewerModal' }, "", "#image");
+        };
+        
+        window.closeImageViewer = function() {
+            document.getElementById('imageViewerModal').style.display = 'none';
+        };
+
+        function shareAsImage(elementId) { 
+            const card = document.getElementById(elementId); 
+            card.classList.add('premium-poster');
+            const actions = card.querySelectorAll('.export-btn, .share-actions, .btn-enter-match, .close-btn');
+            actions.forEach(a => { if(a) a.style.display = 'none'; });
+            
+            triggerNotification('معالجة', 'جاري إنشاء بوستر احترافي 📸'); 
+            
+            html2canvas(card, { backgroundColor: '#0a0e12', useCORS: true, scale: 2 }).then(canvas => { 
+                const link = document.createElement('a'); 
+                link.download = `Match_Poster.png`; 
+                link.href = canvas.toDataURL('image/png'); 
+                link.click(); 
+                card.classList.remove('premium-poster');
+                actions.forEach(a => { if(a) a.style.display = ''; });
+            }).catch(e => {
+                card.classList.remove('premium-poster');
+                actions.forEach(a => { if(a) a.style.display = ''; });
+            }); 
+        }
+
+        window.shareAsStatsImage = function(elementId) {
+            const card = document.getElementById(elementId); 
+            card.classList.add('premium-poster');
+            card.classList.add('stats-export-mode');
+            const actions = card.querySelectorAll('.export-btn, .share-actions, .btn-enter-match, .close-btn, button');
+            actions.forEach(a => { if(a) a.style.display = 'none'; });
+            
+            triggerNotification('معالجة', 'جاري إنشاء بوستر لأول 5 مراكز 📸'); 
+            
+            html2canvas(card, { backgroundColor: '#0a0e12', useCORS: true, scale: 2 }).then(canvas => { 
+                const link = document.createElement('a'); 
+                link.download = `Stats_Top5.png`; 
+                link.href = canvas.toDataURL('image/png'); 
+                link.click(); 
+                card.classList.remove('premium-poster');
+                card.classList.remove('stats-export-mode');
+                actions.forEach(a => { if(a) a.style.display = ''; });
+            }).catch(e => {
+                card.classList.remove('premium-poster');
+                card.classList.remove('stats-export-mode');
+                actions.forEach(a => { if(a) a.style.display = ''; });
+            }); 
+        }
+
+        window.exportAllGroupsHorizontal = function() {
+            const container = document.getElementById('groupsContainer');
+            container.classList.add('export-horizontal-mode');
+            triggerNotification('معالجة', 'جاري إنشاء بوستر المجموعات 📸');
+            html2canvas(container, { backgroundColor: '#0a0e12', useCORS: true, scale: 2 }).then(canvas => {
+                const link = document.createElement('a');
+                link.download = `All_Groups.png`;
+                link.href = canvas.toDataURL('image/png');
+                link.click();
+                container.classList.remove('export-horizontal-mode');
+            }).catch(() => container.classList.remove('export-horizontal-mode'));
+        }
+
+        function triggerNotification(title, msg) { const notif = document.getElementById('osNotification'); document.getElementById('notifTitle').innerText = title; document.getElementById('notifText').innerText = msg; notif.classList.add('show'); setTimeout(() => { notif.classList.remove('show'); }, 4000); }
+
+        db.ref('analytics/visits').push({ time: Date.now() });
+
+        db.ref(`tournaments/${dbPath}/settings`).on('value', snap => {
+            let s = snap.val() || {};
+            
+            const liveCard = document.getElementById('liveMatchCard');
+            const placeholder = document.getElementById('testModePlaceholder');
+            if(s.testMode === true) {
+                liveCard.style.display = 'none';
+                placeholder.style.display = 'block';
+            } else {
+                liveCard.style.display = 'block';
+                placeholder.style.display = 'none';
+            }
+
+            let root = document.documentElement;
+            let t = s.theme || 'blue';
+            if(t === 'blue') { root.style.setProperty('--primary', '#3b82f6'); root.style.setProperty('--accent', '#4ade80'); }
+            else if(t === 'gold') { root.style.setProperty('--primary', '#d4af37'); root.style.setProperty('--accent', '#facc15'); }
+            else if(t === 'green') { root.style.setProperty('--primary', '#10b981'); root.style.setProperty('--accent', '#34d399'); }
+            else if(t === 'crimson') { root.style.setProperty('--primary', '#e11d48'); root.style.setProperty('--accent', '#fb7185'); }
+            else if(t === 'purple') { root.style.setProperty('--primary', '#8b5cf6'); root.style.setProperty('--accent', '#c084fc'); }
+            else if(t === 'orange') { root.style.setProperty('--primary', '#f97316'); root.style.setProperty('--accent', '#fbbf24'); }
+            else if(t === 'neon') { root.style.setProperty('--primary', '#39ff14'); root.style.setProperty('--accent', '#0ff'); root.style.setProperty('--bg', '#050505'); root.style.setProperty('--card', '#111'); }
+            
+            if(t !== 'neon') { root.style.setProperty('--bg', '#0e1318'); root.style.setProperty('--card', '#1a222b'); }
+        });
+
+        db.ref(`tournaments/${dbPath}/round_stars`).on('value', snap => {
+            let data = snap.val();
+            let hasAny = false;
+            if(data?.player_of_week) { document.getElementById('potwImgDisplay').src = data.player_of_week; document.getElementById('potwContainer').style.display = 'block'; hasAny = true; } else { document.getElementById('potwContainer').style.display = 'none'; }
+            if(data?.team_of_week) { document.getElementById('totwImgDisplay').src = data.team_of_week; document.getElementById('totwContainer').style.display = 'block'; hasAny = true; } else { document.getElementById('totwContainer').style.display = 'none'; }
+            document.getElementById('roundStarsContainer').style.display = hasAny ? 'flex' : 'none';
+        });
+
+        let refereesDataGlobal = {};
+        db.ref(`tournaments/${dbPath}/referees_data`).on('value', snap => {
+            refereesDataGlobal = snap.val() || {};
+        });
+
+        function getRefHtml(name) {
+            if(!name || name === '--') return '--';
+            let photo = refereesDataGlobal[name]?.photo;
+            let imgHtml = photo ? `<img src="${photo}" style="width:24px;height:24px;border-radius:50%;object-fit:cover;border:1px solid var(--primary);">` : `<i class="fa-solid fa-user" style="color:var(--primary); font-size:14px;"></i>`;
+            return `${imgHtml} <span>${name}</span>`;
+        }
+
+        function getPlayerImageHtml(pName, tName, fallbackColorClass) {
+            let pPhoto = teamsDataGlobal[tName]?.players?.[pName]?.photo || '';
+            if(pPhoto) return `<img src="${pPhoto}" style="width:30px;height:30px;border-radius:50%;object-fit:cover;border:1px solid var(--primary); margin-left:8px;">`;
+            return `<div style="width:30px;height:30px;border-radius:50%;background:rgba(255,255,255,0.05);display:inline-flex;align-items:center;justify-content:center;margin-left:8px;border:1px solid var(--primary);font-size:12px;color:${fallbackColorClass};"><i class="fa-solid fa-user"></i></div>`;
+        }
+
+        let teamsDataGlobal = {};
+        db.ref(`tournaments/${dbPath}/teams`).on('value', snap => {
+            teamsDataGlobal = snap.val() || {}; const cont = document.getElementById('teamsContainer'); cont.innerHTML = ''; let allPlayers = []; let allTeamsArr = [];
+            for(const tName in teamsDataGlobal) {
+                let tData = teamsDataGlobal[tName]; const logo = tData.logo ? `<img src="${tData.logo}">` : `<i class="fa-solid fa-shield-halved"></i>`;
+                cont.innerHTML += `<div class="team-btn" onclick="openTeam('${tName}')"><div class="logo-ph">${logo}</div><div style="font-size:14px; font-weight:bold; color:var(--text); margin-top:5px;">${tName}</div></div>`;
+                allTeamsArr.push({name: tName, gf: tData.gf || 0, ga: tData.ga || 0});
+                if(tData.players) for(let p in tData.players) allPlayers.push({ name: p, team: tName, ...tData.players[p] });
+            }
+
+            const tStatsList = document.getElementById('teamStatsList'); tStatsList.innerHTML = '';
+            allTeamsArr.sort((a,b) => b.gf - a.gf).forEach(t => { let gd = t.gf - t.ga; let tLogo = teamsDataGlobal[t.name]?.logo ? `<img src="${teamsDataGlobal[t.name].logo}" style="width:20px;height:20px;object-fit:contain;margin-left:5px;">` : `<i class="fa-solid fa-shield-halved" style="margin-left:5px; color:var(--muted);"></i>`; tStatsList.innerHTML += `<tr class="team-clickable" onclick="openTeam('${t.name}')"><td style="text-align:right; font-weight:bold; padding-right:15px; display:flex; align-items:center;">${tLogo}${t.name}</td><td>${t.gf}</td><td>${t.ga}</td><td dir="ltr">${gd>0?'+'+gd:gd}</td></tr>`; });
+            if(allTeamsArr.length === 0) tStatsList.innerHTML = `<tr><td colspan="4" style="color:var(--muted); padding:15px;">لا توجد فرق</td></tr>`;
+
+            const tScorers = document.getElementById('topScorersList'); tScorers.innerHTML = '';
+            allPlayers.sort((a,b) => (b.goals||0) - (a.goals||0)).sort((a,b) => (b.goals||0) - (a.goals||0)).forEach((p, i) => { if((p.goals||0)>0) tScorers.innerHTML += `<tr class="clickable-player" onclick="openPlayerProfile('${p.name}','${p.team}')"><td>${i+1}</td><td style="text-align:right; padding-right:15px; display:flex; align-items:center; font-weight:bold;">${getPlayerImageHtml(p.name, p.team, 'var(--primary)')} <div>${p.name}<br><span style="font-size:10px; color:var(--muted); font-weight:normal;">${p.team}</span></div></td><td style="font-size:16px; color:var(--primary);">${p.goals}</td></tr>`; });
+            
+            const tAssists = document.getElementById('topAssistsList'); tAssists.innerHTML = '';
+            allPlayers.sort((a,b) => (b.assists||0) - (a.assists||0)).sort((a,b) => (b.assists||0) - (a.assists||0)).forEach((p, i) => { if((p.assists||0)>0) tAssists.innerHTML += `<tr class="clickable-player" onclick="openPlayerProfile('${p.name}','${p.team}')"><td>${i+1}</td><td style="text-align:right; padding-right:15px; display:flex; align-items:center; font-weight:bold;">${getPlayerImageHtml(p.name, p.team, 'var(--primary)')} <div>${p.name}<br><span style="font-size:10px; color:var(--muted); font-weight:normal;">${p.team}</span></div></td><td style="font-size:16px; color:var(--primary);">${p.assists}</td></tr>`; });
+            
+            const tMotms = document.getElementById('topMotmList'); tMotms.innerHTML = '';
+            allPlayers.sort((a,b) => (b.motm||0) - (a.motm||0)).sort((a,b) => (b.motm||0) - (a.motm||0)).forEach((p, i) => { if((p.motm||0)>0) tMotms.innerHTML += `<tr class="clickable-player" onclick="openPlayerProfile('${p.name}','${p.team}')"><td>${i+1}</td><td style="text-align:right; padding-right:15px; display:flex; align-items:center; font-weight:bold;">${getPlayerImageHtml(p.name, p.team, '#facc15')} <div>${p.name}<br><span style="font-size:10px; color:var(--muted); font-weight:normal;">${p.team}</span></div></td><td style="font-size:16px; color:#facc15;">${p.motm}</td></tr>`; });
+            
+            const tCards = document.getElementById('cardsList'); tCards.innerHTML = '';
+            allPlayers.filter(p => p.yellow > 0 || p.red > 0).sort((a,b) => (b.red||0) - (a.red||0) || (b.yellow||0) - (a.yellow||0)).forEach(p => { tCards.innerHTML += `<tr class="clickable-player" onclick="openPlayerProfile('${p.name}','${p.team}')"><td style="text-align:right; padding-right:15px; display:flex; align-items:center; font-weight:bold;">${getPlayerImageHtml(p.name, p.team, '#ef4444')} <div>${p.name}<br><span style="font-size:10px; color:var(--muted); font-weight:normal;">${p.team}</span></div></td><td style="font-size:14px; color:#facc15;">${p.yellow||0}</td><td style="font-size:14px; color:#ef4444;">${p.red||0}</td></tr>`; });
+        });
+
+        let currentSquadsData = { t1:'', t2:'', sq1:{}, sq2:{} };
+        let activeSquadView = 0; 
+
+        function renderPitchPlayers() {
+            let container = document.getElementById('pitchPlayersContainer');
+            container.innerHTML = '';
+            
+            let t1 = currentSquadsData.t1; let t2 = currentSquadsData.t2;
+            let sq1 = currentSquadsData.sq1; let sq2 = currentSquadsData.sq2;
+
+            document.getElementById('sqT1Header').style.opacity = (activeSquadView === 0 || activeSquadView === 1) ? '1' : '0.3';
+            document.getElementById('sqT2Header').style.opacity = (activeSquadView === 0 || activeSquadView === 2) ? '1' : '0.3';
+
+            let positionsT1 = { gk: {x:'50%', y:'10%'}, lb: {x:'20%', y:'25%'}, rb: {x:'80%', y:'25%'}, lm: {x:'18%', y:'40%'}, cm: {x:'50%', y:'35%'}, rm: {x:'82%', y:'40%'}, st: {x:'50%', y:'47%'} };
+            let positionsT2 = { gk: {x:'50%', y:'90%'}, lb: {x:'80%', y:'75%'}, rb: {x:'20%', y:'75%'}, lm: {x:'82%', y:'60%'}, cm: {x:'50%', y:'65%'}, rm: {x:'18%', y:'60%'}, st: {x:'50%', y:'53%'} };
+            
+            if(activeSquadView === 1) {
+                positionsT1 = { gk: {x:'50%', y:'12%'}, lb: {x:'20%', y:'35%'}, rb: {x:'80%', y:'35%'}, lm: {x:'18%', y:'60%'}, cm: {x:'50%', y:'50%'}, rm: {x:'82%', y:'60%'}, st: {x:'50%', y:'80%'} };
+            } else if (activeSquadView === 2) {
+                positionsT2 = { gk: {x:'50%', y:'88%'}, lb: {x:'80%', y:'65%'}, rb: {x:'20%', y:'65%'}, lm: {x:'82%', y:'40%'}, cm: {x:'50%', y:'50%'}, rm: {x:'18%', y:'40%'}, st: {x:'50%', y:'20%'} };
+            }
+
+            let createPlayerNode = (pName, teamName, posObj) => {
+                let tData = teamsDataGlobal[teamName];
+                let pPhoto = tData?.players?.[pName]?.photo || '';
+                let imgH = pPhoto ? `<img src="${pPhoto}">` : `<div class="p-placeholder"><i class="fa-solid fa-user"></i></div>`;
+                let div = document.createElement('div');
+                div.className = 'pitch-player';
+                div.style.left = posObj.x; div.style.top = posObj.y;
+                div.onclick = () => openPlayerProfile(pName, teamName);
+                div.innerHTML = `${imgH}<span>${pName}<br><span class="team-tag">${teamName}</span></span>`;
+                return div;
+            };
+
+            if((activeSquadView === 0 || activeSquadView === 1) && sq1) {
+                for(let pos in sq1) { if(sq1[pos]) container.appendChild(createPlayerNode(sq1[pos], t1, positionsT1[pos])); }
+            }
+            if((activeSquadView === 0 || activeSquadView === 2) && sq2) {
+                for(let pos in sq2) { if(sq2[pos]) container.appendChild(createPlayerNode(sq2[pos], t2, positionsT2[pos])); }
+            }
+        }
+
+        window.toggleSquadView = function(teamNum) {
+            if(activeSquadView === teamNum) activeSquadView = 0; 
+            else activeSquadView = teamNum;
+            renderPitchPlayers();
+        }
+
+        window.openSquads = function(t1, t2, sq1, sq2) {
+            document.getElementById('sqT1Name').innerText = t1 || 'فريق 1';
+            document.getElementById('sqT2Name').innerText = t2 || 'فريق 2';
+            
+            let d1 = teamsDataGlobal[t1]; let d2 = teamsDataGlobal[t2];
+            document.getElementById('sqLogo1').innerHTML = d1?.logo ? `<img src="${d1.logo}" style="width:100%;height:100%;object-fit:contain;">` : `<i class="fa-solid fa-shield"></i>`;
+            document.getElementById('sqLogo2').innerHTML = d2?.logo ? `<img src="${d2.logo}" style="width:100%;height:100%;object-fit:contain;">` : `<i class="fa-solid fa-shield"></i>`;
+            
+            currentSquadsData = { t1, t2, sq1, sq2 };
+            activeSquadView = 0; 
+            renderPitchPlayers();
+            
+            document.getElementById('squadsModal').style.display = 'block';
+            history.pushState({ modal: 'squadsModal' }, "", "#squads");
+        };
+
+        let timerInterval; let initialLoad = true; let lastS1 = -1, lastS2 = -1; let liveSquad1 = {}, liveSquad2 = {};
+        db.ref(`tournaments/${dbPath}/live_match`).on('value', snap => {
+            const d = snap.val(); if(!d) return;
+            if (!initialLoad) { if (lastS1 !== -1 && (parseInt(d.score1) > lastS1 || parseInt(d.score2) > lastS2)) { document.getElementById('crowdSound').play().catch(e=>{}); if (navigator.vibrate) navigator.vibrate([300, 100, 300]); } }
+            lastS1 = parseInt(d.score1); lastS2 = parseInt(d.score2); initialLoad = false;
+            
+            liveSquad1 = d.squad1 || {}; liveSquad2 = d.squad2 || {};
+
+            let liveInfo = [];
+            if(d.groupInfo && d.groupInfo !== 'أدوار إقصائية') liveInfo.push('مجموعة ' + d.groupInfo);
+            if(d.round) liveInfo.push(d.round);
+            document.getElementById('lContext').innerHTML = `<i class="fa-regular fa-futbol"></i> ${liveInfo.length > 0 ? liveInfo.join(' - ') : 'مباراة ودية'}`;
+            
+            document.getElementById('lTeam1').innerText = d.team1 || '--'; document.getElementById('lTeam2').innerText = d.team2 || '--';
+            document.getElementById('lScore').innerText = `${parseInt(d.score1)||0} - ${parseInt(d.score2)||0}`; document.getElementById('lStatus').innerText = d.status || 'انتظار';
+            document.getElementById('lEvents').innerHTML = d.events ? d.events.replace(/\n/g, '<br>') : '<div style="text-align:center;">لا توجد أحداث مسجلة</div>';
+            document.getElementById('lLogo1').innerHTML = teamsDataGlobal[d.team1]?.logo ? `<img src="${teamsDataGlobal[d.team1].logo}">` : `<i class="fa-solid fa-shield-halved"></i>`;
+            document.getElementById('lLogo2').innerHTML = teamsDataGlobal[d.team2]?.logo ? `<img src="${teamsDataGlobal[d.team2].logo}">` : `<i class="fa-solid fa-shield-halved"></i>`;
+            
+            if(d.referee1 || d.referee2) {
+                document.getElementById('lReferees').style.display = 'flex';
+                document.getElementById('lRef1Txt').innerHTML = getRefHtml(d.referee1);
+                document.getElementById('lRef2Txt').innerHTML = getRefHtml(d.referee2);
+            } else {
+                document.getElementById('lReferees').style.display = 'none';
+            }
+
+            if(d.stats && (d.stats.possession1 !== undefined || d.stats.shots1 !== undefined)) {
+                document.getElementById('lStats').style.display = 'block';
+                document.getElementById('pos1Txt').innerText = (d.stats.possession1 || 50) + '%';
+                document.getElementById('pos2Txt').innerText = (d.stats.possession2 || 50) + '%';
+                document.getElementById('pos1Bar').style.width = (d.stats.possession1 || 50) + '%';
+                document.getElementById('pos2Bar').style.width = (d.stats.possession2 || 50) + '%';
+                document.getElementById('shots1Txt').innerText = d.stats.shots1 || 0;
+                document.getElementById('shots2Txt').innerText = d.stats.shots2 || 0;
+                document.getElementById('corn1Txt').innerText = d.stats.corners1 || 0;
+                document.getElementById('corn2Txt').innerText = d.stats.corners2 || 0;
+                document.getElementById('fouls1Txt').innerText = d.stats.fouls1 || 0;
+                document.getElementById('fouls2Txt').innerText = d.stats.fouls2 || 0;
+            } else {
+                document.getElementById('lStats').style.display = 'none';
+            }
+
+            document.getElementById('lTeam1Container').onclick = function() { if(d.team1) openTeam(d.team1); };
+            document.getElementById('lTeam2Container').onclick = function() { if(d.team2) openTeam(d.team2); };
+            
+            let btnSq = document.getElementById('liveSquadBtn');
+            if(btnSq) { btnSq.onclick = function() { openSquads(d.team1, d.team2, liveSquad1, liveSquad2); }; }
+            
+            clearInterval(timerInterval);
+            if(d.timer && d.timer.isRunning) {
+                timerInterval = setInterval(() => {
+                    let elapsedSecs = Math.floor((Date.now() - (d.timer.startTime || Date.now())) / 1000);
+                    let totalSecs = (d.timer.savedSeconds || 0) + elapsedSecs;
+                    let m = Math.floor(totalSecs / 60); let s = totalSecs % 60;
+                    document.getElementById('lTimer').innerText = `${m}:${s < 10 ? '0'+s : s}`;
+                }, 1000);
+            } else if (d.timer && !d.timer.isRunning) {
+                let totalSecs = d.timer.savedSeconds || 0;
+                let m = Math.floor(totalSecs / 60); let s = totalSecs % 60;
+                document.getElementById('lTimer').innerText = `${m}:${s < 10 ? '0'+s : s}`;
+            } else { document.getElementById('lTimer').innerText = `00:00`; }
+        });
+
+        db.ref(`tournaments/${dbPath}/groups`).on('value', snap => {
+            const groups = snap.val() || {}; const cont = document.getElementById('groupsContainer'); cont.innerHTML = '';
+            ['A', 'B', 'C', 'D'].forEach(grp => {
+                let html = `<div style="display:flex; justify-content:space-between; align-items:center; margin: 20px 5px 10px;"><div class="title-section" style="margin:0; flex:1;">مجموعة ${grp}</div><button onclick="shareAsImage('group-card-${grp}')" style="background:transparent; color:var(--primary); border:none; font-size:16px; cursor:pointer;"><i class="fa-solid fa-camera"></i></button></div><div class="card" id="group-card-${grp}" style="padding:0;"><table><tr><th>#</th><th style="text-align:right; padding-right:15px;">الفريق</th><th>لعب</th><th>له</th><th>عليه</th><th>الفرق</th><th>نقاط</th></tr>`;
+                if(groups[grp]) {
+                    let ts = Object.keys(groups[grp]).map(k => ({name:k, ...groups[grp][k]})); ts.sort((a,b)=>b.points-a.points || b.gd-a.gd);
+                    ts.forEach((t, idx) => { let tLogo = teamsDataGlobal[t.name]?.logo ? `<img src="${teamsDataGlobal[t.name].logo}" style="width:20px;height:20px;object-fit:contain;margin-left:5px;">` : `<i class="fa-solid fa-shield-halved" style="margin-left:5px; color:var(--muted);"></i>`; html += `<tr class="team-clickable" onclick="openTeam('${t.name}')"><td>${idx+1}</td><td style="text-align:right; padding-right:15px; display:flex; align-items:center; font-weight:bold;">${tLogo}${t.name}</td><td>${t.played}</td><td>${t.gf||0}</td><td>${t.ga||0}</td><td dir="ltr">${t.gd>0?'+'+t.gd:t.gd}</td><td style="font-weight:900; color:var(--primary); font-size:14px;">${t.points}</td></tr>`; });
+                } else html += `<tr><td colspan="7" style="color:var(--muted); padding:15px;">لا توجد فرق</td></tr>`;
+                cont.innerHTML += html + `</table></div>`;
+            });
+        });
+
+        let scheduleGlobal = {};
+        db.ref(`tournaments/${dbPath}/schedule`).on('value', snap => { 
+            scheduleGlobal = snap.val() || {};
+            const list = document.getElementById('scheduleList'); list.innerHTML = ''; 
+            if(scheduleGlobal) { 
+                for(let id in scheduleGlobal) { 
+                    let m = scheduleGlobal[id]; 
+                    let badgeInfo = '';
+                    let info = [];
+                    if(m.group) info.push(`مجموعة ${m.group}`);
+                    if(m.round) info.push(m.round);
+                    
+                    if (info.length > 0) {
+                        badgeInfo = `<div style="font-size:11px; color:var(--primary); margin-bottom:12px; text-align:center; font-weight:bold; background: rgba(255,255,255,0.05); padding: 6px; border-radius: 6px; border:1px solid var(--primary);">${info.join(' - ')}</div>`;
+                    } else {
+                        badgeInfo = `<div style="font-size:11px; color:var(--primary); margin-bottom:12px; text-align:center; font-weight:bold; background: rgba(255,255,255,0.05); padding: 6px; border-radius: 6px; border:1px solid var(--primary);">مباراة مجدولة</div>`;
+                    }
+                    
+                    list.innerHTML += `
+                    <div class="card" style="padding:15px; margin-bottom:12px; border-right: 3px solid var(--primary);">
+                        ${badgeInfo}
+                        <div style="display:flex; justify-content:space-between; font-size:11px; color:var(--muted); margin-bottom:15px; background: rgba(0,0,0,0.2); padding: 8px 10px; border-radius: 6px;">
+                            <span><i class="fa-regular fa-calendar-days"></i> ${m.date || ''}</span>
+                            <span><i class="fa-regular fa-clock"></i> ${m.time || ''}</span>
+                        </div>
+                        <div style="display:flex; justify-content:space-between; align-items:center; font-weight:bold; font-size:15px;">
+                            <span class="team-clickable" onclick="openTeam('${m.team1}')" style="flex:1; text-align:right;">${m.team1}</span>
+                            <span style="font-size:11px; background:var(--primary); padding:4px 12px; border-radius:12px; color:#fff;">VS</span>
+                            <span class="team-clickable" onclick="openTeam('${m.team2}')" style="flex:1; text-align:left;">${m.team2}</span>
+                        </div>
+                        <div style="font-size:12px; color:var(--muted); margin-top:15px; text-align:center;">
+                            <i class="fa-solid fa-location-dot" style="color:var(--live);"></i> ${m.stadium || 'لم يحدد بعد'}
+                        </div>
+                        <div style="display:flex; gap:10px; margin-top:15px;">
+                            <button class="btn-enter-match" onclick="openScheduledMatch('${id}')" style="flex:1; margin:0;"><i class="fa-solid fa-square-poll-horizontal"></i> التفاصيل والتصدير</button>
+                        </div>
+                    </div>`; 
+                } 
+            } 
+        });
+        
+        let groupMatchupsGlobal = {};
+        db.ref(`tournaments/${dbPath}/group_matchups`).on('value', snap => {
+            groupMatchupsGlobal = snap.val() || {};
+            const list = document.getElementById('groupMatchupsList'); list.innerHTML = '';
+            if(groupMatchupsGlobal) {
+                for(let id in groupMatchupsGlobal) {
+                    let m = groupMatchupsGlobal[id];
+                    let info = [];
+                    if(m.group) info.push(`مجموعة ${m.group}`);
+                    if(m.round) info.push(m.round);
+                    
+                    list.innerHTML += `
+                    <div class="card" style="padding:15px; margin-bottom:12px; border-right: 3px solid #f59e0b;">
+                        <div style="font-size:11px; color:#f59e0b; margin-bottom:12px; text-align:center; font-weight:bold; background: rgba(245,158,11,0.05); padding: 6px; border-radius: 6px; border:1px solid #f59e0b;">
+                            <i class="fa-solid fa-layer-group"></i> ${info.length > 0 ? info.join(' - ') : 'مواجهة بدون موعد'}
+                        </div>
+                        <div style="display:flex; justify-content:space-between; align-items:center; font-weight:bold; font-size:15px;">
+                            <span class="team-clickable" onclick="openTeam('${m.team1}')" style="flex:1; text-align:right;">${m.team1}</span>
+                            <span style="font-size:11px; background:#f59e0b; padding:4px 12px; border-radius:12px; color:#fff;">VS</span>
+                            <span class="team-clickable" onclick="openTeam('${m.team2}')" style="flex:1; text-align:left;">${m.team2}</span>
+                        </div>
+                        <div style="display:flex; gap:10px; margin-top:15px;">
+                            <button class="btn-enter-match" onclick="openGroupMatchup('${id}')" style="flex:1; margin:0; color:#f59e0b; border-color:#f59e0b;"><i class="fa-solid fa-square-poll-horizontal"></i> التفاصيل والتصدير</button>
+                        </div>
+                    </div>`;
+                }
+            } else { list.innerHTML = '<div style="text-align:center; font-size:12px; color:var(--muted); margin-bottom:20px;">لا توجد مواجهات مسجلة حالياً</div>'; }
+        });
+
+        let savedMatchesGlobal = {};
+        db.ref(`tournaments/${dbPath}/saved_matches`).on('value', snap => { 
+            savedMatchesGlobal = snap.val() || {}; 
+            const aList = document.getElementById('archiveList'); aList.innerHTML = ''; 
+            const kList = document.getElementById('knockoutList'); kList.innerHTML = '';
+            let hasKnockouts = false;
+
+            if(savedMatchesGlobal) { 
+                Object.keys(savedMatchesGlobal).reverse().forEach(key => { 
+                    let m = savedMatchesGlobal[key]; 
+                    let s1 = parseInt(m.score1) || 0;
+                    let s2 = parseInt(m.score2) || 0;
+                    
+                    let info = [];
+                    if(m.groupInfo && m.groupInfo !== "أدوار إقصائية") info.push(`مجموعة ${m.groupInfo}`);
+                    if(m.round) info.push(m.round);
+
+                    let htmlCard = `
+                    <div class="card" style="padding:15px; margin-bottom:12px; transition:0.2s;">
+                        <div style="font-size:11px; color:var(--muted); margin-bottom:15px; display:flex; justify-content:space-between; background: rgba(0,0,0,0.2); padding: 8px 10px; border-radius: 6px;">
+                            <span><i class="fa-regular fa-calendar-check"></i> ${m.date || ''}</span>
+                            <span style="color:var(--primary);"><i class="fa-solid fa-trophy"></i> ${info.length > 0 ? info.join(' - ') : 'مباراة منتهية'}</span>
+                        </div>
+                        <div style="display:flex; justify-content:space-between; align-items:center; font-weight:bold; font-size:16px;">
+                            <span class="team-clickable" onclick="openTeam('${m.team1}')" style="flex:1; text-align:right;">${m.team1}</span>
+                            <span style="background:rgba(255,255,255,0.05); padding:8px 20px; border-radius:8px; font-size:22px; font-weight:900; letter-spacing:2px; color:var(--accent); border:1px solid var(--border); box-shadow: inset 0 0 5px rgba(0,0,0,0.5);">${s1} - ${s2}</span>
+                            <span class="team-clickable" onclick="openTeam('${m.team2}')" style="flex:1; text-align:left;">${m.team2}</span>
+                        </div>
+                        <button class="btn-enter-match" onclick="openMatchDetails('${key}')" style="border:none; margin-top:15px; background:var(--primary); color:#fff;"><i class="fa-solid fa-square-poll-horizontal"></i> التفاصيل والبوستر</button>
+                    </div>`; 
+                    
+                    if(m.round && (m.round.includes("النهائي") || m.round.includes("ربع") || m.round.includes("نصف"))) {
+                        kList.innerHTML += htmlCard;
+                        hasKnockouts = true;
+                    } else {
+                        aList.innerHTML += htmlCard;
+                    }
+                }); 
+            } 
+            if(!hasKnockouts) kList.innerHTML = '<div style="text-align:center; font-size:12px; color:var(--muted); margin-bottom:20px;">لم تبدأ مباريات الحسم بعد</div>';
+        });
+
+        window.openMatchDetails = function(key) {
+            let m = savedMatchesGlobal[key];
+            if(!m) return;
+            let info = [];
+            if(m.groupInfo && m.groupInfo !== "أدوار إقصائية") info.push(`مجموعة ${m.groupInfo}`);
+            if(m.round) info.push(m.round);
+            document.getElementById('mdRound').innerText = info.length > 0 ? info.join(' - ') : 'نتيجة مباراة';
+            document.getElementById('mdT1Name').innerText = m.team1 || '--';
+            document.getElementById('mdT2Name').innerText = m.team2 || '--';
+            document.getElementById('mdLogo1').innerHTML = teamsDataGlobal[m.team1]?.logo ? `<img src="${teamsDataGlobal[m.team1].logo}">` : `<i class="fa-solid fa-shield"></i>`;
+            document.getElementById('mdLogo2').innerHTML = teamsDataGlobal[m.team2]?.logo ? `<img src="${teamsDataGlobal[m.team2].logo}">` : `<i class="fa-solid fa-shield"></i>`;
+            document.getElementById('mdScore').innerText = `${parseInt(m.score1) || 0} - ${parseInt(m.score2) || 0}`;
+            document.getElementById('mdScore').style.fontSize = '36px';
+            document.getElementById('mdEventsTitle').style.display = 'block';
+            document.getElementById('mdEvents').innerHTML = m.events ? m.events.replace(/\n/g, '<br><hr style="border-color:var(--border); margin:8px 0;">') : '<div style="text-align:center; color:var(--muted);">لا توجد أحداث مسجلة</div>';
+            
+            if(m.motm && m.motm !== '') {
+                document.getElementById('mdMotm').innerHTML = `<i class="fa-solid fa-star" style="color:var(--accent);"></i> نجم المباراة: ${m.motm} <small>(${m.motmTeam || m.team1})</small>`;
+                document.getElementById('mdMotm').onclick = () => openPlayerProfile(m.motm, m.motmTeam || m.team1);
+            } else {
+                document.getElementById('mdMotm').innerHTML = '<div style="color:var(--muted); font-size:12px;">لم يتم تحديد أفضل لاعب</div>';
+                document.getElementById('mdMotm').onclick = null;
+            }
+            
+            if(m.referee1 || m.referee2) {
+                document.getElementById('mdReferees').style.display = 'flex';
+                document.getElementById('mdRef1Txt').innerHTML = getRefHtml(m.referee1);
+                document.getElementById('mdRef2Txt').innerHTML = getRefHtml(m.referee2);
+            } else {
+                document.getElementById('mdReferees').style.display = 'none';
+            }
+
+            if(m.stats && (m.stats.possession1 !== undefined || m.stats.shots1 !== undefined)) {
+                document.getElementById('mdStats').style.display = 'block';
+                document.getElementById('mdPos1Txt').innerText = (m.stats.possession1 || 50) + '%';
+                document.getElementById('mdPos2Txt').innerText = (m.stats.possession2 || 50) + '%';
+                document.getElementById('mdPos1Bar').style.width = (m.stats.possession1 || 50) + '%';
+                document.getElementById('mdPos2Bar').style.width = (m.stats.possession2 || 50) + '%';
+                document.getElementById('mdShots1Txt').innerText = m.stats.shots1 || 0;
+                document.getElementById('mdShots2Txt').innerText = m.stats.shots2 || 0;
+                document.getElementById('mdCorn1Txt').innerText = m.stats.corners1 || 0;
+                document.getElementById('mdCorn2Txt').innerText = m.stats.corners2 || 0;
+                document.getElementById('mdFouls1Txt').innerText = m.stats.fouls1 || 0;
+                document.getElementById('mdFouls2Txt').innerText = m.stats.fouls2 || 0;
+            } else {
+                document.getElementById('mdStats').style.display = 'none';
+            }
+
+            document.getElementById('mdTeam1Container').onclick = function() { openTeam(m.team1); };
+            document.getElementById('mdTeam2Container').onclick = function() { openTeam(m.team2); };
+            
+            let btnSq = document.getElementById('mdSquadBtn');
+            if(btnSq) { btnSq.onclick = function() { openSquads(m.team1, m.team2, m.squad1, m.squad2); }; }
+            
+            document.getElementById('matchDetailsModal').style.display = 'block';
+        };
+
+        window.openScheduledMatch = function(key) {
+            let m = scheduleGlobal[key];
+            if(!m) return;
+            let info = [];
+            if(m.group) info.push(`مجموعة ${m.group}`);
+            if(m.round) info.push(m.round);
+            document.getElementById('mdRound').innerText = info.length > 0 ? info.join(' - ') : 'مباراة قادمة';
+            document.getElementById('mdT1Name').innerText = m.team1 || '--';
+            document.getElementById('mdT2Name').innerText = m.team2 || '--';
+            document.getElementById('mdLogo1').innerHTML = teamsDataGlobal[m.team1]?.logo ? `<img src="${teamsDataGlobal[m.team1].logo}">` : `<i class="fa-solid fa-shield"></i>`;
+            document.getElementById('mdLogo2').innerHTML = teamsDataGlobal[m.team2]?.logo ? `<img src="${teamsDataGlobal[m.team2].logo}">` : `<i class="fa-solid fa-shield"></i>`;
+            document.getElementById('mdScore').innerText = `VS`;
+            document.getElementById('mdScore').style.fontSize = '24px';
+            document.getElementById('mdEventsTitle').style.display = 'none';
+            document.getElementById('mdStats').style.display = 'none';
+            document.getElementById('mdEvents').innerHTML = `<div style="text-align:center; padding: 20px;"><i class="fa-regular fa-clock" style="font-size:30px; color:var(--primary); margin-bottom:15px; display:block;"></i><strong style="font-size:14px; color:var(--text);">المباراة لم تبدأ بعد</strong><br><br><span style="color:var(--muted); font-size:12px;">موعد المباراة: ${m.time} | ${m.date}</span><br><span style="color:var(--muted); font-size:12px;"><i class="fa-solid fa-location-dot"></i> الملعب: ${m.stadium || 'لم يحدد'}</span></div>`;
+            document.getElementById('mdMotm').innerHTML = '';
+            
+            if(m.referee1 || m.referee2) {
+                document.getElementById('mdReferees').style.display = 'flex';
+                document.getElementById('mdRef1Txt').innerHTML = getRefHtml(m.referee1);
+                document.getElementById('mdRef2Txt').innerHTML = getRefHtml(m.referee2);
+            } else {
+                document.getElementById('mdReferees').style.display = 'none';
+            }
+            
+            document.getElementById('mdTeam1Container').onclick = function() { openTeam(m.team1); };
+            document.getElementById('mdTeam2Container').onclick = function() { openTeam(m.team2); };
+            
+            let btnSq = document.getElementById('mdSquadBtn');
+            if(btnSq) { btnSq.onclick = function() { openSquads(m.team1, m.team2, null, null); }; }
+            
+            document.getElementById('matchDetailsModal').style.display = 'block';
+        }
+
+        window.openGroupMatchup = function(key) {
+            let m = groupMatchupsGlobal[key];
+            if(!m) return;
+            let info = [];
+            if(m.group) info.push(`مجموعة ${m.group}`);
+            if(m.round) info.push(m.round);
+            document.getElementById('mdRound').innerText = info.length > 0 ? info.join(' - ') : 'مواجهة قادمة';
+            document.getElementById('mdT1Name').innerText = m.team1 || '--';
+            document.getElementById('mdT2Name').innerText = m.team2 || '--';
+            document.getElementById('mdLogo1').innerHTML = teamsDataGlobal[m.team1]?.logo ? `<img src="${teamsDataGlobal[m.team1].logo}">` : `<i class="fa-solid fa-shield"></i>`;
+            document.getElementById('mdLogo2').innerHTML = teamsDataGlobal[m.team2]?.logo ? `<img src="${teamsDataGlobal[m.team2].logo}">` : `<i class="fa-solid fa-shield"></i>`;
+            document.getElementById('mdScore').innerText = `VS`;
+            document.getElementById('mdScore').style.fontSize = '24px';
+            document.getElementById('mdEventsTitle').style.display = 'none';
+            document.getElementById('mdStats').style.display = 'none';
+            document.getElementById('mdEvents').innerHTML = `<div style="text-align:center; padding: 20px;"><i class="fa-regular fa-calendar-xmark" style="font-size:30px; color:#f59e0b; margin-bottom:15px; display:block;"></i><strong style="font-size:14px; color:var(--text);">بانتظار التحديد</strong><br><br><span style="color:var(--muted); font-size:12px;">لم يتم تحديد وقت أو تاريخ لهذه المواجهة حتى الآن.</span></div>`;
+            document.getElementById('mdMotm').innerHTML = '';
+            document.getElementById('mdReferees').style.display = 'none';
+            
+            document.getElementById('mdTeam1Container').onclick = function() { openTeam(m.team1); };
+            document.getElementById('mdTeam2Container').onclick = function() { openTeam(m.team2); };
+            
+            let btnSq = document.getElementById('mdSquadBtn');
+            if(btnSq) { btnSq.onclick = function() { openSquads(m.team1, m.team2, null, null); }; }
+
+            document.getElementById('matchDetailsModal').style.display = 'block';
+        }
+
+        window.openTeam = function(tName) {
+            const d = teamsDataGlobal[tName]; 
+            if(!d) return;
+            document.getElementById('modalTeamName').innerText = tName; 
+            document.getElementById('modalLogo').innerHTML = d.logo ? `<img src="${d.logo}">` : `<i class="fa-solid fa-shield-halved" style="font-size:30px;"></i>`; 
+            document.getElementById('modalGf').innerText = d.gf || 0; 
+            document.getElementById('modalGa').innerText = d.ga || 0; 
+            
+            let staff = ''; 
+            if(d.coach) staff += `<div style="background:rgba(255,255,255,0.05); padding:6px 12px; border-radius:8px; border:1px solid var(--primary); font-size:12px; color:var(--text);">مدرب: ${d.coach}</div>`; 
+            if(d.assistant) staff += `<div style="background:rgba(255,255,255,0.05); padding:6px 12px; border-radius:8px; border:1px solid var(--primary); font-size:12px; color:var(--text);">مساعد: ${d.assistant}</div>`; 
+            
+            let jerseyHtml = '';
+            if (d.jerseyColor || d.jerseyImage || d.jerseyImage2) {
+                let colorBox = d.jerseyColor ? `<div style="width:16px; height:16px; border-radius:4px; background-color:${d.jerseyColor}; border:1px solid var(--border); display:inline-block;"></div>` : '';
+                let imgBox1 = d.jerseyImage ? `<img src="${d.jerseyImage}" onclick="openImageViewer('${d.jerseyImage}')" style="width:35px; height:35px; object-fit:contain; border-radius:6px; cursor:pointer; background:rgba(255,255,255,0.05); padding:3px; border:1px solid var(--border);">` : '';
+                let imgBox2 = d.jerseyImage2 ? `<img src="${d.jerseyImage2}" onclick="openImageViewer('${d.jerseyImage2}')" style="width:35px; height:35px; object-fit:contain; border-radius:6px; cursor:pointer; background:rgba(255,255,255,0.05); padding:3px; border:1px solid var(--border);">` : '';
+                jerseyHtml = `<div style="background:rgba(255,255,255,0.05); padding:8px 12px; border-radius:8px; border:1px solid var(--primary); font-size:12px; color:var(--text); display:flex; align-items:center; gap:8px;"> الطقم: ${colorBox} ${imgBox1} ${imgBox2}</div>`;
+            }
+
+            document.getElementById('modalStaffArea').innerHTML = staff + jerseyHtml; 
+            
+            const tbody = document.getElementById('modalPlayers'); tbody.innerHTML = ''; 
+            if(d.players) {
+                for(let p in d.players) { 
+                    let s = d.players[p]; 
+                    let pImgHtml = s.photo ? `<img src="${s.photo}" style="width:30px;height:30px;border-radius:50%;object-fit:cover;vertical-align:middle;margin-left:8px;border:1px solid var(--primary);">` : `<div style="width:30px;height:30px;border-radius:50%;background:rgba(255,255,255,0.05);display:inline-flex;align-items:center;justify-content:center;vertical-align:middle;margin-left:8px;border:1px solid var(--primary);font-size:12px;color:var(--primary);"><i class="fa-solid fa-user"></i></div>`;
+                    tbody.innerHTML += `<tr class="clickable-player" onclick="openPlayerProfile('${p}','${tName}')"><td style="text-align:right; padding-right:15px; display:flex; align-items:center; font-weight:bold;">${pImgHtml}<span>${p}</span></td><td style="font-size:14px; color:var(--primary);">${s.goals||0}</td><td style="font-size:14px; color:#facc15;">${s.motm||0}</td><td style="font-size:14px;">${s.yellow||0}</td><td style="font-size:14px;">${s.red||0}</td></tr>`; 
+                }
+            }
+            document.getElementById('teamModal').style.display = 'block'; 
+        }
+        
+        window.openPlayerProfile = function(pName, tName) { 
+            const p = teamsDataGlobal[tName].players[pName]; 
+            const pLogo = p.photo ? `<img src="${p.photo}" onclick="openImageViewer('${p.photo}')" style="width:100%; height:100%; object-fit:cover; cursor:pointer;">` : teamsDataGlobal[tName].logo ? `<img src="${teamsDataGlobal[tName].logo}">` : `<i class="fa-solid fa-user" style="font-size:40px;"></i>`; 
+            
+            let teamMatchesCount = 0;
+            if (savedMatchesGlobal) {
+                for (let key in savedMatchesGlobal) {
+                    if (savedMatchesGlobal[key].team1 === tName || savedMatchesGlobal[key].team2 === tName) {
+                        teamMatchesCount++;
+                    }
+                }
+            }
+
+            document.getElementById('pModalLogo').innerHTML = pLogo; 
+            document.getElementById('pModalName').innerText = pName; 
+            document.getElementById('pModalTeam').innerText = tName; 
+            document.getElementById('pModalTeam').onclick = () => openTeam(tName);
+            document.getElementById('pModalMatches').innerText = p.matches || 0; 
+            document.getElementById('pModalGoals').innerText = p.goals || 0; 
+            document.getElementById('pModalAssists').innerText = p.assists || 0; 
+            document.getElementById('pModalMotm').innerText = p.motm || 0; 
+            document.getElementById('pModalY').innerText = p.yellow || 0; 
+            document.getElementById('pModalR').innerText = p.red || 0; 
+            document.getElementById('playerModal').style.display = 'block'; 
+        }
+    </script>
+<script>
+  window.addEventListener('beforeinstallprompt', (e) => {
+    e.preventDefault();
+  });
+</script>
+
+<script>
+    (function() {
+        history.replaceState({ page: 'matches' }, "", "#matches");
+
+        const originalOpenTeam = window.openTeam;
+        window.openTeam = function(tName) { history.pushState({ modal: 'teamModal' }, "", "#team"); originalOpenTeam(tName); };
+
+        const originalOpenPlayer = window.openPlayerProfile;
+        window.openPlayerProfile = function(pName, tName) { history.pushState({ modal: 'playerModal' }, "", "#player"); originalOpenPlayer(pName, tName); };
+
+        const originalOpenMatchDetails = window.openMatchDetails;
+        window.openMatchDetails = function(key) { history.pushState({ modal: 'matchDetailsModal' }, "", "#match"); originalOpenMatchDetails(key); };
+
+        const originalOpenScheduled = window.openScheduledMatch;
+        window.openScheduledMatch = function(key) { history.pushState({ modal: 'matchDetailsModal' }, "", "#scheduled"); originalOpenScheduled(key); };
+
+        const originalOpenGroupMatchup = window.openGroupMatchup;
+        window.openGroupMatchup = function(key) { history.pushState({ modal: 'matchDetailsModal' }, "", "#matchup"); originalOpenGroupMatchup(key); };
+
+        const originalOpenSquads = window.openSquads;
+        window.openSquads = function(t1, t2, sq1, sq2) { history.pushState({ modal: 'squadsModal' }, "", "#squads"); originalOpenSquads(t1, t2, sq1, sq2); };
+
+        window.nav = function(id, el) {
+            if(!history.state || history.state.page !== id) {
+                history.pushState({ page: id }, "", "#" + id);
+            }
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active')); 
+            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active')); 
+            document.getElementById('page-' + id).classList.add('active'); 
+            el.classList.add('active'); 
+            window.scrollTo(0,0);
+        };
+
+        window.addEventListener('popstate', function(event) {
+            let isModalOpen = false;
+            
+            const imageViewer = document.getElementById('imageViewerModal');
+            if(imageViewer && imageViewer.style.display === 'flex') {
+                imageViewer.style.display = 'none';
+                isModalOpen = true;
+            }
+
+            document.querySelectorAll('.modal').forEach(m => { 
+                if(m.style.display === 'block') { m.style.display = 'none'; isModalOpen = true; }
+            });
+            
+            if(isModalOpen) return;
+
+            if(event.state && event.state.page) {
+                let id = event.state.page;
+                let navItems = document.querySelectorAll('.nav-item');
+                let el = navItems[0];
+                if(id === 'groups') el = navItems[1];
+                if(id === 'teams') el = navItems[2];
+                if(id === 'stats') el = navItems[3];
+                
+                document.querySelectorAll('.page').forEach(p => p.classList.remove('active')); 
+                document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active')); 
+                document.getElementById('page-' + id).classList.add('active'); 
+                el.classList.add('active'); 
+                window.scrollTo(0,0);
+            } else {
+                history.pushState({ page: 'matches' }, "", "#matches");
+                document.querySelectorAll('.page').forEach(p => p.classList.remove('active')); 
+                document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active')); 
+                document.getElementById('page-matches').classList.add('active'); 
+                document.querySelectorAll('.nav-item')[0].classList.add('active'); 
+            }
+        });
+    })();
+</script>
+</body>
+</html>
