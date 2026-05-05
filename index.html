@@ -1160,10 +1160,21 @@
         });
     })();
 </script>
-
+ <script>
+  // كود تسجيل الـ Service Worker لضمان ميزة التثبيت كـ تطبيق
   if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('/kdc/OneSignalSDKWorker.js');
+    window.addEventListener('load', function() {
+      navigator.serviceWorker.register('/kdc/OneSignalSDKWorker.js', { scope: '/kdc/' });
+    });
   }
-</script> 
+
+  // كود تشغيل زر التنبيهات عند الضغط عليه
+  function activateNotifications() {
+    OneSignalDeferred.push(function(OneSignal) {
+      OneSignal.Slidedown.promptPush();
+    });
+  }
+</script>
+
 </body>
 </html>
