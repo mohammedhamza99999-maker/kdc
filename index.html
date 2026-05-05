@@ -187,8 +187,9 @@
             </div>
         </div>
         
-       <button id="enablePushBtn" class="notify-btn" onclick="window.open('https://onesignal.com/subscribe?appId=d29380b0-23f9-4f35-b262-4a9a3102cf56', 'OneSignal', 'width=500,height=600')">
-    <i class="fa-regular fa-bell"></i> تفعيل تنبيهات الأهداف
+      <a href="#" onclick="OneSignalDeferred.push(function(OneSignal) { OneSignal.Slidedown.promptPush(); }); return false;" style="cursor: pointer; display: block; text-decoration: none;">
+     تفعيل تنبيهات الأهداف
+</a>
 </button>
 
         <div id="page-matches" class="page active">
