@@ -191,6 +191,9 @@
   <a href="#" onclick="activateNotifications(); return false;" class="btn-subscribe" style="display: block; width: 100%; padding: 14px; background: linear-gradient(135deg, #001529, #003366); border: 1px solid #D4AF37; border-radius: 8px; color: #D4AF37; text-align: center; text-decoration: none; font-size: 16px; font-weight: bold; margin-bottom: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.3);">
    تفعيل تنبيهات أحداث المباراة
 </a>
+        <button id="installBtn" style="display: none; width: 100%; padding: 14px; background: linear-gradient(135deg, #28a745, #218838); border: 1px solid #1e7e34; border-radius: 8px; color: #fff; text-align: center; font-size: 16px; font-weight: bold; margin-bottom: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.3); cursor: pointer;">
+   📱 تثبيت تطبيق البطولة
+</button>
 </button>
 
         <div id="page-matches" class="page active">
@@ -1161,41 +1164,48 @@
     })();
 </script>
 <script>
-  // 1. تسجيل ملف التطبيق (PWA)
+  // 1. تسجيل ملف التطبيق
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', function() {
       navigator.serviceWorker.register('/kdc/OneSignalSDKWorker.js', { scope: '/kdc/' });
     });
   }
 
-  // 2. تفعيل زر الإشعارات عند الضغط عليه
+  // 2. وظائف الإشعارات
   function activateNotifications() {
     OneSignalDeferred.push(function(OneSignal) {
-      OneSignal.Slidedown.promptPush({ force: true });
+      OneSignal.User.PushSubscription.optIn();
     });
   }
-
-  // 3. إظهار رسالة الإشعارات تلقائياً عند تحميل الموقع
   window.addEventListener('load', function() {
     OneSignalDeferred.push(function(OneSignal) {
       OneSignal.Slidedown.promptPush({ force: true });
     });
   });
 
-  // 4. خدعة إظهار رسالة التثبيت (التطبيق) عند أول لمسة للشاشة
+  // 3. تشغيل زر تثبيت التطبيق
   let deferredPrompt;
+  const installBtn = document.getElementById('installBtn');
+
   window.addEventListener('beforeinstallprompt', (e) => {
-    // نمنع المتصفح من إخفاء الرسالة
+    // نمنع الرسالة العشوائية مال المتصفح
     e.preventDefault();
     deferredPrompt = e;
-    
-    // بمجرد أن يلمس اللاعب الشاشة أو يضغط بأي مكان، تظهر رسالة التثبيت
-    window.addEventListener('click', () => {
-      if (deferredPrompt) {
-        deferredPrompt.prompt();
-        deferredPrompt = null;
+    // نظهر الزر الأخضر مالتنا
+    installBtn.style.display = 'block';
+  });
+
+  installBtn.addEventListener('click', async () => {
+    if (deferredPrompt) {
+      // نظهر نافذة التثبيت الرسمية
+      deferredPrompt.prompt();
+      const { outcome } = await deferredPrompt.userChoice;
+      if (outcome === 'accepted') {
+        // إذا وافق، نخفي الزر
+        installBtn.style.display = 'none';
       }
-    }, { once: true });
+      deferredPrompt = null;
+    }
   });
 </script>
 </body>
