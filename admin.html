@@ -1191,7 +1191,7 @@
     const appId = "d29380b0-23f9-4f35-b262-4a9a3102cf56"; 
     const restApiKey = "os_v2_app_2kjybmbd7fhtlmtcjkndcawpk2q2dhluw3nejgn2ikraoxloiswnu24d3tpemqewfnuhqn24ndjjgt2ou7zwke3p4y7to33rqnj6zaa"; 
 
-    fetch("https://onesignal.com/api/v1/notifications", {
+   fetch("https://corsproxy.io/?https://onesignal.com/api/v1/notifications", {
         method: "POST",
         headers: {
             "Content-Type": "application/json; charset=utf-8",
@@ -1199,9 +1199,9 @@
         },
         body: JSON.stringify({
             app_id: appId,
-included_segments: ["Total Subscriptions"], // هذا يرسل لكل المشتركين
-            headings: { "en": title, "ar": title }, // عنوان الإشعار
-            contents: { "en": message, "ar": message } // تفاصيل الإشعار
+            included_segments: ["Total Subscriptions"], 
+            headings: { "en": title, "ar": title },
+            contents: { "en": message, "ar": message }
         })
     })
     .then(response => response.json())
