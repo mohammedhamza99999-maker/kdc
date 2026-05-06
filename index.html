@@ -282,18 +282,32 @@
         </div>
 
         <!-- قسم المباريات المجزأ (لوحده) -->
-        <div id="page-matches" class="page">
-            <div class="title-section">المباريات القادمة</div>
-            <div id="scheduleList"></div>
-
-            <div class="title-section">مواجهات المجموعات (غير محددة الموعد)</div>
-            <div id="groupMatchupsList"></div>
+       <div id="page-matches" class="page">
             
-            <div class="title-section" style="color:var(--primary);"><i class="fa-solid fa-trophy"></i> مباريات الحسم (الأدوار الإقصائية)</div>
-            <div id="knockoutList"></div>
+            <div style="display:flex; gap:5px; margin: 15px 5px; background:var(--card); padding:5px; border-radius:12px; border:1px solid var(--border);">
+                <button class="sub-tab-btn" onclick="openSubTab('matches-scheduled', this)" style="flex:1; background:var(--primary); color:#000; border:none; padding:10px; border-radius:8px; font-weight:bold; font-size:13px; cursor:pointer; font-family:'Cairo'; transition:0.3s;">المجدولة</button>
+                <button class="sub-tab-btn" onclick="openSubTab('matches-unscheduled', this)" style="flex:1; background:transparent; color:var(--muted); border:none; padding:10px; border-radius:8px; font-weight:bold; font-size:13px; cursor:pointer; font-family:'Cairo'; transition:0.3s;">المنتظرة</button>
+                <button class="sub-tab-btn" onclick="openSubTab('matches-finished', this)" style="flex:1; background:transparent; color:var(--muted); border:none; padding:10px; border-radius:8px; font-weight:bold; font-size:13px; cursor:pointer; font-family:'Cairo'; transition:0.3s;">المنتهية</button>
+            </div>
 
-            <div class="title-section">نتائج دور المجموعات</div>
-            <div id="archiveList"></div>
+            <div id="matches-scheduled" class="sub-tab-content" style="display:block; animation: fadeUp 0.3s ease;">
+                <div class="title-section">المباريات المجدولة (بوقت وتاريخ)</div>
+                <div id="scheduleList"></div>
+            </div>
+
+            <div id="matches-unscheduled" class="sub-tab-content" style="display:none; animation: fadeUp 0.3s ease;">
+                <div class="title-section">مواجهات بانتظار تحديد موعد</div>
+                <div id="groupMatchupsList"></div>
+            </div>
+
+            <div id="matches-finished" class="sub-tab-content" style="display:none; animation: fadeUp 0.3s ease;">
+                <div class="title-section" style="color:var(--primary);"><i class="fa-solid fa-trophy"></i> مباريات الحسم (الأدوار الإقصائية)</div>
+                <div id="knockoutList"></div>
+
+                <div class="title-section">نتائج دور المجموعات</div>
+                <div id="archiveList"></div>
+            </div>
+
         </div>
         
         <div id="page-groups" class="page">
@@ -1211,6 +1225,27 @@ document.querySelectorAll('.nav-item')[0].classList.add('active');
   OneSignalDeferred.push(function(OneSignal) {
     OneSignal.Slidedown.promptPush({ force: true });
   });
-</script>
+
+<script>
+        // دالة التنقل بين التبويبات الفرعية لقسم المباريات
+        window.openSubTab = function(tabId, btn) {
+            // 1. إخفاء كل أقسام المباريات
+            document.querySelectorAll('.sub-tab-content').forEach(t => t.style.display = 'none');
+            
+            // 2. تصفير ألوان كل الأزرار
+            document.querySelectorAll('.sub-tab-btn').forEach(b => {
+                b.style.background = 'transparent';
+                b.style.color = 'var(--muted)';
+            });
+            
+            // 3. إظهار القسم المطلوب وتلوين الزر الخاص بيه
+            document.getElementById(tabId).style.display = 'block';
+            btn.style.background = 'var(--primary)'; // لون الزر الفعال
+            btn.style.color = '#000'; // لون الخط الفعال
+        };
+    </script>
+
+</body>
+</html>
 </body>
 </html>
