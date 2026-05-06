@@ -1161,23 +1161,41 @@
     })();
 </script>
 <script>
-  // تسجيل الموقع كتطبيق (PWA)
+  // 1. تسجيل ملف التطبيق (PWA)
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', function() {
       navigator.serviceWorker.register('/kdc/OneSignalSDKWorker.js', { scope: '/kdc/' });
     });
   }
 
-  // وظيفة الزر: طلب الإذن عند الضغط
+  // 2. تفعيل زر الإشعارات عند الضغط عليه
   function activateNotifications() {
     OneSignalDeferred.push(function(OneSignal) {
-      OneSignal.User.PushSubscription.optIn();
+      OneSignal.Slidedown.promptPush({ force: true });
     });
   }
 
-  // إظهار نافذة التنبيهات تلقائياً عند فتح الموقع (تتجاهل التخطي السابق)
-  OneSignalDeferred.push(function(OneSignal) {
-    OneSignal.Slidedown.promptPush({ force: true });
+  // 3. إظهار رسالة الإشعارات تلقائياً عند تحميل الموقع
+  window.addEventListener('load', function() {
+    OneSignalDeferred.push(function(OneSignal) {
+      OneSignal.Slidedown.promptPush({ force: true });
+    });
+  });
+
+  // 4. خدعة إظهار رسالة التثبيت (التطبيق) عند أول لمسة للشاشة
+  let deferredPrompt;
+  window.addEventListener('beforeinstallprompt', (e) => {
+    // نمنع المتصفح من إخفاء الرسالة
+    e.preventDefault();
+    deferredPrompt = e;
+    
+    // بمجرد أن يلمس اللاعب الشاشة أو يضغط بأي مكان، تظهر رسالة التثبيت
+    window.addEventListener('click', () => {
+      if (deferredPrompt) {
+        deferredPrompt.prompt();
+        deferredPrompt = null;
+      }
+    }, { once: true });
   });
 </script>
 </body>
