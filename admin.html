@@ -1186,6 +1186,34 @@
                 alert("تم إصلاح وإعادة حساب جميع مباريات اللاعبين بنجاح! راجع تطبيق الجمهور الآن.");
             }).catch(e => alert("حدث خطأ أثناء التحديث!"));
         }
+        function sendMatchNotification(title, message) {
+    // جيب هاي المعلومات من حسابك بموقع وان سنكل
+    const appId = "d29380b0-23f9-4f35-b262-4a9a3102cf56"; 
+    const restApiKey = "os_v2_app_2kjybmbd7fhtlmtcjkndcawpk2q2dhluw3nejgn2ikraoxloiswnu24d3tpemqewfnuhqn24ndjjgt2ou7zwke3p4y7to33rqnj6zaa"; 
+
+    fetch("https://onesignal.com/api/v1/notifications", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json; charset=utf-8",
+            "Authorization": "Basic " + restApiKey
+        },
+        body: JSON.stringify({
+            app_id: appId,
+            included_segments: ["Subscribed Users"], // هذا يرسل لكل المشتركين
+            headings: { "en": title, "ar": title }, // عنوان الإشعار
+            contents: { "en": message, "ar": message } // تفاصيل الإشعار
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        console.log("تم إرسال الإشعار بنجاح:", data);
+        alert("تم إرسال الإشعار للجمهور بنجاح 🚀");
+    })
+    .catch(error => {
+        console.error("خطأ في إرسال الإشعار:", error);
+        alert("صار خطأ وما راح الإشعار!");
+    });
+}
     </script>
 </body>
 </html>
