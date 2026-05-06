@@ -1186,49 +1186,24 @@
         });
     })();
 </script>
-<script>
-  // 1. تسجيل ملف التطبيق
+    <script>
+  // تسجيل الموقع كتطبيق (PWA)
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', function() {
       navigator.serviceWorker.register('/kdc/OneSignalSDKWorker.js', { scope: '/kdc/' });
     });
   }
 
-  // 2. وظائف الإشعارات
+  // وظيفة الزر: طلب الإذن عند الضغط
   function activateNotifications() {
     OneSignalDeferred.push(function(OneSignal) {
       OneSignal.User.PushSubscription.optIn();
     });
   }
-  window.addEventListener('load', function() {
-    OneSignalDeferred.push(function(OneSignal) {
-      OneSignal.Slidedown.promptPush({ force: true });
-    });
-  });
 
-  // 3. تشغيل زر تثبيت التطبيق
-  let deferredPrompt;
-  const installBtn = document.getElementById('installBtn');
-
-  window.addEventListener('beforeinstallprompt', (e) => {
-    // نمنع الرسالة العشوائية مال المتصفح
-    e.preventDefault();
-    deferredPrompt = e;
-    // نظهر الزر الأخضر مالتنا
-    installBtn.style.display = 'block';
-  });
-
-  installBtn.addEventListener('click', async () => {
-    if (deferredPrompt) {
-      // نظهر نافذة التثبيت الرسمية
-      deferredPrompt.prompt();
-      const { outcome } = await deferredPrompt.userChoice;
-      if (outcome === 'accepted') {
-        // إذا وافق، نخفي الزر
-        installBtn.style.display = 'none';
-      }
-      deferredPrompt = null;
-    }
+  // إظهار نافذة التنبيهات تلقائياً عند فتح الموقع (تتجاهل التخطي السابق)
+  OneSignalDeferred.push(function(OneSignal) {
+    OneSignal.Slidedown.promptPush({ force: true });
   });
 </script>
 </body>
