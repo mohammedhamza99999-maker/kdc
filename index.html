@@ -16,11 +16,22 @@
 <script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
 <script>
   window.OneSignalDeferred = window.OneSignalDeferred || [];
-  OneSignalDeferred.push(async function(OneSignal) {
-    await OneSignal.init({
+  OneSignalDeferred.push(function(OneSignal) {
+    OneSignal.init({
       appId: "d29380b0-23f9-4f35-b262-4a9a3102cf56",
+      // هاي الأسطر الجوا هي اللي تحل مشكلة مسار موقعك على GitHub
+      path: "/kdc/",
+      serviceWorkerParam: { scope: "/kdc/" },
+      serviceWorkerPath: "OneSignalSDKWorker.js"
     });
   });
+
+  // هذا الكود هو اللي يخلي زر "تفعيل تنبيهات أحداث المباراة" يشتغل من تضغط عليه
+  function activateNotifications() {
+    window.OneSignalDeferred.push(function(OneSignal) {
+      OneSignal.Slidedown.promptPush({ force: true });
+    });
+  }
 </script>
     
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
