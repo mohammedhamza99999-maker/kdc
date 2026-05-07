@@ -65,6 +65,19 @@
         @keyframes fadeUp { to { opacity: 1; transform: translateY(0); } }
         
         .card { background: var(--card); border: 1px solid rgba(255,255,255,0.03); border-radius: 16px; margin-bottom: 16px; overflow: hidden; position: relative; box-shadow: 0 4px 12px rgba(0,0,0,0.15); transition: all 0.3s ease;}
+        
+        /* خلفية كارت المباراة المباشرة */
+        #liveMatchCard {
+            background-image: 
+                linear-gradient(to bottom, rgba(27, 28, 33, 0.85), rgba(17, 18, 21, 0.95)), 
+                url('https://images.unsplash.com/photo-1508344928928-7137b29de216?q=80&w=1000&auto=format&fit=crop');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.6);
+        }
+
         .card-header { background: transparent; padding: 12px 15px; display: flex; justify-content: space-between; font-size: 11px; border-bottom: 1px solid var(--border); font-weight: 700; color: var(--muted); text-transform: uppercase;}
         .card-body { padding: 20px 15px; display: flex; justify-content: space-between; align-items: center; }
         
@@ -139,9 +152,9 @@
         .modern-referees span span { color: var(--text); font-weight: 800; font-size: 13px; display:flex; align-items:center; gap:5px;}
 
         /* --- تصميم الملعب العشبي الغامق وعدم التداخل --- */
-       .pitch-container {
-   width: 100%; max-width: 550px; height: 750px; margin: 0 auto;
-            background-color: #072e12; /* لون أخضر غامق جداً */
+        .pitch-container {
+            width: 100%; max-width: 550px; height: 650px; margin: 0 auto;
+            background-color: #072e12; 
             background-image: 
                 repeating-linear-gradient(0deg, transparent, transparent 10%, rgba(0,0,0,0.15) 10%, rgba(0,0,0,0.15) 20%), 
                 radial-gradient(circle at center, rgba(255,255,255,0.05) 0%, transparent 100%);
@@ -228,11 +241,21 @@
             
             <div id="testModePlaceholder" style="display:none; text-align:center; padding:40px 20px; background:var(--card); border-radius:12px; border:2px dashed var(--primary); color:var(--text); margin-bottom:15px;">
                 <i class="fa-solid fa-clock" style="font-size:40px; color:var(--primary); margin-bottom:15px; display:block;"></i>
-                <div style="font-size:16px; font-weight:bold;">لا توجد مباراة مباشرة حالياً</div>
-                <div style="font-size:12px; color:var(--muted); margin-top:5px;">يرجى الانتظار حتى انطلاق المباراة القادمة</div>
+                <div style="font-size:16px; font-weight:bold;">الوضع التجريبي مفعل</div>
+                <div style="font-size:12px; color:var(--muted); margin-top:5px;">المباراة المباشرة مخفية عن الجمهور حالياً</div>
             </div>
 
-            <div class="card" id="liveMatchCard">
+            <div id="noLiveMatchBanner" style="display:none; text-align:center; padding:30px 20px; background:var(--card); border-radius:16px; border:1px solid rgba(255,255,255,0.05); margin-bottom:15px; box-shadow:0 10px 30px rgba(0,0,0,0.3);">
+                <i class="fa-regular fa-calendar-xmark" style="font-size:45px; color:var(--muted); margin-bottom:15px; opacity:0.5;"></i>
+                <h3 style="margin:0 0 5px; color:var(--text); font-size:16px;">لا توجد مباريات مباشرة الآن</h3>
+                <p style="margin:0 0 20px; font-size:12px; color:var(--muted);">ترقبوا انطلاق المباريات القادمة قريباً...</p>
+                <div style="background:rgba(255,255,255,0.02); border:1px dashed var(--border); padding:20px; border-radius:12px;">
+                    <i class="fa-solid fa-bullhorn" style="color:var(--primary); font-size:20px; margin-bottom:10px;"></i>
+                    <div style="font-size:12px; color:var(--muted); font-weight:bold;">مساحة إعلانية لبطولة دوائر خانقين</div>
+                </div>
+            </div>
+
+            <div class="card" id="liveMatchCard" style="display:none;">
                 <div class="card-header">
                     <span id="lContext"><i class="fa-regular fa-futbol"></i> جاري التحميل...</span>
                     <span style="color:var(--live); font-weight:bold;">مباشر <i class="fa-solid fa-circle" style="font-size:8px; animation: pulse 1.5s infinite;"></i></span>
@@ -360,7 +383,10 @@
         </div>
 
         <div class="nav">
-            <div class="nav-item active" onclick="nav('live', this)"><i class="fa-solid fa-tv nav-icon"></i>المباشر</div>
+            <div class="nav-item active" onclick="nav('live', this)">
+                <i class="fa-solid fa-tv nav-icon"></i>
+                المباشر <i id="navLiveDot" class="fa-solid fa-circle" style="display:none; color:#ef4444; font-size:6px; vertical-align:top; animation: pulse 1.5s infinite; text-shadow: 0 0 5px #ef4444; margin-right:2px;"></i>
+            </div>
             <div class="nav-item" onclick="nav('matches', this)"><i class="fa-regular fa-futbol nav-icon"></i>المباريات</div>
             <div class="nav-item" onclick="nav('groups', this)"><i class="fa-solid fa-list-ol nav-icon"></i>المجموعات</div>
             <div class="nav-item" onclick="nav('teams', this)"><i class="fa-solid fa-shield-halved nav-icon"></i>الفرق</div>
@@ -539,12 +565,43 @@
 
         function triggerNotification(title, msg) { const notif = document.getElementById('osNotification'); document.getElementById('notifTitle').innerText = title; document.getElementById('notifText').innerText = msg; notif.classList.add('show'); setTimeout(() => { notif.classList.remove('show'); }, 4000); }
 
+        // إدارة إظهار وإخفاء البنر والكلوب الأحمر للمباشر بناءً على البيانات
+        window.testModeActive = false;
+        window.currentMatchActive = false;
+
+        window.triggerLiveVisibilityUpdate = function() {
+            const liveCard = document.getElementById('liveMatchCard');
+            const testModePlaceholder = document.getElementById('testModePlaceholder');
+            const noLiveBanner = document.getElementById('noLiveMatchBanner');
+            const navDot = document.getElementById('navLiveDot');
+
+            if (window.testModeActive) {
+                if(liveCard) liveCard.style.display = 'none';
+                if(noLiveBanner) noLiveBanner.style.display = 'none';
+                if(testModePlaceholder) testModePlaceholder.style.display = 'block';
+                if(navDot) navDot.style.display = 'none';
+            } else {
+                if(testModePlaceholder) testModePlaceholder.style.display = 'none';
+                
+                if (window.currentMatchActive) {
+                    if(liveCard) liveCard.style.display = 'block';
+                    if(noLiveBanner) noLiveBanner.style.display = 'none';
+                    if(navDot) navDot.style.display = 'inline-block';
+                } else {
+                    if(liveCard) liveCard.style.display = 'none';
+                    if(noLiveBanner) noLiveBanner.style.display = 'block';
+                    if(navDot) navDot.style.display = 'none';
+                }
+            }
+        };
+
         db.ref('analytics/visits').push({ time: Date.now() });
 
         db.ref(`tournaments/${dbPath}/settings`).on('value', snap => {
             let s = snap.val() || {};
-            const liveCard = document.getElementById('liveMatchCard'); const placeholder = document.getElementById('testModePlaceholder');
-            if(s.testMode === true) { liveCard.style.display = 'none'; placeholder.style.display = 'block'; } else { liveCard.style.display = 'block'; placeholder.style.display = 'none'; }
+            window.testModeActive = s.testMode === true;
+            window.triggerLiveVisibilityUpdate();
+            
             let root = document.documentElement; let t = s.theme || 'blue';
             if(t === 'blue') { root.style.setProperty('--primary', '#3b82f6'); root.style.setProperty('--accent', '#4ade80'); }
             else if(t === 'gold') { root.style.setProperty('--primary', '#d4af37'); root.style.setProperty('--accent', '#facc15'); }
@@ -614,6 +671,10 @@
         let timerInterval; let initialLoad = true; let lastS1 = -1, lastS2 = -1; let liveSquad1 = {}, liveSquad2 = {};
         db.ref(`tournaments/${dbPath}/live_match`).on('value', snap => {
             const d = snap.val(); if(!d) return;
+            
+            window.currentMatchActive = !!(d.team1 && d.team2 && d.team1.trim() !== '' && d.team2.trim() !== '');
+            window.triggerLiveVisibilityUpdate();
+            
             if (!initialLoad) { if (lastS1 !== -1 && (parseInt(d.score1) > lastS1 || parseInt(d.score2) > lastS2)) { document.getElementById('crowdSound').play().catch(e=>{}); if (navigator.vibrate) navigator.vibrate([300, 100, 300]); } }
             lastS1 = parseInt(d.score1); lastS2 = parseInt(d.score2); initialLoad = false;
             
@@ -900,6 +961,10 @@
         }
     </script>
     <script>
+        window.addEventListener('beforeinstallprompt', (e) => { e.preventDefault(); });
+    </script>
+
+    <script>
         (function() {
             try { history.replaceState({ page: 'matches' }, "", "#matches"); } catch(e){}
 
@@ -918,7 +983,7 @@
             const originalOpenGroupMatchup = window.openGroupMatchup;
             window.openGroupMatchup = function(key) { try{ history.pushState({ modal: 'matchDetailsModal' }, "", "#matchup"); }catch(e){} originalOpenGroupMatchup(key); };
 
-            // التشكيلة على الملعب العشبي الواقعي
+            // نافذة التشكيلة العشبية (7 ضد 7) بدون أخطاء
             window.openSquads = function(t1, t2, sq1, sq2) {
                 document.getElementById('sqT1Name').innerText = t1 || 'فريق 1';
                 document.getElementById('sqT2Name').innerText = t2 || 'فريق 2';
