@@ -526,6 +526,32 @@
             </select>
             
             <label>سجل الأحداث (أهداف، كروت):</label><textarea id="arcEvents" rows="3"></textarea>
+<div style="margin-top:15px; padding:10px; border:1px solid var(--primary); border-radius:8px; background:rgba(59, 130, 246, 0.05);">
+                <h4 style="margin:0 0 10px; color:var(--primary); font-size:14px; text-align:center;">تعديل التشكيلة الأساسية (7 ضد 7)</h4>
+                
+                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
+                    <div>
+                        <label style="font-size:10px; color:var(--muted);">تشكيلة فريق 1:</label>
+                        <select id="arc_sq1_gk" style="font-size:11px; margin-bottom:4px;"></select>
+                        <select id="arc_sq1_lb" style="font-size:11px; margin-bottom:4px;"></select>
+                        <select id="arc_sq1_rb" style="font-size:11px; margin-bottom:4px;"></select>
+                        <select id="arc_sq1_lm" style="font-size:11px; margin-bottom:4px;"></select>
+                        <select id="arc_sq1_cm" style="font-size:11px; margin-bottom:4px;"></select>
+                        <select id="arc_sq1_rm" style="font-size:11px; margin-bottom:4px;"></select>
+                        <select id="arc_sq1_st" style="font-size:11px; margin-bottom:4px;"></select>
+                    </div>
+                    <div>
+                        <label style="font-size:10px; color:var(--muted);">تشكيلة فريق 2:</label>
+                        <select id="arc_sq2_gk" style="font-size:11px; margin-bottom:4px;"></select>
+                        <select id="arc_sq2_lb" style="font-size:11px; margin-bottom:4px;"></select>
+                        <select id="arc_sq2_rb" style="font-size:11px; margin-bottom:4px;"></select>
+                        <select id="arc_sq2_lm" style="font-size:11px; margin-bottom:4px;"></select>
+                        <select id="arc_sq2_cm" style="font-size:11px; margin-bottom:4px;"></select>
+                        <select id="arc_sq2_rm" style="font-size:11px; margin-bottom:4px;"></select>
+                        <select id="arc_sq2_st" style="font-size:11px; margin-bottom:4px;"></select>
+                    </div>
+                </div>
+            </div>
             
             <div class="flex-row" style="margin-top:15px;">
                 <button onclick="saveArchiveEdit()" style="background:#10b981; color:#000;">حفظ التعديلات</button>
@@ -1066,12 +1092,30 @@
         }
 
         function editArchiveMatch(id) { 
-            let m = allData.saved_matches[id]; if(!m) return; 
+            let m = allData.saved_matches[id] || {}; if(!m) return; 
             document.getElementById('arcId').value = id; 
             document.getElementById('arcT1').value = m.team1; document.getElementById('arcT2').value = m.team2; 
             document.getElementById('arcS1').value = m.score1; document.getElementById('arcS2').value = m.score2; 
             document.getElementById('arcRound').value = m.round || ''; 
             document.getElementById('arcEvents').value = m.events || ''; 
+            
+            // تعبئة قوائم التشكيلة
+            const fillSquadOpts = (tName, prefix, savedSq) => {
+                let pOpts = '<option value="">-- اختر --</option>';
+                if(allData.teams?.[tName]?.players) {
+                    for(let p in allData.teams[tName].players) pOpts += `<option value="${p}">${p}</option>`;
+                }
+                ['gk','lb','rb','lm','cm','rm','st'].forEach(pos => {
+                    let el = document.getElementById(`${prefix}_${pos}`);
+                    el.innerHTML = pOpts;
+                    if(savedSq && savedSq[pos]) el.value = savedSq[pos];
+                });
+            };
+            fillSquadOpts(m.team1, 'arc_sq1', m.squad1);
+            fillSquadOpts(m.team2, 'arc_sq2', m.squad2);
+
+            document.getElementById('archiveModal').style.display = 'flex'; 
+        }
             
             populateRefereesDropdowns(); 
             document.getElementById('arcRef1').value = m.referee1 || ''; 
@@ -1105,32 +1149,28 @@
 
         function saveArchiveEdit() { 
             let id = document.getElementById('arcId').value; 
-            let oldMatch = allData.saved_matches[id] || {};
-            
-            const motmVal = document.getElementById('arcMotm').value;
-            let motmName = "", motmTeam = "";
-            if(motmVal && motmVal !== "") { [motmTeam, motmName] = motmVal.split('|'); }
-
-            if(oldMatch.motm !== motmName || oldMatch.motmTeam !== motmTeam) {
-                if(oldMatch.motmTeam && oldMatch.motm) {
-                    db.ref(`tournaments/${dbPath}/teams/${oldMatch.motmTeam}/players/${oldMatch.motm}/motm`).transaction(c => Math.max(0, (c||0)-1));
-                }
-                if(motmTeam && motmName) {
-                    db.ref(`tournaments/${dbPath}/teams/${motmTeam}/players/${motmName}/motm`).transaction(c => (c||0)+1);
-                }
-            }
+            const getSq = (prefix) => ({
+                gk: document.getElementById(`${prefix}_gk`).value,
+                lb: document.getElementById(`${prefix}_lb`).value,
+                rb: document.getElementById(`${prefix}_rb`).value,
+                lm: document.getElementById(`${prefix}_lm`).value,
+                cm: document.getElementById(`${prefix}_cm`).value,
+                rm: document.getElementById(`${prefix}_rm`).value,
+                st: document.getElementById(`${prefix}_st`).value
+            });
 
             let updates = { 
                 score1: parseInt(document.getElementById('arcS1').value) || 0, 
                 score2: parseInt(document.getElementById('arcS2').value) || 0, 
                 round: document.getElementById('arcRound').value, 
                 events: document.getElementById('arcEvents').value,
-                referee1: document.getElementById('arcRef1').value,
-                referee2: document.getElementById('arcRef2').value,
-                motm: motmName,
-                motmTeam: motmTeam
+                squad1: getSq('arc_sq1'),
+                squad2: getSq('arc_sq2')
             }; 
-            db.ref(`tournaments/${dbPath}/saved_matches/${id}`).update(updates).then(()=>{ alert("تم تحديث الأرشيف بنجاح!"); document.getElementById('archiveModal').style.display = 'none'; }).catch(e => alert("حدث خطأ أثناء التحديث")); 
+            db.ref(`tournaments/${dbPath}/saved_matches/${id}`).update(updates).then(()=>{ 
+                alert("تم تحديث الأرشيف والتشكيلة بنجاح!"); 
+                document.getElementById('archiveModal').style.display = 'none'; 
+            }); 
         }
 
         function filterTeamsByGroup(groupId, t1Id, t2Id) { const groupVal = document.getElementById(groupId).value; const t1El = document.getElementById(t1Id); const t2El = document.getElementById(t2Id); const currentVal1 = t1El.value; const currentVal2 = t2El.value; let opts = '<option value="">اختر الفريق...</option>'; if (groupVal && allData.groups && allData.groups[groupVal]) { for (let t in allData.groups[groupVal]) opts += `<option value="${t}">${t}</option>`; } else { if (allData.teams) { for (let t in allData.teams) opts += `<option value="${t}">${t}</option>`; } } t1El.innerHTML = opts; t2El.innerHTML = opts; if(Array.from(t1El.options).some(opt => opt.value === currentVal1)) t1El.value = currentVal1; if(Array.from(t2El.options).some(opt => opt.value === currentVal2)) t2El.value = currentVal2; }
