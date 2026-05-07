@@ -643,7 +643,24 @@
             const arcPreview = document.getElementById('adminArchivePreview'); arcPreview.innerHTML = ''; 
             if(allData.saved_matches) { for(let id in allData.saved_matches) { let m = allData.saved_matches[id]; let info = []; if(m.groupInfo && m.groupInfo !== "أدوار إقصائية") info.push(`مجموعة ${m.groupInfo}`); if(m.round) info.push(m.round); let infoTxt = info.length > 0 ? info.join(' - ') : 'مباراة'; arcPreview.innerHTML += `<div class="preview-item"><div class="preview-item-header"><div><span style="font-weight:bold; color:var(--text);">${m.team1} (${m.score1}) - (${m.score2}) ${m.team2}</span><br><span style="font-size:10px; color:var(--muted);">${infoTxt}</span></div><div><button class="edit-btn" style="color:#f59e0b; border-color:#f59e0b;" onclick="restoreMatchToLive('${id}')" title="إعادة للبث المباشر"><i class="fa-solid fa-rotate-left"></i></button><button class="edit-btn" onclick="editArchiveMatch('${id}')"><i class="fa-solid fa-pen"></i></button><button class="del-btn" onclick="deleteItem('saved_matches/${id}')"><i class="fa-solid fa-trash"></i></button></div></div></div>`; } }
             
-            const gPreview = document.getElementById('groupsPreview'); gPreview.innerHTML = ''; if(allData.groups) { ['A', 'B', 'C', 'D'].forEach(g => { if(allData.groups[g]) { for(let t in allData.groups[g]) { gPreview.innerHTML += `<div class="preview-item"><div class="preview-item-header">مجموعة ${g}: ${t} (${allData.groups[g][t].points} نقطة)<button class="del-btn" onclick="deleteItem('groups/${g}/${t}')"><i class="fa-solid fa-xmark"></i></button></div></div>`; } } }); }
+            const gmPreview = document.getElementById('groupMatchupsPreview'); gmPreview.innerHTML = ''; 
+            if(allData.group_matchups) { 
+                for(let id in allData.group_matchups) { 
+                    let m = allData.group_matchups[id]; let info = []; 
+                    if (m.group) info.push(`مجموعة ${m.group}`); if (m.round) info.push(m.round); 
+                    gmPreview.innerHTML += `
+                    <div class="preview-item" style="border:1px solid var(--border); padding:10px; border-radius:8px; margin-bottom:10px; background:rgba(255,255,255,0.02);">
+                        <div class="preview-item-header">
+                            <div><b>${m.team1} - ${m.team2}</b><br><span style="font-size:10px; color:var(--muted)">${info.length > 0 ? info.join(' | ') : 'بدون موعد'}</span></div>
+                            <button class="del-btn" onclick="deleteItem('group_matchups/${id}')" style="background:#ef4444; color:#fff; border:none; padding:8px 12px; border-radius:6px; cursor:pointer;"><i class="fa-solid fa-trash"></i></button>
+                        </div>
+                        <div style="display:flex; gap: 5px; margin-top: 10px;">
+                            <button class="edit-btn" style="flex:1; color:var(--accent); border-color:var(--accent);" onclick="loadGroupMatchupToLive('${id}')"><i class="fa-solid fa-play"></i> بدء</button>
+                            <button class="edit-btn" style="flex:1; color:#facc15; border-color:#facc15;" onclick="openEditSchedule('${id}')"><i class="fa-solid fa-calendar"></i> تحديد موعد</button>
+                        </div>
+                    </div>`; 
+                } 
+            }
             
             const sPreview = document.getElementById('schedulePreview'); sPreview.innerHTML = ''; 
             if(allData.schedule) { for(let id in allData.schedule) { let m = allData.schedule[id]; let info = []; if (m.group) info.push(`مجموعة ${m.group}`); if (m.round) info.push(m.round); let extraInfo = info.length > 0 ? `<br><span style="font-size:10px; color:var(--accent)">${info.join(' | ')}</span>` : ''; sPreview.innerHTML += `<div class="preview-item"><div class="preview-item-header"><div><b>${m.team1} - ${m.team2}</b>${extraInfo}<br><span style="font-size:10px; color:var(--muted)">${m.date} | ${m.time}</span></div><div><button class="edit-btn" onclick="openEditScheduledMatch('${id}')"><i class="fa-solid fa-pen"></i></button><button class="del-btn" onclick="deleteItem('schedule/${id}')"><i class="fa-solid fa-xmark"></i></button></div></div><div style="display:flex; gap: 5px; margin-top: 5px;"><button class="edit-btn" style="flex:1; color:var(--accent); border-color:var(--accent);" onclick="loadScheduledToLive('${id}')"><i class="fa-solid fa-play"></i> بدء المباراة (سيتم حذفها من الجدول)</button></div><div style="display:flex; gap: 5px; margin-top: 5px; background:#1c1c1c; padding:5px; border-radius:5px; border:1px solid #3f3f46;"><input type="text" id="remTime_${id}" placeholder="مثال: 15 دقيقة / نصف ساعة" style="flex:2; margin:0; font-size:11px; height:35px;"><button class="edit-btn" style="flex:1; color:#facc15; border-color:#facc15; height:35px; margin:0; margin-right:5px;" onclick="sendCustomPreMatchPush('${id}')"><i class="fa-solid fa-bell"></i> تنبيه للجمهور</button></div></div>`; } }
