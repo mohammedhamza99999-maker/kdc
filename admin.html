@@ -476,7 +476,6 @@
         </div>
     </div>
 
-    <!-- نافذة الأرشيف -->
     <div id="archiveModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); z-index:1000; justify-content:center; align-items:center;">
         <div style="background:var(--card); padding:20px; border-radius:12px; border:1px solid var(--border); width:90%; max-width:400px; box-shadow: 0 10px 25px rgba(0,0,0,0.8); max-height:90vh; overflow-y:auto;">
             <h3 style="color:var(--accent); text-align:center; margin-top:0;">تعديل مباراة منتهية ✏️</h3>
@@ -992,7 +991,7 @@
             if(allData.teams) { for(let t in allData.teams) { let data = allData.teams[t]; let logoHtml = data.logo ? `<img src="${data.logo}" style="width:100%; height:100%; object-fit:contain;">` : `<i class="fa-solid fa-shield"></i>`; let pTable = `<table class="db-preview-table"><tr><th style="text-align:right;">اللاعب</th><th>صورة</th><th>⚽</th></tr>`; if(data.players) { for(let p in data.players) { let pl = data.players[p]; let pImg = pl.photo ? `<i class="fa-solid fa-check" style="color:var(--accent);"></i>` : `-`; pTable += `<tr><td style="text-align:right;">${p}</td><td>${pImg}</td><td style="color:#60a5fa;">${pl.goals||0}</td></tr>`; } } pTable += `</table>`; tPreview.innerHTML += `<div class="db-preview-card"><div class="db-preview-header"><div style="display:flex; align-items:center; gap:10px;"><div class="db-logo">${logoHtml}</div><strong style="color:var(--text); font-size:13px;">${t}</strong></div><div><button class="edit-btn" onclick="loadTeamForEdit('${t}')"><i class="fa-solid fa-pen"></i></button><button class="del-btn" onclick="deleteItem('teams/${t}')"><i class="fa-solid fa-trash"></i></button></div></div>${pTable}</div>`; } } else { tPreview.innerHTML = '<div style="color:var(--muted); text-align:center; font-size:11px; padding:15px;">لا توجد فرق مسجلة</div>'; }
             
             const arcPreview = document.getElementById('adminArchivePreview'); arcPreview.innerHTML = ''; 
-            if(allData.saved_matches) { for(let id in allData.saved_matches) { let m = allData.saved_matches[id]; let info = []; if(m.groupInfo && m.groupInfo !== "أدوار إقصائية") info.push(`مجموعة ${m.groupInfo}`); if(m.round) info.push(m.round); let infoTxt = info.length > 0 ? info.join(' - ') : 'مباراة'; arcPreview.innerHTML += `<div class="preview-item"><div class="preview-item-header"><div><span style="font-weight:bold; color:var(--text);">${m.team1} (${m.score1}) - (${m.score2}) ${m.team2}</span><br><span style="font-size:10px; color:var(--muted);">${infoTxt}</span></div><div><button class="edit-btn" onclick="editArchiveMatch('${id}')"><i class="fa-solid fa-pen"></i></button><button class="del-btn" onclick="deleteItem('saved_matches/${id}')"><i class="fa-solid fa-trash"></i></button></div></div></div>`; } }
+            if(allData.saved_matches) { for(let id in allData.saved_matches) { let m = allData.saved_matches[id]; let info = []; if(m.groupInfo && m.groupInfo !== "أدوار إقصائية") info.push(`مجموعة ${m.groupInfo}`); if(m.round) info.push(m.round); let infoTxt = info.length > 0 ? info.join(' - ') : 'مباراة'; arcPreview.innerHTML += `<div class="preview-item"><div class="preview-item-header"><div><span style="font-weight:bold; color:var(--text);">${m.team1} (${m.score1}) - (${m.score2}) ${m.team2}</span><br><span style="font-size:10px; color:var(--muted);">${infoTxt}</span></div><div><button class="edit-btn" style="color:#f59e0b; border-color:#f59e0b;" onclick="restoreMatchToLive('${id}')" title="إعادة للبث المباشر"><i class="fa-solid fa-rotate-left"></i></button><button class="edit-btn" onclick="editArchiveMatch('${id}')"><i class="fa-solid fa-pen"></i></button><button class="del-btn" onclick="deleteItem('saved_matches/${id}')"><i class="fa-solid fa-trash"></i></button></div></div></div>`; } }
             
             const gPreview = document.getElementById('groupsPreview'); gPreview.innerHTML = ''; if(allData.groups) { ['A', 'B', 'C', 'D'].forEach(g => { if(allData.groups[g]) { for(let t in allData.groups[g]) { gPreview.innerHTML += `<div class="preview-item"><div class="preview-item-header">مجموعة ${g}: ${t} (${allData.groups[g][t].points} نقطة)<button class="del-btn" onclick="deleteItem('groups/${g}/${t}')"><i class="fa-solid fa-xmark"></i></button></div></div>`; } } }); }
             
@@ -1091,11 +1090,58 @@
             });
         }
 
-  function saveArchiveEdit() { 
+        function editArchiveMatch(id) { 
+            let m = allData.saved_matches[id]; if(!m) return; 
+            document.getElementById('arcId').value = id; 
+            document.getElementById('arcT1').value = m.team1; document.getElementById('arcT2').value = m.team2; 
+            document.getElementById('arcS1').value = m.score1; document.getElementById('arcS2').value = m.score2; 
+            document.getElementById('arcRound').value = m.round || ''; 
+            document.getElementById('arcEvents').value = m.events || ''; 
+            
+            populateRefereesDropdowns(); 
+            document.getElementById('arcRef1').value = m.referee1 || ''; 
+            document.getElementById('arcRef2').value = m.referee2 || ''; 
+            
+            let allPOpts = '<option value="">-- بدون رجل مباراة --</option>';
+            let playersList = '<option value="">اختر اللاعب لإعطائه كارت...</option>';
+            if(allData.teams?.[m.team1]?.players) for(let p in allData.teams[m.team1].players) { allPOpts += `<option value="${m.team1}|${p}">${p} (${m.team1})</option>`; playersList += `<option value="${m.team1}|${p}">${p} (${m.team1})</option>`; }
+            if(allData.teams?.[m.team2]?.players) for(let p in allData.teams[m.team2].players) { allPOpts += `<option value="${m.team2}|${p}">${p} (${m.team2})</option>`; playersList += `<option value="${m.team2}|${p}">${p} (${m.team2})</option>`; }
+            document.getElementById('arcMotm').innerHTML = allPOpts;
+            document.getElementById('arcMotm').value = (m.motmTeam && m.motm) ? `${m.motmTeam}|${m.motm}` : '';
+            document.getElementById('arcPlayerSelect').innerHTML = playersList;
+
+            const fillSquadOpts = (tName, prefix, savedSq) => {
+                let pOpts = '<option value="">-- اختر --</option>';
+                if(allData.teams?.[tName]?.players) {
+                    for(let p in allData.teams[tName].players) pOpts += `<option value="${p}">${p}</option>`;
+                }
+                ['gk','lb','rb','lm','cm','rm','st'].forEach(pos => {
+                    let el = document.getElementById(`${prefix}_${pos}`);
+                    if(el) { el.innerHTML = pOpts; if(savedSq && savedSq[pos]) el.value = savedSq[pos]; }
+                });
+            };
+            fillSquadOpts(m.team1, 'arc_sq1', m.squad1);
+            fillSquadOpts(m.team2, 'arc_sq2', m.squad2);
+
+            document.getElementById('archiveModal').style.display = 'flex'; 
+        }
+
+        function addArcCard(type) {
+            const pVal = document.getElementById('arcPlayerSelect').value;
+            if(!pVal) return alert("اختر اللاعب أولاً");
+            let [team, pName] = pVal.split('|');
+            const icon = type === 'yellow' ? '🟨' : '🟥';
+            document.getElementById('arcEvents').value += `\n${icon} ${pName}`;
+            if(team && pName) {
+                db.ref(`tournaments/${dbPath}/teams/${team}/players/${pName}/${type}`).transaction(c => (c||0)+1);
+                alert("تمت إضافة الكارت لبروفايل اللاعب بنجاح!");
+            }
+        }
+
+        function saveArchiveEdit() { 
             let id = document.getElementById('arcId').value; 
             let oldMatch = allData.saved_matches[id] || {};
             
-            // --- حفظ رجل المباراة ---
             const motmVal = document.getElementById('arcMotm').value;
             let motmName = "", motmTeam = "";
             if(motmVal && motmVal !== "") { [motmTeam, motmName] = motmVal.split('|'); }
@@ -1109,18 +1155,13 @@
                 }
             }
 
-            // --- حفظ التشكيلة ---
             const getSq = (prefix) => ({
-                gk: document.getElementById(`${prefix}_gk`).value,
-                lb: document.getElementById(`${prefix}_lb`).value,
-                rb: document.getElementById(`${prefix}_rb`).value,
-                lm: document.getElementById(`${prefix}_lm`).value,
-                cm: document.getElementById(`${prefix}_cm`).value,
-                rm: document.getElementById(`${prefix}_rm`).value,
+                gk: document.getElementById(`${prefix}_gk`).value, lb: document.getElementById(`${prefix}_lb`).value,
+                rb: document.getElementById(`${prefix}_rb`).value, lm: document.getElementById(`${prefix}_lm`).value,
+                cm: document.getElementById(`${prefix}_cm`).value, rm: document.getElementById(`${prefix}_rm`).value,
                 st: document.getElementById(`${prefix}_st`).value
             });
 
-            // --- التحديث الشامل ---
             let updates = { 
                 score1: parseInt(document.getElementById('arcS1').value) || 0, 
                 score2: parseInt(document.getElementById('arcS2').value) || 0, 
@@ -1128,10 +1169,8 @@
                 events: document.getElementById('arcEvents').value,
                 referee1: document.getElementById('arcRef1').value,
                 referee2: document.getElementById('arcRef2').value,
-                motm: motmName,
-                motmTeam: motmTeam,
-                squad1: getSq('arc_sq1'),
-                squad2: getSq('arc_sq2')
+                motm: motmName, motmTeam: motmTeam,
+                squad1: getSq('arc_sq1'), squad2: getSq('arc_sq2')
             }; 
 
             db.ref(`tournaments/${dbPath}/saved_matches/${id}`).update(updates).then(()=>{ 
@@ -1139,45 +1178,28 @@
                 document.getElementById('archiveModal').style.display = 'none'; 
             }).catch(e => alert("حدث خطأ أثناء التحديث")); 
         }
-        function addArcCard(type) {
-            const pVal = document.getElementById('arcPlayerSelect').value;
-            if(!pVal) return alert("اختر اللاعب أولاً");
-            let [team, pName] = pVal.split('|');
-            const icon = type === 'yellow' ? '🟨' : '🟥';
-            document.getElementById('arcEvents').value += `\n${icon} ${pName}`;
+
+        async function restoreMatchToLive(id) {
+            let m = allData.saved_matches[id]; if(!m) return;
+            if(!confirm(`إعادة مباراة ${m.team1} و ${m.team2} للمباشر؟ (سيتم خصم أهدافها من المجموعات)`)) return;
+            isInternalUpdate = true;
             
-            if(team && pName) {
-                db.ref(`tournaments/${dbPath}/teams/${team}/players/${pName}/${type}`).transaction(c => (c||0)+1);
-                if(type === 'yellow') sendManualPush("🟨 بطاقة صفراء!", `إنذار للاعب ${pName} من فريق ${team}`);
-                if(type === 'red') sendManualPush("🟥 بطاقة حمراء!", `طرد للاعب ${pName} من فريق ${team}`);
-                alert("تمت إضافة الكارت لبروفايل اللاعب بنجاح وإرسال إشعار للجمهور!");
-            }
-        }
+            const s1 = parseInt(m.score1)||0; const s2 = parseInt(m.score2)||0;
+            db.ref(`tournaments/${dbPath}/teams/${m.team1}/gf`).transaction(c => Math.max(0, (c||0)-s1));
+            db.ref(`tournaments/${dbPath}/teams/${m.team1}/ga`).transaction(c => Math.max(0, (c||0)-s2));
+            db.ref(`tournaments/${dbPath}/teams/${m.team2}/gf`).transaction(c => Math.max(0, (c||0)-s2));
+            db.ref(`tournaments/${dbPath}/teams/${m.team2}/ga`).transaction(c => Math.max(0, (c||0)-s1));
+            
+            if(m.motmTeam && m.motm) { db.ref(`tournaments/${dbPath}/teams/${m.motmTeam}/players/${m.motm}/motm`).transaction(c => Math.max(0, (c||0)-1)); }
 
-        function saveArchiveEdit() { 
-            let id = document.getElementById('arcId').value; 
-            const getSq = (prefix) => ({
-                gk: document.getElementById(`${prefix}_gk`).value,
-                lb: document.getElementById(`${prefix}_lb`).value,
-                rb: document.getElementById(`${prefix}_rb`).value,
-                lm: document.getElementById(`${prefix}_lm`).value,
-                cm: document.getElementById(`${prefix}_cm`).value,
-                rm: document.getElementById(`${prefix}_rm`).value,
-                st: document.getElementById(`${prefix}_st`).value
+            await db.ref(`tournaments/${dbPath}/live_match`).update({
+                team1: m.team1, team2: m.team2, score1: s1, score2: s2, round: m.round||'', groupInfo: m.groupInfo||'',
+                status: 'انتهت', events: m.events||'', referee1: m.referee1||'', referee2: m.referee2||'',
+                squad1: m.squad1||{}, squad2: m.squad2||{}, timer: {isRunning:false, savedSeconds:0, startTime:0},
+                stats: m.stats || {posSec1:0, posSec2:0, possession1:50, possession2:50, shots1:0, shots2:0, corners1:0, corners2:0, fouls1:0, fouls2:0}
             });
-
-            let updates = { 
-                score1: parseInt(document.getElementById('arcS1').value) || 0, 
-                score2: parseInt(document.getElementById('arcS2').value) || 0, 
-                round: document.getElementById('arcRound').value, 
-                events: document.getElementById('arcEvents').value,
-                squad1: getSq('arc_sq1'),
-                squad2: getSq('arc_sq2')
-            }; 
-            db.ref(`tournaments/${dbPath}/saved_matches/${id}`).update(updates).then(()=>{ 
-                alert("تم تحديث الأرشيف والتشكيلة بنجاح!"); 
-                document.getElementById('archiveModal').style.display = 'none'; 
-            }); 
+            await db.ref(`tournaments/${dbPath}/saved_matches/${id}`).remove();
+            isInternalUpdate = false; alert("✅ عادت المباراة للبث المباشر!"); openTab('tab-live', document.querySelectorAll('.tab-btn')[0]);
         }
 
         function filterTeamsByGroup(groupId, t1Id, t2Id) { const groupVal = document.getElementById(groupId).value; const t1El = document.getElementById(t1Id); const t2El = document.getElementById(t2Id); const currentVal1 = t1El.value; const currentVal2 = t2El.value; let opts = '<option value="">اختر الفريق...</option>'; if (groupVal && allData.groups && allData.groups[groupVal]) { for (let t in allData.groups[groupVal]) opts += `<option value="${t}">${t}</option>`; } else { if (allData.teams) { for (let t in allData.teams) opts += `<option value="${t}">${t}</option>`; } } t1El.innerHTML = opts; t2El.innerHTML = opts; if(Array.from(t1El.options).some(opt => opt.value === currentVal1)) t1El.value = currentVal1; if(Array.from(t2El.options).some(opt => opt.value === currentVal2)) t2El.value = currentVal2; }
