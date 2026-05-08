@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
@@ -200,6 +201,26 @@
                 <button onclick="saveFullTeam()" style="background:var(--primary); color:#fff; border:none; margin-top:15px;"><i class="fa-solid fa-cloud-arrow-up"></i> حفظ بيانات الفريق</button>
                 <button onclick="clearTeamForm()" style="background:transparent; color:var(--muted); border-color:var(--border);">إفراغ الحقول وبدء فريق جديد</button>
             </div>
+
+            <div class="panel" style="border-color:#f59e0b; background:rgba(245, 158, 11, 0.05);">
+                <h2 style="color:#f59e0b; border-bottom-color:rgba(245, 158, 11, 0.2);"><i class="fa-solid fa-user-pen"></i> تعديل إحصائيات لاعب يدوي</h2>
+                <div class="flex-row">
+                    <div><label>الفريق:</label><select id="editStatTeam" onchange="updateEditStatPlayers()"><option value="">اختر الفريق...</option></select></div>
+                    <div><label>اللاعب:</label><select id="editStatPlayer" onchange="loadSinglePlayerStats()"><option value="">اختر اللاعب...</option></select></div>
+                </div>
+                <div class="flex-row" style="margin-top:10px;">
+                    <div><label>⚽ أهداف:</label><input type="number" id="esGoals" value="0"></div>
+                    <div><label>🅰️ صناعة:</label><input type="number" id="esAssists" value="0"></div>
+                    <div><label>🌟 رجل مباراة:</label><input type="number" id="esMotm" value="0"></div>
+                </div>
+                <div class="flex-row">
+                    <div><label>🟨 إنذار:</label><input type="number" id="esYellow" value="0"></div>
+                    <div><label>🟥 طرد:</label><input type="number" id="esRed" value="0"></div>
+                    <div><label>مباريات:</label><input type="number" id="esMatches" value="0"></div>
+                </div>
+                <button onclick="saveSinglePlayerStats()" style="background:#f59e0b; color:#000; border:none; margin-top:10px;"><i class="fa-solid fa-floppy-disk"></i> حفظ وتحديث الإحصائيات</button>
+            </div>
+
             <div id="teamsPreview" class="preview-box" style="background:var(--card); border:none; padding:0;"></div>
         </div>
 
@@ -436,6 +457,50 @@
             ['mRef1', 'mRef2', 'sRef1', 'sRef2', 'esRef1', 'esRef2', 'arcRef1', 'arcRef2', 'ersRef1', 'ersRef2'].forEach(id => { let el = document.getElementById(id); if(el) { let val = el.value; el.innerHTML = opts; if(val) el.value = val; } });
         }
 
+        // --- دوال تعديل الإحصائيات اليدوية ---
+        function updateEditStatPlayers() {
+            const tName = document.getElementById('editStatTeam').value;
+            let pOpts = '<option value="">اختر اللاعب...</option>';
+            if(tName && allData.teams && allData.teams[tName] && allData.teams[tName].players) {
+                for(let p in allData.teams[tName].players) pOpts += `<option value="${p}">${p}</option>`;
+            }
+            document.getElementById('editStatPlayer').innerHTML = pOpts;
+            clearSinglePlayerStats();
+        }
+        function loadSinglePlayerStats() {
+            const tName = document.getElementById('editStatTeam').value;
+            const pName = document.getElementById('editStatPlayer').value;
+            if(!tName || !pName) return clearSinglePlayerStats();
+            const p = allData.teams[tName].players[pName];
+            document.getElementById('esGoals').value = p.goals || 0;
+            document.getElementById('esAssists').value = p.assists || 0;
+            document.getElementById('esMotm').value = p.motm || 0;
+            document.getElementById('esYellow').value = p.yellow || 0;
+            document.getElementById('esRed').value = p.red || 0;
+            document.getElementById('esMatches').value = p.matches || 0;
+        }
+        function clearSinglePlayerStats() {
+            document.getElementById('esGoals').value = 0; document.getElementById('esAssists').value = 0;
+            document.getElementById('esMotm').value = 0; document.getElementById('esYellow').value = 0;
+            document.getElementById('esRed').value = 0; document.getElementById('esMatches').value = 0;
+        }
+        function saveSinglePlayerStats() {
+            const tName = document.getElementById('editStatTeam').value;
+            const pName = document.getElementById('editStatPlayer').value;
+            if(!tName || !pName) return alert("الرجاء اختيار الفريق واللاعب أولاً");
+            const updates = {
+                goals: parseInt(document.getElementById('esGoals').value) || 0,
+                assists: parseInt(document.getElementById('esAssists').value) || 0,
+                motm: parseInt(document.getElementById('esMotm').value) || 0,
+                yellow: parseInt(document.getElementById('esYellow').value) || 0,
+                red: parseInt(document.getElementById('esRed').value) || 0,
+                matches: parseInt(document.getElementById('esMatches').value) || 0
+            };
+            db.ref(`tournaments/${dbPath}/teams/${tName}/players/${pName}`).update(updates).then(() => {
+                alert("تم تحديث إحصائيات اللاعب بنجاح! 🚀");
+            }).catch(e => alert("حدث خطأ أثناء الحفظ"));
+        }
+
         // --- دالة الحذف الشاملة ---
         window.deleteItem = function(path) { 
             if(confirm('تأكيد: هل أنت متأكد من الحذف نهائياً؟')) {
@@ -460,6 +525,9 @@
             let opts = '<option value="">اختر الفريق...</option>'; if(allData.teams) for(let t in allData.teams) opts += `<option value="${t}">${t}</option>`;
             ['t1Name','t2Name','gTeam'].forEach(id => { let el = document.getElementById(id); let currentVal = el.value; el.innerHTML = opts; if(currentVal) el.value = currentVal; });
             
+            // تحديث دروب داون لوحة تعديل الإحصائيات
+            let esTeam = document.getElementById('editStatTeam'); let currEsTeam = esTeam.value; esTeam.innerHTML = opts; if(currEsTeam) esTeam.value = currEsTeam;
+
             filterTeamsByGroup('sGroup', 'sTeam1', 'sTeam2'); filterTeamsByGroup('gmGroup', 'gmTeam1', 'gmTeam2');
             if(live.team1) document.getElementById('t1Name').value = live.team1; if(live.team2) document.getElementById('t2Name').value = live.team2;
             updatePlayerList();
