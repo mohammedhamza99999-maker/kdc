@@ -328,10 +328,33 @@
             if(liveCard) { if(s.active_liveBg) { liveCard.style.backgroundImage = `linear-gradient(to bottom, rgba(14, 19, 24, 0.85), rgba(14, 19, 24, 0.98)), url('${s.active_liveBg}')`; } else { liveCard.style.backgroundImage = `linear-gradient(to bottom, rgba(14, 19, 24, 0.85), rgba(14, 19, 24, 0.98)), url('https://images.unsplash.com/photo-1521731978332-9e9e714b7a3a?q=80&w=1000')`; } }
 
             let adWrapper = document.getElementById('adLinkWrapper'); let adTextDisplay = document.getElementById('adTextDisplay'); let adArea = document.getElementById('adArea'); let adOverlay = document.getElementById('adOverlay'); let adIcon = document.getElementById('adIcon');
-            if(adWrapper) {
+         if(adWrapper) {
                 if(s.adLink && s.adLink.trim() !== '') { adWrapper.href = s.adLink; adWrapper.style.pointerEvents = 'auto'; } else { adWrapper.href = '#'; adWrapper.style.pointerEvents = 'none'; }
-                adTextDisplay.innerText = s.adText || 'مساحة إعلانية لبطولة دوائر خانقين';
-                if(s.active_adBg) { adArea.style.backgroundImage = `url('${s.active_adBg}')`; adArea.style.border = 'none'; adOverlay.style.display = 'block'; adIcon.style.color = '#fff'; } else { adArea.style.backgroundImage = 'none'; adArea.style.border = '1px dashed var(--border)'; adOverlay.style.display = 'none'; adIcon.style.color = 'var(--primary)'; }
+                
+                if(s.active_adBg) { 
+                    // في حالة وجود صورة للإعلان
+                    adArea.style.backgroundImage = `url('${s.active_adBg}')`; 
+                    adArea.style.border = 'none'; 
+                    adOverlay.style.display = 'none'; // إزالة التظليل حتى تبرز الصورة
+                    adIcon.style.display = 'none'; // إخفاء الأيقونة
+                    
+                    // إخفاء النص إذا لم يكتب الأدمن نصاً مخصصاً
+                    if(s.adText && s.adText.trim() !== '') {
+                        adTextDisplay.style.display = 'block';
+                        adTextDisplay.innerText = s.adText;
+                    } else {
+                        adTextDisplay.style.display = 'none';
+                    }
+                } else { 
+                    // في حالة عدم وجود صورة (الوضع الافتراضي)
+                    adArea.style.backgroundImage = 'none'; 
+                    adArea.style.border = '1px dashed var(--border)'; 
+                    adOverlay.style.display = 'none'; 
+                    adIcon.style.display = 'block'; // إظهار الأيقونة
+                    adIcon.style.color = 'var(--primary)'; 
+                    adTextDisplay.style.display = 'block'; // إظهار النص
+                    adTextDisplay.innerText = s.adText || 'مساحة إعلانية لبطولة دوائر خانقين';
+                }
             }
         });
 
