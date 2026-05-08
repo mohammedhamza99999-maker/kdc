@@ -119,6 +119,10 @@
                         <div><label>🙎 حكم الساحة:</label><select id="mRef1" onchange="autoSaveMatchDetails()" style="margin-bottom:0;"></select></div>
                         <div><label>🚩 الحكم المساعد:</label><select id="mRef2" onchange="autoSaveMatchDetails()" style="margin-bottom:0;"></select></div>
                     </div>
+                    <div class="flex-row" style="margin-top:10px;">
+                        <div><label>🚩 الحكم الرابع (اختياري):</label><select id="mRef3" onchange="autoSaveMatchDetails()" style="margin-bottom:0;"></select></div>
+                        <div><label>📺 حكم VAR (اختياري):</label><select id="mRef4" onchange="autoSaveMatchDetails()" style="margin-bottom:0;"></select></div>
+                    </div>
                 </div>
 
                 <div class="flex-row">
@@ -165,9 +169,10 @@
                     </div>
                     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top:15px;">
                         <button onclick="addAutoEvent('goals', '⚽')" style="margin:0; background:var(--accent); color:#000; border:none;"><i class="fa-solid fa-futbol"></i> هدف</button>
+                        <button onclick="addOwnGoal()" style="margin:0; background:transparent; color:#ef4444; border:1px solid #ef4444;">هدف عكسي <i class="fa-solid fa-rotate-left"></i></button>
                         <button onclick="addAutoEvent('assists', '🅰️')" style="margin:0; background:#8b5cf6; color:#fff; border:none;">صناعة 🅰️</button>
                         <button onclick="addAutoEvent('yellow', '🟨')" style="margin:0; background:#facc15; color:#000; border:none;">إنذار 🟨</button>
-                        <button onclick="addAutoEvent('red', '🟥')" style="margin:0; background:#ef4444; color:#fff; border:none;">طرد 🟥</button>
+                        <button onclick="addAutoEvent('red', '🟥')" style="margin:0; background:#ef4444; color:#fff; border:none; grid-column:span 2;">طرد 🟥</button>
                     </div>
                 </div>
                 <textarea id="mEvents" style="min-height: 80px; font-size:13px;" readonly placeholder="سجل الأحداث يظهر هنا..."></textarea>
@@ -246,9 +251,13 @@
                 <div class="flex-row"><select id="sTeam1"></select><select id="sTeam2"></select></div>
                 <div class="flex-row"><input type="date" id="sDate"><input type="time" id="sTime"></div>
                 <input type="text" id="sStadium" placeholder="اسم الملعب (اختياري)" style="margin-bottom:10px;">
-                <div class="flex-row">
+                <div class="flex-row" style="margin-bottom:10px;">
                     <div><label>🙎 حكم الساحة:</label><select id="sRef1" style="margin-bottom:0;"></select></div>
                     <div><label>🚩 حكم مساعد:</label><select id="sRef2" style="margin-bottom:0;"></select></div>
+                </div>
+                <div class="flex-row">
+                    <div><label>🚩 حكم رابع:</label><select id="sRef3" style="margin-bottom:0;"></select></div>
+                    <div><label>📺 حكم VAR:</label><select id="sRef4" style="margin-bottom:0;"></select></div>
                 </div>
                 <button onclick="addSchedule()" style="margin-top:10px;"><i class="fa-solid fa-calendar-plus"></i> إضافة للجدول</button>
             </div>
@@ -275,9 +284,13 @@
                 <div style="font-weight:bold; font-size:15px; text-align:center; margin-bottom:15px; color:var(--text);" id="editMatchupTeams">-- ضد --</div>
                 <div class="flex-row" style="margin-bottom:10px;"><input type="date" id="esDate"><input type="time" id="esTime"></div>
                 <input type="text" id="esStadium" placeholder="اسم الملعب (اختياري)" style="margin-bottom:10px;">
-                <div class="flex-row" style="margin-bottom:15px;">
+                <div class="flex-row" style="margin-bottom:10px;">
                     <div><label>🙎 حكم الساحة:</label><select id="esRef1" style="margin-bottom:0;"></select></div>
                     <div><label>🚩 حكم مساعد:</label><select id="esRef2" style="margin-bottom:0;"></select></div>
+                </div>
+                <div class="flex-row" style="margin-bottom:15px;">
+                    <div><label>🚩 حكم رابع:</label><select id="esRef3" style="margin-bottom:0;"></select></div>
+                    <div><label>📺 حكم VAR:</label><select id="esRef4" style="margin-bottom:0;"></select></div>
                 </div>
                 <button onclick="saveMatchupToSchedule()" style="background:#facc15; color:#000; width:100%; padding:12px; border-radius:8px; border:none; margin-bottom:10px; font-weight:bold;"><i class="fa-solid fa-save"></i> حفظ الموعد للجدول</button>
                 <button onclick="document.getElementById('editScheduleModal').style.display='none'" style="background:transparent; color:#ef4444; width:100%; border:1px solid #ef4444; padding:10px; border-radius:8px;">إلغاء</button>
@@ -291,9 +304,13 @@
                 <div style="font-weight:bold; font-size:15px; text-align:center; margin-bottom:15px; color:var(--text);" id="ersTeams">-- ضد --</div>
                 <div class="flex-row" style="margin-bottom:10px;"><input type="date" id="ersDate"><input type="time" id="ersTime"></div>
                 <input type="text" id="ersStadium" placeholder="اسم الملعب (اختياري)" style="margin-bottom:10px;">
-                <div class="flex-row" style="margin-bottom:15px;">
+                <div class="flex-row" style="margin-bottom:10px;">
                     <div><label>🙎 حكم الساحة:</label><select id="ersRef1" style="margin-bottom:0;"></select></div>
                     <div><label>🚩 حكم مساعد:</label><select id="ersRef2" style="margin-bottom:0;"></select></div>
+                </div>
+                <div class="flex-row" style="margin-bottom:15px;">
+                    <div><label>🚩 حكم رابع:</label><select id="ersRef3" style="margin-bottom:0;"></select></div>
+                    <div><label>📺 حكم VAR:</label><select id="ersRef4" style="margin-bottom:0;"></select></div>
                 </div>
                 <button onclick="saveEditScheduledMatch()" style="background:var(--primary); color:#fff; width:100%; padding:12px; border-radius:8px; border:none; margin-bottom:10px; font-weight:bold;"><i class="fa-solid fa-save"></i> حفظ التعديلات</button>
                 <button onclick="document.getElementById('editRealScheduleModal').style.display='none'" style="background:transparent; color:#ef4444; width:100%; border:1px solid #ef4444; padding:10px; border-radius:8px;">إلغاء</button>
@@ -342,7 +359,7 @@
     <div id="adminSquadModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.85); z-index:2000; align-items:center; justify-content:center; overflow-y:auto; padding:20px; box-sizing:border-box;">
         <div style="background:var(--card); width:100%; max-width:400px; padding:20px; border-radius:12px; border:1px solid var(--primary);">
             <h3 id="sqModalTitle" style="color:var(--primary); text-align:center; margin-top:0;">إدارة تشكيلة الفريق</h3>
-            <div id="liveSquadCtr" style="border:1px solid var(--border); padding:15px; border-radius:8px; margin-bottom:15px;"></div>
+            <div id="liveSquadCtr" style="border:1px solid var(--border); padding:15px; border-radius:8px; margin-bottom:15px; max-height:400px; overflow-y:auto;"></div>
             <label style="display:flex; align-items:center; gap:8px; font-size:13px; color:var(--accent); margin-bottom:15px; cursor:pointer;"><input type="checkbox" id="notifySquad" checked style="width:20px; height:20px; margin:0;"> إرسال إشعار</label>
             <button onclick="saveAdminSquad()" style="background:var(--primary); color:#fff; width:100%; padding:12px; border-radius:8px; border:none; margin-bottom:10px; font-weight:bold;"><i class="fa-solid fa-save"></i> حفظ التشكيلة والتقييمات</button>
             <button onclick="document.getElementById('adminSquadModal').style.display='none'" style="background:transparent; color:#ef4444; width:100%; border:1px solid #ef4444; padding:10px; border-radius:8px;">إلغاء</button>
@@ -355,7 +372,8 @@
             <input type="hidden" id="arcId">
             <div class="flex-row" style="margin-bottom:10px;"><div><label>فريق 1</label><input type="text" id="arcT1" readonly style="background:#27272a; color:#a1a1aa;"></div><div><label>أهداف</label><input type="number" id="arcS1" style="font-weight:bold; text-align:center;"></div></div>
             <div class="flex-row" style="margin-bottom:10px;"><div><label>فريق 2</label><input type="text" id="arcT2" readonly style="background:#27272a; color:#a1a1aa;"></div><div><label>أهداف</label><input type="number" id="arcS2" style="font-weight:bold; text-align:center;"></div></div>
-            <div class="flex-row"><div><label>حكم الساحة</label><select id="arcRef1" style="margin-bottom:0;"></select></div><div><label>حكم مساعد</label><select id="arcRef2" style="margin-bottom:0;"></select></div></div>
+            <div class="flex-row" style="margin-bottom:10px;"><div><label>حكم الساحة</label><select id="arcRef1" style="margin-bottom:0;"></select></div><div><label>حكم مساعد</label><select id="arcRef2" style="margin-bottom:0;"></select></div></div>
+            <div class="flex-row"><div><label>حكم رابع</label><select id="arcRef3" style="margin-bottom:0;"></select></div><div><label>حكم VAR</label><select id="arcRef4" style="margin-bottom:0;"></select></div></div>
             <div style="margin-top:10px; margin-bottom:10px; padding:10px; border:1px dashed #facc15; border-radius:8px;"><label style="color:#facc15;">أفضل لاعب:</label><select id="arcMotm" style="margin-bottom:10px;"></select><button onclick="document.getElementById('arcMotm').value='';" style="background:transparent; color:#ef4444; border:1px solid #ef4444; padding:8px; font-size:12px; font-family:'Cairo';"><i class="fa-solid fa-trash"></i> إلغاء</button></div>
             <div style="background:rgba(255,255,255,0.05); padding:10px; border-radius:8px; margin-bottom:10px;"><label style="color:#ef4444;">كروت بأثر رجعي:</label><select id="arcPlayerSelect" style="margin-bottom:5px;"></select><div class="flex-row"><button onclick="addArcCard('yellow')" style="background:#facc15; color:#000; border:none; margin:0;">إنذار 🟨</button><button onclick="addArcCard('red')" style="background:#ef4444; color:#fff; border:none; margin:0;">طرد 🟥</button></div></div>
             <label>المرحلة / الجولة:</label><select id="arcRound" style="margin-bottom:10px;"><option value="">اختر...</option><option value="الجولة الأولى">الجولة الأولى</option><option value="الجولة الثانية">الجولة الثانية</option><option value="الجولة الثالثة">الجولة الثالثة</option><option value="الجولة الرابعة">الجولة الرابعة</option><option value="الجولة الخامسة">الجولة الخامسة</option><option value="دور الـ 16">دور الـ 16</option><option value="ربع النهائي">ربع النهائي</option><option value="نصف النهائي">نصف النهائي</option><option value="تحديد المركز الثالث">تحديد المركز الثالث</option><option value="النهائي">النهائي</option></select>
@@ -377,7 +395,34 @@
         function openTab(tabId, btn) { document.querySelectorAll('.tab-content').forEach(t=>t.classList.remove('active')); document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active')); document.getElementById(tabId).classList.add('active'); btn.classList.add('active'); }
         
         const grid = document.getElementById('playersGridInputs'); grid.innerHTML = ''; 
-        for(let i=1; i<=12; i++) { grid.innerHTML += `<div style="display:flex; background:var(--input-bg); border-radius:8px; border:1px solid var(--border); overflow:hidden; margin-bottom:10px;"><input type="text" id="p${i}" placeholder="اسم لاعب ${i}" style="border:none; border-radius:0; flex:1; margin:0; padding:10px;"><div style="position:relative; width:45px; display:flex; justify-content:center; align-items:center; background:#27272a; border-right:1px solid var(--border);"><i id="pIcon${i}" class="fa-solid fa-camera" style="color:var(--muted); font-size:16px;"></i><input type="file" id="pImg${i}" accept="image/*" onchange="document.getElementById('pIcon${i}').className='fa-solid fa-circle-check'; document.getElementById('pIcon${i}').style.color='var(--accent)';" style="position:absolute; width:100%; height:100%; opacity:0; cursor:pointer;"></div></div>`; }
+        for(let i=1; i<=25; i++) { 
+            grid.innerHTML += `<div style="display:flex; flex-direction:column; background:var(--input-bg); border-radius:8px; border:1px solid var(--border); overflow:hidden; margin-bottom:10px;">
+                <div style="display:flex; border-bottom:1px solid var(--border);">
+                    <input type="text" id="p${i}" placeholder="اسم لاعب ${i}" style="border:none; border-radius:0; flex:2; margin:0; padding:10px;">
+                    <div style="position:relative; width:45px; display:flex; justify-content:center; align-items:center; background:#27272a; border-right:1px solid var(--border);">
+                        <i id="pIcon${i}" class="fa-solid fa-camera" style="color:var(--muted); font-size:16px;"></i>
+                        <input type="file" id="pImg${i}" accept="image/*" onchange="document.getElementById('pIcon${i}').className='fa-solid fa-circle-check'; document.getElementById('pIcon${i}').style.color='var(--accent)';" style="position:absolute; width:100%; height:100%; opacity:0; cursor:pointer;">
+                    </div>
+                </div>
+                <div style="display:flex; padding:5px; background:#18181b;">
+                    <select id="pPos${i}" style="margin:0; font-size:11px; padding:5px; border:none; background:transparent; color:var(--muted);">
+                        <option value="">-- بدون مركز محدد --</option>
+                        <option value="GK">حارس مرمى (GK)</option>
+                        <option value="CB">قلب دفاع (CB)</option>
+                        <option value="LB">ظهير أيسر (LB)</option>
+                        <option value="RB">ظهير أيمن (RB)</option>
+                        <option value="CDM">ارتكاز (CDM)</option>
+                        <option value="CM">وسط محور (CM)</option>
+                        <option value="CAM">صانع ألعاب (CAM)</option>
+                        <option value="LM">وسط أيسر (LM)</option>
+                        <option value="RM">وسط أيمن (RM)</option>
+                        <option value="LW">جناح أيسر (LW)</option>
+                        <option value="RW">جناح أيمن (RW)</option>
+                        <option value="ST">مهاجم (ST)</option>
+                    </select>
+                </div>
+            </div>`; 
+        }
         
         function updateVisualName() { localStorage.setItem('visualName', document.getElementById('tourneyName').value); alert("تم التغيير!"); }
         if(localStorage.getItem('visualName')) document.getElementById('tourneyName').value = localStorage.getItem('visualName');
@@ -385,53 +430,28 @@
         function updateAppSettings() { const tm = document.getElementById('testModeSelect').value === 'true'; db.ref(`tournaments/${dbPath}/settings`).update({ testMode: tm }); }
         function saveTourneySystem() { const sys = document.getElementById('tourneySystemType').value; db.ref(`tournaments/${dbPath}/settings`).update({ systemType: sys }).then(() => alert("تم حفظ النظام!")); }
 
-        // --- دوال الخلفيات والإعلانات ---
         async function uploadBg(type, inputId) {
             let file = document.getElementById(inputId).files[0]; if(!file) return alert('الرجاء اختيار صورة!');
             document.getElementById('autoSaveMsg1').innerText = "جاري الرفع..."; document.getElementById('autoSaveMsg1').classList.add('show');
             let b64 = await compressImage(file);
-            db.ref(`tournaments/${dbPath}/gallery/${type}`).push(b64).then(() => {
-                document.getElementById(inputId).value = ''; document.getElementById('autoSaveMsg1').classList.remove('show');
-                alert('تم الرفع بنجاح! اختر الصورة من المعرض.');
-            });
+            db.ref(`tournaments/${dbPath}/gallery/${type}`).push(b64).then(() => { document.getElementById(inputId).value = ''; document.getElementById('autoSaveMsg1').classList.remove('show'); alert('تم الرفع بنجاح! اختر الصورة من المعرض.'); });
         }
         window.setActiveBg = function(type, b64) { db.ref(`tournaments/${dbPath}/settings/active_${type}`).set(b64).then(() => alert('تم التفعيل!')); }
-        window.deleteGalleryBg = function(type, key) {
-            if(confirm('متأكد من حذف الصورة؟')) {
-                db.ref(`tournaments/${dbPath}/gallery/${type}/${key}`).remove();
-                db.ref(`tournaments/${dbPath}/settings/active_${type}`).once('value').then(s => {
-                    db.ref(`tournaments/${dbPath}/gallery/${type}/${key}`).once('value').then(imgSnap => { if(s.val() === imgSnap.val()) db.ref(`tournaments/${dbPath}/settings/active_${type}`).remove(); });
-                });
-            }
-        }
-        function saveAdDetails() {
-            db.ref(`tournaments/${dbPath}/settings`).update({
-                adText: document.getElementById('adText').value, adLink: document.getElementById('adLink').value
-            }).then(() => alert('تم حفظ نص ورابط الإعلان!'));
-        }
+        window.deleteGalleryBg = function(type, key) { if(confirm('متأكد من حذف الصورة؟')) { db.ref(`tournaments/${dbPath}/gallery/${type}/${key}`).remove(); db.ref(`tournaments/${dbPath}/settings/active_${type}`).once('value').then(s => { db.ref(`tournaments/${dbPath}/gallery/${type}/${key}`).once('value').then(imgSnap => { if(s.val() === imgSnap.val()) db.ref(`tournaments/${dbPath}/settings/active_${type}`).remove(); }); }); } }
+        function saveAdDetails() { db.ref(`tournaments/${dbPath}/settings`).update({ adText: document.getElementById('adText').value, adLink: document.getElementById('adLink').value }).then(() => alert('تم حفظ نص ورابط الإعلان!')); }
 
         db.ref(`tournaments/${dbPath}/settings`).on('value', snap => {
-            let s = snap.val() || {}; testModeActive = s.testMode === true;
-            let tmEl = document.getElementById('testModeSelect'); if(tmEl) tmEl.value = testModeActive ? 'true' : 'false';
-            document.getElementById('testModeBanner').style.display = testModeActive ? 'block' : 'none';
-            if(s.systemType && document.getElementById('tourneySystemType')) document.getElementById('tourneySystemType').value = s.systemType;
+            let s = snap.val() || {}; testModeActive = s.testMode === true; let tmEl = document.getElementById('testModeSelect'); if(tmEl) tmEl.value = testModeActive ? 'true' : 'false';
+            document.getElementById('testModeBanner').style.display = testModeActive ? 'block' : 'none'; if(s.systemType && document.getElementById('tourneySystemType')) document.getElementById('tourneySystemType').value = s.systemType;
             window.currentActiveLiveBg = s.active_liveBg; window.currentActiveAdBg = s.active_adBg;
-            if(document.getElementById('adText')) document.getElementById('adText').value = s.adText || '';
-            if(document.getElementById('adLink')) document.getElementById('adLink').value = s.adLink || '';
+            if(document.getElementById('adText')) document.getElementById('adText').value = s.adText || ''; if(document.getElementById('adLink')) document.getElementById('adLink').value = s.adLink || '';
         });
 
         db.ref(`tournaments/${dbPath}/gallery`).on('value', snap => {
-            let d = snap.val() || {};
-            let renderGallery = (dataObj, containerId, typeStr) => {
+            let d = snap.val() || {}; let renderGallery = (dataObj, containerId, typeStr) => {
                 let cont = document.getElementById(containerId); cont.innerHTML = '';
-                if(dataObj) {
-                    Object.keys(dataObj).forEach(k => {
-                        let img = dataObj[k]; let isActive = (typeStr === 'liveBg' && img === window.currentActiveLiveBg) || (typeStr === 'adBg' && img === window.currentActiveAdBg);
-                        cont.innerHTML += `<div class="gallery-item ${isActive ? 'active-bg' : ''}"><img src="${img}" onclick="setActiveBg('${typeStr}', '${img}')"><button class="gallery-del-btn" onclick="deleteGalleryBg('${typeStr}', '${k}')"><i class="fa-solid fa-trash"></i></button></div>`;
-                    });
-                } else { cont.innerHTML = '<div style="font-size:11px; color:var(--muted);">لا توجد صور.</div>'; }
-            };
-            renderGallery(d.liveBg, 'liveBgGallery', 'liveBg'); renderGallery(d.adBg, 'adBgGallery', 'adBg');
+                if(dataObj) { Object.keys(dataObj).forEach(k => { let img = dataObj[k]; let isActive = (typeStr === 'liveBg' && img === window.currentActiveLiveBg) || (typeStr === 'adBg' && img === window.currentActiveAdBg); cont.innerHTML += `<div class="gallery-item ${isActive ? 'active-bg' : ''}"><img src="${img}" onclick="setActiveBg('${typeStr}', '${img}')"><button class="gallery-del-btn" onclick="deleteGalleryBg('${typeStr}', '${k}')"><i class="fa-solid fa-trash"></i></button></div>`; }); } else { cont.innerHTML = '<div style="font-size:11px; color:var(--muted);">لا توجد صور.</div>'; }
+            }; renderGallery(d.liveBg, 'liveBgGallery', 'liveBg'); renderGallery(d.adBg, 'adBgGallery', 'adBg');
         });
 
         async function sendManualPush(title, message) {
@@ -442,79 +462,28 @@
             }).then(r => { if(r.ok) alert("تم الإرسال 🚀"); else alert("حدث خطأ"); }).catch(e => console.error(e));
         }
 
-        async function saveRoundStars() {
-            let pFile = document.getElementById('potwImg').files[0]; let tFile = document.getElementById('totwImg').files[0]; let updates = {};
-            if(pFile) updates.player_of_week = await compressImage(pFile); if(tFile) updates.team_of_week = await compressImage(tFile);
-            if(Object.keys(updates).length > 0) { db.ref(`tournaments/${dbPath}/round_stars`).update(updates).then(()=>{ document.getElementById('potwImg').value = ''; document.getElementById('totwImg').value = ''; alert("تم الحفظ!"); }); } else { alert("اختر صورة!"); }
-        }
-
+        async function saveRoundStars() { let pFile = document.getElementById('potwImg').files[0]; let tFile = document.getElementById('totwImg').files[0]; let updates = {}; if(pFile) updates.player_of_week = await compressImage(pFile); if(tFile) updates.team_of_week = await compressImage(tFile); if(Object.keys(updates).length > 0) { db.ref(`tournaments/${dbPath}/round_stars`).update(updates).then(()=>{ document.getElementById('potwImg').value = ''; document.getElementById('totwImg').value = ''; alert("تم الحفظ!"); }); } else { alert("اختر صورة!"); } }
         function editReferee(rName) { document.getElementById('newRefName').value = rName; document.getElementById('newRefName').focus(); alert(`تم تحديد الحكم "${rName}".`); }
         async function addReferee() { const name = document.getElementById('newRefName').value.trim(); if(!name) return alert('أدخل اسم الحكم'); const file = document.getElementById('newRefPhoto').files[0]; let photo = ''; if(file) { photo = await compressImage(file); } else if(allData.referees_data && allData.referees_data[name]) { photo = allData.referees_data[name].photo || ''; } db.ref(`tournaments/${dbPath}/referees_data/${name}`).set({ name, photo }).then(() => { document.getElementById('newRefName').value = ''; document.getElementById('newRefPhoto').value = ''; alert('تم الحفظ!'); }); }
 
         function populateRefereesDropdowns() {
-            let opts = '<option value="">بدون حكم...</option>';
-            if(allData.referees_data) { for(let r in allData.referees_data) { opts += `<option value="${r}">${r}</option>`; } }
-            ['mRef1', 'mRef2', 'sRef1', 'sRef2', 'esRef1', 'esRef2', 'arcRef1', 'arcRef2', 'ersRef1', 'ersRef2'].forEach(id => { let el = document.getElementById(id); if(el) { let val = el.value; el.innerHTML = opts; if(val) el.value = val; } });
+            let opts = '<option value="">بدون حكم...</option>'; if(allData.referees_data) { for(let r in allData.referees_data) { opts += `<option value="${r}">${r}</option>`; } }
+            ['mRef1', 'mRef2', 'mRef3', 'mRef4', 'sRef1', 'sRef2', 'sRef3', 'sRef4', 'esRef1', 'esRef2', 'esRef3', 'esRef4', 'arcRef1', 'arcRef2', 'arcRef3', 'arcRef4', 'ersRef1', 'ersRef2', 'ersRef3', 'ersRef4'].forEach(id => { let el = document.getElementById(id); if(el) { let val = el.value; el.innerHTML = opts; if(val) el.value = val; } });
         }
 
-        // --- دوال تعديل الإحصائيات اليدوية ---
-        function updateEditStatPlayers() {
-            const tName = document.getElementById('editStatTeam').value;
-            let pOpts = '<option value="">اختر اللاعب...</option>';
-            if(tName && allData.teams && allData.teams[tName] && allData.teams[tName].players) {
-                for(let p in allData.teams[tName].players) pOpts += `<option value="${p}">${p}</option>`;
-            }
-            document.getElementById('editStatPlayer').innerHTML = pOpts;
-            clearSinglePlayerStats();
-        }
-        function loadSinglePlayerStats() {
-            const tName = document.getElementById('editStatTeam').value;
-            const pName = document.getElementById('editStatPlayer').value;
-            if(!tName || !pName) return clearSinglePlayerStats();
-            const p = allData.teams[tName].players[pName];
-            document.getElementById('esGoals').value = p.goals || 0;
-            document.getElementById('esAssists').value = p.assists || 0;
-            document.getElementById('esMotm').value = p.motm || 0;
-            document.getElementById('esYellow').value = p.yellow || 0;
-            document.getElementById('esRed').value = p.red || 0;
-            document.getElementById('esMatches').value = p.matches || 0;
-        }
-        function clearSinglePlayerStats() {
-            document.getElementById('esGoals').value = 0; document.getElementById('esAssists').value = 0;
-            document.getElementById('esMotm').value = 0; document.getElementById('esYellow').value = 0;
-            document.getElementById('esRed').value = 0; document.getElementById('esMatches').value = 0;
-        }
-        function saveSinglePlayerStats() {
-            const tName = document.getElementById('editStatTeam').value;
-            const pName = document.getElementById('editStatPlayer').value;
-            if(!tName || !pName) return alert("الرجاء اختيار الفريق واللاعب أولاً");
-            const updates = {
-                goals: parseInt(document.getElementById('esGoals').value) || 0,
-                assists: parseInt(document.getElementById('esAssists').value) || 0,
-                motm: parseInt(document.getElementById('esMotm').value) || 0,
-                yellow: parseInt(document.getElementById('esYellow').value) || 0,
-                red: parseInt(document.getElementById('esRed').value) || 0,
-                matches: parseInt(document.getElementById('esMatches').value) || 0
-            };
-            db.ref(`tournaments/${dbPath}/teams/${tName}/players/${pName}`).update(updates).then(() => {
-                alert("تم تحديث إحصائيات اللاعب بنجاح! 🚀");
-            }).catch(e => alert("حدث خطأ أثناء الحفظ"));
-        }
+        function updateEditStatPlayers() { const tName = document.getElementById('editStatTeam').value; let pOpts = '<option value="">اختر اللاعب...</option>'; if(tName && allData.teams && allData.teams[tName] && allData.teams[tName].players) { for(let p in allData.teams[tName].players) pOpts += `<option value="${p}">${p}</option>`; } document.getElementById('editStatPlayer').innerHTML = pOpts; clearSinglePlayerStats(); }
+        function loadSinglePlayerStats() { const tName = document.getElementById('editStatTeam').value; const pName = document.getElementById('editStatPlayer').value; if(!tName || !pName) return clearSinglePlayerStats(); const p = allData.teams[tName].players[pName]; document.getElementById('esGoals').value = p.goals || 0; document.getElementById('esAssists').value = p.assists || 0; document.getElementById('esMotm').value = p.motm || 0; document.getElementById('esYellow').value = p.yellow || 0; document.getElementById('esRed').value = p.red || 0; document.getElementById('esMatches').value = p.matches || 0; }
+        function clearSinglePlayerStats() { document.getElementById('esGoals').value = 0; document.getElementById('esAssists').value = 0; document.getElementById('esMotm').value = 0; document.getElementById('esYellow').value = 0; document.getElementById('esRed').value = 0; document.getElementById('esMatches').value = 0; }
+        function saveSinglePlayerStats() { const tName = document.getElementById('editStatTeam').value; const pName = document.getElementById('editStatPlayer').value; if(!tName || !pName) return alert("الرجاء اختيار الفريق واللاعب أولاً"); const updates = { goals: parseInt(document.getElementById('esGoals').value) || 0, assists: parseInt(document.getElementById('esAssists').value) || 0, motm: parseInt(document.getElementById('esMotm').value) || 0, yellow: parseInt(document.getElementById('esYellow').value) || 0, red: parseInt(document.getElementById('esRed').value) || 0, matches: parseInt(document.getElementById('esMatches').value) || 0 }; db.ref(`tournaments/${dbPath}/teams/${tName}/players/${pName}`).update(updates).then(() => { alert("تم تحديث إحصائيات اللاعب بنجاح! 🚀"); }).catch(e => alert("حدث خطأ أثناء الحفظ")); }
 
-        // --- دالة الحذف الشاملة ---
-        window.deleteItem = function(path) { 
-            if(confirm('تأكيد: هل أنت متأكد من الحذف نهائياً؟')) {
-                db.ref(`tournaments/${dbPath}/${path}`).remove().then(() => { alert("تم الحذف! 🗑️"); if(typeof renderFullAdminPreviews === "function") renderFullAdminPreviews(); }).catch(err => alert("خطأ: " + err.message));
-            }
-        };
+        window.deleteItem = function(path) { if(confirm('تأكيد: هل أنت متأكد من الحذف نهائياً؟')) { db.ref(`tournaments/${dbPath}/${path}`).remove().then(() => { alert("تم الحذف! 🗑️"); if(typeof renderFullAdminPreviews === "function") renderFullAdminPreviews(); }).catch(err => alert("خطأ: " + err.message)); } };
 
         db.ref('tournaments/' + dbPath).on('value', snap => {
             if(isInternalUpdate) return;
-            allData = snap.val() || {}; const live = allData.live_match || {};
-            populateRefereesDropdowns();
+            allData = snap.val() || {}; const live = allData.live_match || {}; populateRefereesDropdowns();
             document.getElementById('t1Score').value = live.score1||0; document.getElementById('t2Score').value = live.score2||0;
             document.getElementById('mEvents').value = live.events || ''; document.getElementById('mStatus').value = live.status || 'لم تبدأ'; document.getElementById('mRound').value = live.round || ''; document.getElementById('mGroup').value = live.groupInfo || '';
-            document.getElementById('mRef1').value = live.referee1 || ''; document.getElementById('mRef2').value = live.referee2 || ''; 
+            document.getElementById('mRef1').value = live.referee1 || ''; document.getElementById('mRef2').value = live.referee2 || ''; document.getElementById('mRef3').value = live.referee3 || ''; document.getElementById('mRef4').value = live.referee4 || ''; 
             const stats = live.stats || {posSec1: 0, posSec2: 0, possession1: 50, possession2: 50, shots1: 0, shots2: 0, corners1: 0, corners2: 0, fouls1: 0, fouls2: 0};
             posSec1 = stats.posSec1 || 0; posSec2 = stats.posSec2 || 0;
             document.getElementById('posValue1').innerText = stats.possession1 + '%'; document.getElementById('posValue2').innerText = stats.possession2 + '%';
@@ -524,35 +493,22 @@
 
             let opts = '<option value="">اختر الفريق...</option>'; if(allData.teams) for(let t in allData.teams) opts += `<option value="${t}">${t}</option>`;
             ['t1Name','t2Name','gTeam'].forEach(id => { let el = document.getElementById(id); let currentVal = el.value; el.innerHTML = opts; if(currentVal) el.value = currentVal; });
-            
-            // تحديث دروب داون لوحة تعديل الإحصائيات
             let esTeam = document.getElementById('editStatTeam'); let currEsTeam = esTeam.value; esTeam.innerHTML = opts; if(currEsTeam) esTeam.value = currEsTeam;
-
             filterTeamsByGroup('sGroup', 'sTeam1', 'sTeam2'); filterTeamsByGroup('gmGroup', 'gmTeam1', 'gmTeam2');
             if(live.team1) document.getElementById('t1Name').value = live.team1; if(live.team2) document.getElementById('t2Name').value = live.team2;
             updatePlayerList();
             
             clearInterval(adminClockInterval);
-            if(live.timer && live.timer.isRunning) {
-                adminClockInterval = setInterval(() => {
-                    let elapsed = Math.floor((Date.now() - (live.timer.startTime || Date.now())) / 1000); let sec = live.timer.savedSeconds !== undefined ? live.timer.savedSeconds : (live.timer.baseMinute * 60 || 0); let totalSecs = sec + elapsed; let m = Math.floor(totalSecs / 60); let s = totalSecs % 60;
-                    document.getElementById('adminClock').innerText = `${m}:${s < 10 ? '0'+s : s}`;
-                    if(posActiveTeam === 1) posSec1++; else if(posActiveTeam === 2) posSec2++;
-                    let totPos = posSec1 + posSec2;
-                    if(totPos > 0) { let pct1 = Math.round((posSec1 / totPos) * 100); let pct2 = 100 - pct1; document.getElementById('posValue1').innerText = pct1 + '%'; document.getElementById('posValue2').innerText = pct2 + '%'; if(totPos % 5 === 0) { db.ref(`tournaments/${dbPath}/live_match/stats`).update({posSec1: posSec1, posSec2: posSec2, possession1: pct1, possession2: pct2}); } }
-                }, 1000);
-            } else if (live.timer && !live.timer.isRunning) {
-                let sec = live.timer.savedSeconds !== undefined ? live.timer.savedSeconds : (live.timer.baseMinute * 60 || 0); let m = Math.floor(sec / 60); let s = sec % 60; document.getElementById('adminClock').innerText = `${m}:${s < 10 ? '0'+s : s}`;
-                if(document.activeElement.id !== 'tMinutes') document.getElementById('tMinutes').value = m;
-            } else { document.getElementById('adminClock').innerText = `00:00`; }
+            if(live.timer && live.timer.isRunning) { adminClockInterval = setInterval(() => { let elapsed = Math.floor((Date.now() - (live.timer.startTime || Date.now())) / 1000); let sec = live.timer.savedSeconds !== undefined ? live.timer.savedSeconds : (live.timer.baseMinute * 60 || 0); let totalSecs = sec + elapsed; let m = Math.floor(totalSecs / 60); let s = totalSecs % 60; document.getElementById('adminClock').innerText = `${m}:${s < 10 ? '0'+s : s}`; if(posActiveTeam === 1) posSec1++; else if(posActiveTeam === 2) posSec2++; let totPos = posSec1 + posSec2; if(totPos > 0) { let pct1 = Math.round((posSec1 / totPos) * 100); let pct2 = 100 - pct1; document.getElementById('posValue1').innerText = pct1 + '%'; document.getElementById('posValue2').innerText = pct2 + '%'; if(totPos % 5 === 0) { db.ref(`tournaments/${dbPath}/live_match/stats`).update({posSec1: posSec1, posSec2: posSec2, possession1: pct1, possession2: pct2}); } } }, 1000);
+            } else if (live.timer && !live.timer.isRunning) { let sec = live.timer.savedSeconds !== undefined ? live.timer.savedSeconds : (live.timer.baseMinute * 60 || 0); let m = Math.floor(sec / 60); let s = sec % 60; document.getElementById('adminClock').innerText = `${m}:${s < 10 ? '0'+s : s}`; if(document.activeElement.id !== 'tMinutes') document.getElementById('tMinutes').value = m; } else { document.getElementById('adminClock').innerText = `00:00`; }
             renderFullAdminPreviews();
         });
 
         db.ref('analytics/visits').on('value', snap => { document.getElementById('visitCount').innerText = snap.numChildren(); });
 
         let autoSaveTimeout;
-        function autoSaveMatchDetails() { clearTimeout(autoSaveTimeout); autoSaveTimeout = setTimeout(() => { isInternalUpdate = true; db.ref(`tournaments/${dbPath}/live_match`).update({ round: document.getElementById('mRound').value, groupInfo: document.getElementById('mGroup').value, status: document.getElementById('mStatus').value, team1: document.getElementById('t1Name').value, team2: document.getElementById('t2Name').value, referee1: document.getElementById('mRef1').value, referee2: document.getElementById('mRef2').value }).then(() => { const ind = document.getElementById('autoSaveMsg1'); ind.classList.add('show'); setTimeout(() => ind.classList.remove('show'), 2000); isInternalUpdate = false; }); }, 500); }
-        function clearLiveMatch() { if(confirm("إفراغ المباشر بالكامل؟")) { isInternalUpdate = true; db.ref(`tournaments/${dbPath}/live_match`).set({ team1:'', team2:'', score1:0, score2:0, events:'', status:'لم تبدأ', round: '', groupInfo: '', referee1:'', referee2:'', squad1:{}, squad2:{}, timer:{isRunning:false, savedSeconds:0, startTime:0}, stats: {posSec1:0, posSec2:0, possession1: 50, possession2: 50, shots1: 0, shots2: 0, corners1: 0, corners2: 0, fouls1: 0, fouls2: 0}}).then(() => { alert("تم الإفراغ!"); location.reload(); }); } }
+        function autoSaveMatchDetails() { clearTimeout(autoSaveTimeout); autoSaveTimeout = setTimeout(() => { isInternalUpdate = true; db.ref(`tournaments/${dbPath}/live_match`).update({ round: document.getElementById('mRound').value, groupInfo: document.getElementById('mGroup').value, status: document.getElementById('mStatus').value, team1: document.getElementById('t1Name').value, team2: document.getElementById('t2Name').value, referee1: document.getElementById('mRef1').value, referee2: document.getElementById('mRef2').value, referee3: document.getElementById('mRef3').value, referee4: document.getElementById('mRef4').value }).then(() => { const ind = document.getElementById('autoSaveMsg1'); ind.classList.add('show'); setTimeout(() => ind.classList.remove('show'), 2000); isInternalUpdate = false; }); }, 500); }
+        function clearLiveMatch() { if(confirm("إفراغ المباشر بالكامل؟")) { isInternalUpdate = true; db.ref(`tournaments/${dbPath}/live_match`).set({ team1:'', team2:'', score1:0, score2:0, events:'', status:'لم تبدأ', round: '', groupInfo: '', referee1:'', referee2:'', referee3:'', referee4:'', squad1:{}, squad2:{}, timer:{isRunning:false, savedSeconds:0, startTime:0}, stats: {posSec1:0, posSec2:0, possession1: 50, possession2: 50, shots1: 0, shots2: 0, corners1: 0, corners2: 0, fouls1: 0, fouls2: 0}}).then(() => { alert("تم الإفراغ!"); location.reload(); }); } }
 
         function setPossession(teamNum) { posActiveTeam = teamNum; document.getElementById('btnPos1').className = 'pos-btn ' + (teamNum===1 ? 'active-1' : ''); document.getElementById('btnPos2').className = 'pos-btn ' + (teamNum===2 ? 'active-2' : ''); document.getElementById('btnPos0').className = 'pos-btn ' + (teamNum===0 ? 'active-0' : ''); let totPos = posSec1 + posSec2; let pct1 = totPos===0 ? 50 : Math.round((posSec1 / totPos) * 100); let pct2 = 100 - pct1; db.ref(`tournaments/${dbPath}/live_match/stats`).update({posSec1: posSec1, posSec2: posSec2, possession1: pct1, possession2: pct2}); }
         function updateStat(id, change) { let el = document.getElementById(id); let val = parseInt(el.value) || 0; if(val + change >= 0) { el.value = val + change; autoSaveMatchStats(); } }
@@ -565,43 +521,38 @@
 
         function updatePlayerList() {
             const t1 = document.getElementById('t1Name').value, t2 = document.getElementById('t2Name').value; const side = document.querySelector('input[name="evtTeam"]:checked').value; const activeTeam = side === "1" ? t1 : t2; 
-            let pOpts = '<option value="">اختر اللاعب...</option>'; 
-            if(allData.teams?.[activeTeam]?.players) for(let p in allData.teams[activeTeam].players) pOpts += `<option value="${p}">${p}</option>`; 
+            let pOpts = '<option value="">اختر اللاعب...</option>'; if(allData.teams?.[activeTeam]?.players) for(let p in allData.teams[activeTeam].players) pOpts += `<option value="${p}">${p}</option>`; 
             document.getElementById('evtPlayer').innerHTML = pOpts; 
-            
-            let allPOpts = '<option value="">رجل المباراة...</option>'; 
-            if(allData.teams?.[t1]?.players) for(let p in allData.teams[t1].players) allPOpts += `<option value="${t1}|${p}">${p} (${t1})</option>`; 
-            if(allData.teams?.[t2]?.players) for(let p in allData.teams[t2].players) allPOpts += `<option value="${t2}|${p}">${p} (${t2})</option>`; 
+            let allPOpts = '<option value="">رجل المباراة...</option>'; if(allData.teams?.[t1]?.players) for(let p in allData.teams[t1].players) allPOpts += `<option value="${t1}|${p}">${p} (${t1})</option>`; if(allData.teams?.[t2]?.players) for(let p in allData.teams[t2].players) allPOpts += `<option value="${t2}|${p}">${p} (${t2})</option>`; 
             document.getElementById('motmPlayer').innerHTML = allPOpts;
         }
 
         let currentAdminSquadTeam = 1;
         function openAdminSquad(teamNum) {
-            currentAdminSquadTeam = teamNum;
-            const tName = document.getElementById(teamNum === 1 ? 't1Name' : 't2Name').value;
-            if(!tName) return alert("اختر الفريق أولاً!");
-            document.getElementById('sqModalTitle').innerText = `تشكيلة وتقييم: ${tName}`;
-            
-            let opts = '<option value="">-- اختر اللاعب --</option>';
-            if(allData.teams?.[tName]?.players) { Object.keys(allData.teams[tName].players).forEach(p => opts += `<option value="${p}">${p}</option>`); }
-
-            let savedSq = allData.live_match?.[`squad${teamNum}`] || {};
-            let html = '';
-            const positions = {gk:'حارس مرمى', lb:'مدافع أيسر', rb:'مدافع أيمن', lm:'وسط أيسر', cm:'وسط ارتكاز', rm:'وسط أيمن', st:'مهاجم'};
+            currentAdminSquadTeam = teamNum; const tName = document.getElementById(teamNum === 1 ? 't1Name' : 't2Name').value; if(!tName) return alert("اختر الفريق أولاً!"); document.getElementById('sqModalTitle').innerText = `تشكيلة وتقييم: ${tName}`;
+            let opts = '<option value="">-- اختر اللاعب --</option>'; if(allData.teams?.[tName]?.players) { Object.keys(allData.teams[tName].players).forEach(p => opts += `<option value="${p}">${p}</option>`); }
+            let savedSq = allData.live_match?.[`squad${teamNum}`] || {}; let html = '';
+            const positions = {gk:'حارس مرمى', cb:'قلب دفاع', lb:'مدافع أيسر', rb:'مدافع أيمن', cdm:'ارتكاز دفاعي', cm:'وسط محور', cam:'صانع ألعاب', lm:'وسط أيسر', rm:'وسط أيمن', lw:'جناح أيسر', rw:'جناح أيمن', st:'مهاجم'};
             for(let pos in positions) { html += `<div style="margin-bottom:10px;"><label style="color:var(--accent); font-size:11px;">${positions[pos]} (${pos.toUpperCase()})</label><div class="flex-row"><select id="sq_${pos}" style="flex:2; margin:0; font-size:12px;">${opts}</select><input type="number" id="sq_r_${pos}" style="flex:1; margin:0; padding:8px; text-align:center; font-size:12px;" placeholder="التقييم" step="0.1" max="10" min="0"></div></div>`; }
             document.getElementById('liveSquadCtr').innerHTML = html;
-
             setTimeout(() => { for(let pos in positions) { let el = document.getElementById(`sq_${pos}`); let rEl = document.getElementById(`sq_r_${pos}`); if(savedSq[pos]) { let pData = savedSq[pos]; if(typeof pData === 'object') { el.value = pData.name || ''; rEl.value = pData.rating || ''; } else { el.value = pData; rEl.value = ''; } } } }, 50);
             document.getElementById('adminSquadModal').style.display = 'flex';
         }
 
         function saveAdminSquad() {
-            let sq = {}; ['gk', 'rb', 'lb', 'rm', 'cm', 'lm', 'st'].forEach(pos => { sq[pos] = { name: document.getElementById(`sq_${pos}`).value, rating: document.getElementById(`sq_r_${pos}`).value }; });
-            db.ref(`tournaments/${dbPath}/live_match/squad${currentAdminSquadTeam}`).set(sq).then(() => {
-                document.getElementById('adminSquadModal').style.display = 'none';
-                if(document.getElementById('notifySquad').checked) { const tName = document.getElementById(currentAdminSquadTeam === 1 ? 't1Name' : 't2Name').value; sendManualPush("إعلان التشكيلة 📋", `تم الإعلان عن التشكيلة الأساسية لفريق ${tName}`); }
-                alert("تم الحفظ!");
-            });
+            let sq = {}; ['gk', 'cb', 'lb', 'rb', 'cdm', 'cm', 'cam', 'lm', 'rm', 'lw', 'rw', 'st'].forEach(pos => { sq[pos] = { name: document.getElementById(`sq_${pos}`).value, rating: document.getElementById(`sq_r_${pos}`).value }; });
+            db.ref(`tournaments/${dbPath}/live_match/squad${currentAdminSquadTeam}`).set(sq).then(() => { document.getElementById('adminSquadModal').style.display = 'none'; if(document.getElementById('notifySquad').checked) { const tName = document.getElementById(currentAdminSquadTeam === 1 ? 't1Name' : 't2Name').value; sendManualPush("إعلان التشكيلة 📋", `تم الإعلان عن التشكيلة الأساسية لفريق ${tName}`); } alert("تم الحفظ!"); });
+        }
+
+        async function addOwnGoal() {
+            const side = document.querySelector('input[name="evtTeam"]:checked').value; const tName = document.getElementById('t' + side + 'Name').value; const pName = document.getElementById('evtPlayer').value;
+            if(!tName || !pName) return alert("اختر اللاعب الذي سجل الهدف العكسي في مرماه!");
+            const otherSide = side === "1" ? "2" : "1"; const otherTName = document.getElementById('t' + otherSide + 'Name').value;
+            let min = document.getElementById('evtMin').value; 
+            if(!min) { const live = allData.live_match || {}; if(live.timer && live.timer.isRunning) { let elapsed = Math.floor((Date.now() - (live.timer.startTime||Date.now())) / 1000); min = Math.floor(((live.timer.savedSeconds||0) + elapsed) / 60); } else { min = Math.floor((live.timer?.savedSeconds||0) / 60); } }
+            let scoreKey = 'score' + otherSide; let currentScore = parseInt(document.getElementById('t'+otherSide+'Score').value) || 0; db.ref(`tournaments/${dbPath}/live_match/${scoreKey}`).set(currentScore + 1); document.getElementById('t'+otherSide+'Score').value = currentScore + 1;
+            sendManualPush("⚽ هدف عكسي!", `هدف عكسي سجله ${pName} في مرماه لصالح ${otherTName}`);
+            const currentEvents = document.getElementById('mEvents').value; const newEvent = `⚽ (عكسي) ${min}' ${pName} (${tName})`; document.getElementById('mEvents').value = currentEvents ? currentEvents + '\n' + newEvent : newEvent; db.ref(`tournaments/${dbPath}/live_match/events`).set(document.getElementById('mEvents').value); autoSaveMatchDetails();
         }
 
         async function addAutoEvent(type, icon) {
@@ -609,35 +560,29 @@
             if(!tName || !pName) return alert("اختر اللاعب!");
             let min = document.getElementById('evtMin').value; 
             if(!min) { const live = allData.live_match || {}; if(live.timer && live.timer.isRunning) { let elapsed = Math.floor((Date.now() - (live.timer.startTime||Date.now())) / 1000); min = Math.floor(((live.timer.savedSeconds||0) + elapsed) / 60); } else { min = Math.floor((live.timer?.savedSeconds||0) / 60); } }
+            
             if(type === 'goals') { let scoreKey = 'score' + side; let currentScore = parseInt(document.getElementById('t'+side+'Score').value) || 0; db.ref(`tournaments/${dbPath}/live_match/${scoreKey}`).set(currentScore + 1); document.getElementById('t'+side+'Score').value = currentScore + 1; sendManualPush("⚽ هدف!", `هدف لـ ${tName} بواسطة ${pName}`); }
-            if(type === 'yellow') sendManualPush("🟨 بطاقة صفراء!", `إنذار للاعب ${pName}`);
+            if(type === 'yellow') {
+                const currentEvents = document.getElementById('mEvents').value; const yellowRegex = new RegExp(`🟨.*${pName}`, 'g'); const yellowCount = (currentEvents.match(yellowRegex) || []).length;
+                sendManualPush("🟨 بطاقة صفراء!", `إنذار للاعب ${pName}`);
+                if (yellowCount >= 1) { alert(`تنبيه: هذه البطاقة الصفراء الثانية للاعب ${pName}، سيتم طرده تلقائياً! 🟥`); setTimeout(() => addAutoEvent('red', '🟥'), 500); }
+            }
             if(type === 'red') sendManualPush("🟥 بطاقة حمراء!", `طرد للاعب ${pName}`);
             
             const currentEvents = document.getElementById('mEvents').value; const newEvent = `${icon} ${min}' ${pName} (${tName})`; document.getElementById('mEvents').value = currentEvents ? currentEvents + '\n' + newEvent : newEvent; db.ref(`tournaments/${dbPath}/live_match/events`).set(document.getElementById('mEvents').value); db.ref(`tournaments/${dbPath}/teams/${tName}/players/${pName}/${type}`).transaction(c => (c||0)+1); autoSaveMatchDetails();
         }
 
         async function endMatchAndSave() {
-            const t1 = document.getElementById('t1Name').value; const t2 = document.getElementById('t2Name').value; 
-            const s1 = parseInt(document.getElementById('t1Score').value) || 0; const s2 = parseInt(document.getElementById('t2Score').value) || 0; 
-            const mRound = document.getElementById('mRound').value; const mGroup = document.getElementById('mGroup').value; const mEvents = document.getElementById('mEvents').value;
-            const ref1 = document.getElementById('mRef1').value; const ref2 = document.getElementById('mRef2').value;
-
-            const motmVal = document.getElementById('motmPlayer').value; let motmName = "", motmTeam = "";
-            if(motmVal) { [motmTeam, motmName] = motmVal.split('|'); db.ref(`tournaments/${dbPath}/teams/${motmTeam}/players/${motmName}/motm`).transaction(c => (c||0)+1); }
-
-            let totPos = posSec1 + posSec2; let pct1 = totPos===0 ? 50 : Math.round((posSec1 / totPos) * 100); let pct2 = 100 - pct1;
-            const fStats = { possession1: pct1, possession2: pct2, shots1: document.getElementById('shots1').value, shots2: document.getElementById('shots2').value, corners1: document.getElementById('corners1').value, corners2: document.getElementById('corners2').value, fouls1: document.getElementById('fouls1').value, fouls2: document.getElementById('fouls2').value };
-
+            const t1 = document.getElementById('t1Name').value; const t2 = document.getElementById('t2Name').value; const s1 = parseInt(document.getElementById('t1Score').value) || 0; const s2 = parseInt(document.getElementById('t2Score').value) || 0; const mRound = document.getElementById('mRound').value; const mGroup = document.getElementById('mGroup').value; const mEvents = document.getElementById('mEvents').value; const ref1 = document.getElementById('mRef1').value; const ref2 = document.getElementById('mRef2').value; const ref3 = document.getElementById('mRef3').value; const ref4 = document.getElementById('mRef4').value;
+            const motmVal = document.getElementById('motmPlayer').value; let motmName = "", motmTeam = ""; if(motmVal) { [motmTeam, motmName] = motmVal.split('|'); db.ref(`tournaments/${dbPath}/teams/${motmTeam}/players/${motmName}/motm`).transaction(c => (c||0)+1); }
+            let totPos = posSec1 + posSec2; let pct1 = totPos===0 ? 50 : Math.round((posSec1 / totPos) * 100); let pct2 = 100 - pct1; const fStats = { possession1: pct1, possession2: pct2, shots1: document.getElementById('shots1').value, shots2: document.getElementById('shots2').value, corners1: document.getElementById('corners1').value, corners2: document.getElementById('corners2').value, fouls1: document.getElementById('fouls1').value, fouls2: document.getElementById('fouls2').value };
             if(!t1 || !t2) return alert("اختر الفرق!"); if(!confirm("إنهاء وحفظ المباراة؟")) return;
             
             let sq1 = allData.live_match?.squad1 || {}; let sq2 = allData.live_match?.squad2 || {};
-            if(Object.keys(sq1).length === 0) { let pList1 = allData.teams[t1]?.players || {}; Object.keys(pList1).forEach(pName => { db.ref(`tournaments/${dbPath}/teams/${t1}/players/${pName}/matches`).transaction(c => (c||0)+1); }); } 
-            else { Object.values(sq1).forEach(pData => { let pName = typeof pData === 'object' ? pData.name : pData; if(pName) db.ref(`tournaments/${dbPath}/teams/${t1}/players/${pName}/matches`).transaction(c => (c||0)+1); }); }
-            if(Object.keys(sq2).length === 0) { let pList2 = allData.teams[t2]?.players || {}; Object.keys(pList2).forEach(pName => { db.ref(`tournaments/${dbPath}/teams/${t2}/players/${pName}/matches`).transaction(c => (c||0)+1); }); } 
-            else { Object.values(sq2).forEach(pData => { let pName = typeof pData === 'object' ? pData.name : pData; if(pName) db.ref(`tournaments/${dbPath}/teams/${t2}/players/${pName}/matches`).transaction(c => (c||0)+1); }); }
+            if(Object.keys(sq1).length === 0) { let pList1 = allData.teams[t1]?.players || {}; Object.keys(pList1).forEach(pName => { db.ref(`tournaments/${dbPath}/teams/${t1}/players/${pName}/matches`).transaction(c => (c||0)+1); }); } else { Object.values(sq1).forEach(pData => { let pName = typeof pData === 'object' ? pData.name : pData; if(pName) db.ref(`tournaments/${dbPath}/teams/${t1}/players/${pName}/matches`).transaction(c => (c||0)+1); }); }
+            if(Object.keys(sq2).length === 0) { let pList2 = allData.teams[t2]?.players || {}; Object.keys(pList2).forEach(pName => { db.ref(`tournaments/${dbPath}/teams/${t2}/players/${pName}/matches`).transaction(c => (c||0)+1); }); } else { Object.values(sq2).forEach(pData => { let pName = typeof pData === 'object' ? pData.name : pData; if(pName) db.ref(`tournaments/${dbPath}/teams/${t2}/players/${pName}/matches`).transaction(c => (c||0)+1); }); }
 
-            const archiveData = { team1: t1, team2: t2, score1: s1, score2: s2, round: mRound, groupInfo: mGroup, events: mEvents, motm: motmName, motmTeam: motmTeam, referee1: ref1, referee2: ref2, squad1: sq1, squad2: sq2, date: new Date().toLocaleDateString('ar-IQ'), stats: fStats };
-
+            const archiveData = { team1: t1, team2: t2, score1: s1, score2: s2, round: mRound, groupInfo: mGroup, events: mEvents, motm: motmName, motmTeam: motmTeam, referee1: ref1, referee2: ref2, referee3: ref3, referee4: ref4, squad1: sq1, squad2: sq2, date: new Date().toLocaleDateString('ar-IQ'), stats: fStats };
             db.ref(`tournaments/${dbPath}/teams/${t1}/gf`).transaction(c => (c||0)+s1); db.ref(`tournaments/${dbPath}/teams/${t1}/ga`).transaction(c => (c||0)+s2); db.ref(`tournaments/${dbPath}/teams/${t2}/gf`).transaction(c => (c||0)+s2); db.ref(`tournaments/${dbPath}/teams/${t2}/ga`).transaction(c => (c||0)+s1);
 
             if (mGroup && mGroup !== "") {
@@ -647,11 +592,10 @@
             }
 
             await db.ref(`tournaments/${dbPath}/saved_matches`).push(archiveData);
-            await db.ref(`tournaments/${dbPath}/live_match`).set({ team1:'', team2:'', score1:0, score2:0, events:'', status:'لم تبدأ', round: '', groupInfo: '', referee1:'', referee2:'', squad1:{}, squad2:{}, timer:{isRunning:false, savedSeconds:0, startTime:0}, stats: {posSec1:0, posSec2:0, possession1: 50, possession2: 50, shots1: 0, shots2: 0, corners1: 0, corners2: 0, fouls1: 0, fouls2: 0}}); 
+            await db.ref(`tournaments/${dbPath}/live_match`).set({ team1:'', team2:'', score1:0, score2:0, events:'', status:'لم تبدأ', round: '', groupInfo: '', referee1:'', referee2:'', referee3:'', referee4:'', squad1:{}, squad2:{}, timer:{isRunning:false, savedSeconds:0, startTime:0}, stats: {posSec1:0, posSec2:0, possession1: 50, possession2: 50, shots1: 0, shots2: 0, corners1: 0, corners2: 0, fouls1: 0, fouls2: 0}}); 
             
             let endMsg = `انتهت مباراة ${t1} و ${t2} بنتيجة ${s1} - ${s2}.`; if(motmName) endMsg += ` نجم المباراة: ${motmName} 🌟.`; sendManualPush("انتهاء المباراة! 🏁", endMsg);
-            document.getElementById('t1Name').value=''; document.getElementById('t2Name').value=''; document.getElementById('mRound').value=''; document.getElementById('mGroup').value=''; document.getElementById('mStatus').value='لم تبدأ'; document.getElementById('tMinutes').value=0; document.getElementById('mRef1').value=''; document.getElementById('mRef2').value=''; posSec1=0; posSec2=0; posActiveTeam=0; setPossession(0);
-            alert("تم الإنهاء والحفظ!"); 
+            document.getElementById('t1Name').value=''; document.getElementById('t2Name').value=''; document.getElementById('mRound').value=''; document.getElementById('mGroup').value=''; document.getElementById('mStatus').value='لم تبدأ'; document.getElementById('tMinutes').value=0; document.getElementById('mRef1').value=''; document.getElementById('mRef2').value=''; document.getElementById('mRef3').value=''; document.getElementById('mRef4').value=''; posSec1=0; posSec2=0; posActiveTeam=0; setPossession(0); alert("تم الإنهاء والحفظ!"); 
         }
 
         function compressImage(file) { return new Promise((resolve) => { const reader = new FileReader(); reader.readAsDataURL(file); reader.onload = (e) => { const img = new Image(); img.src = e.target.result; img.onload = () => { const canvas = document.createElement('canvas'); let w = img.width; let h = img.height; const max_w = 400; const max_h = 400; if (w > h) { if (w > max_w) { h = Math.round(h * max_w / w); w = max_w; } } else { if (h > max_h) { w = Math.round(w * max_h / h); h = max_h; } } canvas.width = w; canvas.height = h; const ctx = canvas.getContext('2d'); ctx.drawImage(img, 0, 0, w, h); resolve(canvas.toDataURL('image/webp', 0.5)); }; }; }); }
@@ -659,7 +603,18 @@
         async function saveFullTeam() { 
             const tName = document.getElementById('dbTeamName').value.trim(); if (!tName) return alert("اكتب اسم الفريق!"); document.getElementById('autoSaveMsg1').innerText = "جاري الحفظ..."; document.getElementById('autoSaveMsg1').classList.add('show');
             let teamObj = { coach: document.getElementById('dbCoach').value || "", assistant: document.getElementById('dbAsst').value || "", players: {} }; 
-            for(let i=1; i<=12; i++) { let pName = document.getElementById('p'+i).value.trim(); let pFile = document.getElementById('pImg'+i).files[0]; if (pName) { let pStats = {goals:0, assists:0, yellow:0, red:0, matches:0, motm:0}; if(allData && allData.teams && allData.teams[tName] && allData.teams[tName].players && allData.teams[tName].players[pName]) { pStats = allData.teams[tName].players[pName]; } if(pFile) { try { pStats.photo = await compressImage(pFile); } catch(e){} } teamObj.players[pName] = pStats; } } 
+            for(let i=1; i<=25; i++) { 
+                let pName = document.getElementById('p'+i).value.trim(); 
+                let pFile = document.getElementById('pImg'+i).files[0]; 
+                let pPos = document.getElementById('pPos'+i).value;
+                if (pName) { 
+                    let pStats = {goals:0, assists:0, yellow:0, red:0, matches:0, motm:0}; 
+                    if(allData && allData.teams && allData.teams[tName] && allData.teams[tName].players && allData.teams[tName].players[pName]) { pStats = allData.teams[tName].players[pName]; } 
+                    pStats.position = pPos;
+                    if(pFile) { try { pStats.photo = await compressImage(pFile); } catch(e){} } 
+                    teamObj.players[pName] = pStats; 
+                } 
+            } 
             const teamLogoFile = document.getElementById('dbLogo').files[0]; const cPhotoFile = document.getElementById('dbCoachPhoto').files[0]; const aPhotoFile = document.getElementById('dbAsstPhoto').files[0]; const jerseyImgFile = document.getElementById('dbJerseyImg').files[0]; const jerseyImgFile2 = document.getElementById('dbJerseyImg2').files[0]; 
             
             if(teamLogoFile) { try { teamObj.logo = await compressImage(teamLogoFile); } catch(e){} } else if (allData && allData.teams && allData.teams[tName] && allData.teams[tName].logo) teamObj.logo = allData.teams[tName].logo; 
@@ -673,20 +628,19 @@
             db.ref(`tournaments/${dbPath}/teams/${tName}`).set(teamObj).then(() => { document.getElementById('autoSaveMsg1').classList.remove('show'); setTimeout(() => { document.getElementById('autoSaveMsg1').innerText = "تم الحفظ"; }, 500); alert("تم حفظ الفريق!"); clearTeamForm(); }).catch(e => alert("خطأ!")); 
         }
 
-        function clearTeamForm() { document.getElementById('dbTeamName').value=''; document.getElementById('dbCoach').value=''; document.getElementById('dbAsst').value=''; document.getElementById('dbLogo').value=''; document.getElementById('dbCoachPhoto').value=''; document.getElementById('dbAsstPhoto').value=''; document.getElementById('dbJerseyColor').value='#ffffff'; document.getElementById('dbJerseyImg').value=''; document.getElementById('dbJerseyImg2').value=''; for(let i=1; i<=12; i++) { document.getElementById('p'+i).value=''; document.getElementById('pImg'+i).value=''; document.getElementById('pIcon'+i).className = 'fa-solid fa-camera'; document.getElementById('pIcon'+i).style.color = 'var(--muted)'; } }
+        function clearTeamForm() { document.getElementById('dbTeamName').value=''; document.getElementById('dbCoach').value=''; document.getElementById('dbAsst').value=''; document.getElementById('dbLogo').value=''; document.getElementById('dbCoachPhoto').value=''; document.getElementById('dbAsstPhoto').value=''; document.getElementById('dbJerseyColor').value='#ffffff'; document.getElementById('dbJerseyImg').value=''; document.getElementById('dbJerseyImg2').value=''; for(let i=1; i<=25; i++) { document.getElementById('p'+i).value=''; document.getElementById('pImg'+i).value=''; document.getElementById('pIcon'+i).className = 'fa-solid fa-camera'; document.getElementById('pIcon'+i).style.color = 'var(--muted)'; if(document.getElementById('pPos'+i)) document.getElementById('pPos'+i).value=''; } }
 
-        window.loadTeamForEdit = function(tName) { const tData = allData.teams[tName]; if(!tData) return; clearTeamForm(); document.getElementById('dbTeamName').value = tName; document.getElementById('dbCoach').value = tData.coach || ''; document.getElementById('dbAsst').value = tData.assistant || ''; document.getElementById('dbJerseyColor').value = tData.jerseyColor || '#ffffff'; if(tData.players) { let i = 1; for(let pName in tData.players) { if(i > 12) break; document.getElementById('p'+i).value = pName; if(tData.players[pName].photo) { document.getElementById('pIcon'+i).className = 'fa-solid fa-check-double'; document.getElementById('pIcon'+i).style.color = '#3b82f6'; } i++; } } openTab('tab-teams', document.querySelectorAll('.tab-btn')[1]); };
+        window.loadTeamForEdit = function(tName) { const tData = allData.teams[tName]; if(!tData) return; clearTeamForm(); document.getElementById('dbTeamName').value = tName; document.getElementById('dbCoach').value = tData.coach || ''; document.getElementById('dbAsst').value = tData.assistant || ''; document.getElementById('dbJerseyColor').value = tData.jerseyColor || '#ffffff'; if(tData.players) { let i = 1; for(let pName in tData.players) { if(i > 25) break; document.getElementById('p'+i).value = pName; if(tData.players[pName].photo) { document.getElementById('pIcon'+i).className = 'fa-solid fa-check-double'; document.getElementById('pIcon'+i).style.color = '#3b82f6'; } if(tData.players[pName].position && document.getElementById('pPos'+i)) { document.getElementById('pPos'+i).value = tData.players[pName].position; } i++; } } openTab('tab-teams', document.querySelectorAll('.tab-btn')[1]); };
 
         function renderFullAdminPreviews() {
             const tPreview = document.getElementById('teamsPreview'); tPreview.innerHTML = '';
-            if(allData.teams) { for(let t in allData.teams) { let data = allData.teams[t]; let logoHtml = data.logo ? `<img src="${data.logo}" style="width:100%; height:100%; object-fit:contain;">` : `<i class="fa-solid fa-shield"></i>`; let pTable = `<table class="db-preview-table"><tr><th style="text-align:right;">اللاعب</th><th>صورة</th><th>⚽</th></tr>`; if(data.players) { for(let p in data.players) { let pl = data.players[p]; let pImg = pl.photo ? `<i class="fa-solid fa-check" style="color:var(--accent);"></i>` : `-`; pTable += `<tr><td style="text-align:right;">${p}</td><td>${pImg}</td><td style="color:#60a5fa;">${pl.goals||0}</td></tr>`; } } pTable += `</table>`; tPreview.innerHTML += `<div class="db-preview-card"><div class="db-preview-header"><div style="display:flex; align-items:center; gap:10px;"><div class="db-logo">${logoHtml}</div><strong style="color:var(--text); font-size:13px;">${t}</strong></div><div><button class="edit-btn" onclick="loadTeamForEdit('${t}')"><i class="fa-solid fa-pen"></i></button><button class="del-btn" onclick="deleteItem('teams/${t}')"><i class="fa-solid fa-trash"></i></button></div></div>${pTable}</div>`; } } else { tPreview.innerHTML = '<div style="color:var(--muted); text-align:center; font-size:11px; padding:15px;">لا توجد فرق</div>'; }
+            if(allData.teams) { for(let t in allData.teams) { let data = allData.teams[t]; let logoHtml = data.logo ? `<img src="${data.logo}" style="width:100%; height:100%; object-fit:contain;">` : `<i class="fa-solid fa-shield"></i>`; let pTable = `<table class="db-preview-table"><tr><th style="text-align:right;">اللاعب</th><th>المركز</th><th>صورة</th><th>⚽</th></tr>`; if(data.players) { for(let p in data.players) { let pl = data.players[p]; let pImg = pl.photo ? `<i class="fa-solid fa-check" style="color:var(--accent);"></i>` : `-`; let pPosBadge = pl.position ? `<span style="background:#27272a; padding:2px 4px; border-radius:4px; font-size:10px;">${pl.position}</span>` : '-'; pTable += `<tr><td style="text-align:right;">${p}</td><td>${pPosBadge}</td><td>${pImg}</td><td style="color:#60a5fa;">${pl.goals||0}</td></tr>`; } } pTable += `</table>`; tPreview.innerHTML += `<div class="db-preview-card"><div class="db-preview-header"><div style="display:flex; align-items:center; gap:10px;"><div class="db-logo">${logoHtml}</div><strong style="color:var(--text); font-size:13px;">${t}</strong></div><div><button class="edit-btn" onclick="loadTeamForEdit('${t}')"><i class="fa-solid fa-pen"></i></button><button class="del-btn" onclick="deleteItem('teams/${t}')"><i class="fa-solid fa-trash"></i></button></div></div>${pTable}</div>`; } } else { tPreview.innerHTML = '<div style="color:var(--muted); text-align:center; font-size:11px; padding:15px;">لا توجد فرق</div>'; }
             
             const arcPreview = document.getElementById('adminArchivePreview'); arcPreview.innerHTML = ''; 
             if(allData.saved_matches) { for(let id in allData.saved_matches) { let m = allData.saved_matches[id]; let info = []; if(m.groupInfo && m.groupInfo !== "أدوار إقصائية") info.push(`مجموعة ${m.groupInfo}`); if(m.round) info.push(m.round); let infoTxt = info.length > 0 ? info.join(' - ') : 'مباراة'; arcPreview.innerHTML += `<div class="preview-item"><div class="preview-item-header"><div><span style="font-weight:bold; color:var(--text);">${m.team1} (${m.score1}) - (${m.score2}) ${m.team2}</span><br><span style="font-size:10px; color:var(--muted);">${infoTxt}</span></div><div><button class="edit-btn" style="color:#f59e0b; border-color:#f59e0b;" onclick="restoreMatchToLive('${id}')" title="إعادة للبث المباشر"><i class="fa-solid fa-rotate-left"></i></button><button class="edit-btn" onclick="editArchiveMatch('${id}')"><i class="fa-solid fa-pen"></i></button><button class="del-btn" onclick="deleteItem('saved_matches/${id}')"><i class="fa-solid fa-trash"></i></button></div></div></div>`; } }
             
             const gPreview = document.getElementById('groupsPreview'); gPreview.innerHTML = ''; if(allData.groups) { ['A', 'B', 'C', 'D'].forEach(g => { if(allData.groups[g]) { for(let t in allData.groups[g]) { gPreview.innerHTML += `<div class="preview-item"><div class="preview-item-header">مجموعة ${g}: ${t} (${allData.groups[g][t].points} نقطة)<button class="del-btn" onclick="deleteItem('groups/${g}/${t}')"><i class="fa-solid fa-xmark"></i></button></div></div>`; } } }); }
             
-            // --- ترتيب ذكي للمباريات المجدولة ---
             const sPreview = document.getElementById('schedulePreview'); sPreview.innerHTML = ''; 
             if(allData.schedule) { 
                 let scheduledArr = []; for(let id in allData.schedule) { scheduledArr.push({ id: id, ...allData.schedule[id] }); }
@@ -697,7 +651,6 @@
                 }); 
             }
             
-            // --- زر الحذف الشغال لمواجهات المجموعات ---
             const gmPreview = document.getElementById('groupMatchupsPreview'); gmPreview.innerHTML = ''; 
             if(allData.group_matchups) { 
                 for(let id in allData.group_matchups) { 
@@ -720,10 +673,24 @@
             if(allData.referees_data) { for(let r in allData.referees_data) { let refData = allData.referees_data[r]; let img = refData.photo ? `<img src="${refData.photo}" style="width:35px;height:35px;border-radius:50%;object-fit:cover;border:1px solid var(--border);">` : `<div style="width:35px;height:35px;border-radius:50%;background:#27272a;display:flex;align-items:center;justify-content:center;font-size:16px;">🙎</div>`; rPreview.innerHTML += `<div class="preview-item" style="background:var(--card); border:1px solid var(--border); border-radius:8px; margin-bottom:8px;"><div class="preview-item-header"><div style="display:flex; align-items:center; gap:10px;">${img} <b style="color:var(--text);">${r}</b></div><div><button class="edit-btn" onclick="editReferee('${r}')"><i class="fa-solid fa-pen"></i></button><button class="del-btn" onclick="deleteItem('referees_data/${r}')"><i class="fa-solid fa-trash"></i></button></div></div></div>`; } }
         }
 
-        function openEditScheduledMatch(id) { let m = allData.schedule[id]; if(!m) return; document.getElementById('ersId').value = id; document.getElementById('ersTeams').innerText = `${m.team1} ضد ${m.team2}`; document.getElementById('ersDate').value = m.date || ''; document.getElementById('ersTime').value = m.time || ''; document.getElementById('ersStadium').value = m.stadium || ''; document.getElementById('ersRef1').value = m.referee1 || ''; document.getElementById('ersRef2').value = m.referee2 || ''; document.getElementById('editRealScheduleModal').style.display = 'flex'; }
-        function saveEditScheduledMatch() { let id = document.getElementById('ersId').value; if(!id) return; db.ref(`tournaments/${dbPath}/schedule/${id}`).update({ date: document.getElementById('ersDate').value, time: document.getElementById('ersTime').value, stadium: document.getElementById('ersStadium').value, referee1: document.getElementById('ersRef1').value, referee2: document.getElementById('ersRef2').value }).then(() => { document.getElementById('editRealScheduleModal').style.display = 'none'; alert("تم التحديث!"); }); }
+        function openEditScheduledMatch(id) { let m = allData.schedule[id]; if(!m) return; document.getElementById('ersId').value = id; document.getElementById('ersTeams').innerText = `${m.team1} ضد ${m.team2}`; document.getElementById('ersDate').value = m.date || ''; document.getElementById('ersTime').value = m.time || ''; document.getElementById('ersStadium').value = m.stadium || ''; document.getElementById('ersRef1').value = m.referee1 || ''; document.getElementById('ersRef2').value = m.referee2 || ''; document.getElementById('ersRef3').value = m.referee3 || ''; document.getElementById('ersRef4').value = m.referee4 || ''; document.getElementById('editRealScheduleModal').style.display = 'flex'; }
+        function saveEditScheduledMatch() { let id = document.getElementById('ersId').value; if(!id) return; db.ref(`tournaments/${dbPath}/schedule/${id}`).update({ date: document.getElementById('ersDate').value, time: document.getElementById('ersTime').value, stadium: document.getElementById('ersStadium').value, referee1: document.getElementById('ersRef1').value, referee2: document.getElementById('ersRef2').value, referee3: document.getElementById('ersRef3').value, referee4: document.getElementById('ersRef4').value }).then(() => { document.getElementById('editRealScheduleModal').style.display = 'none'; alert("تم التحديث!"); }); }
         function openEditSchedule(id) { let m = allData.group_matchups[id]; if(!m) return; document.getElementById('editMatchupId').value = id; document.getElementById('editMatchupTeams').innerText = `${m.team1} ضد ${m.team2}`; document.getElementById('esDate').value = ''; document.getElementById('esTime').value = ''; document.getElementById('esStadium').value = ''; document.getElementById('editScheduleModal').style.display = 'flex'; }
-        function saveMatchupToSchedule() { let id = document.getElementById('editMatchupId').value; let m = allData.group_matchups[id]; if(!m) return; let date = document.getElementById('esDate').value; let time = document.getElementById('esTime').value; if(!date || !time) return alert("حدد التاريخ والوقت!"); let scheduledMatch = { team1: m.team1, team2: m.team2, group: m.group || '', round: m.round || '', date: date, time: time, stadium: document.getElementById('esStadium').value, referee1: document.getElementById('esRef1').value, referee2: document.getElementById('esRef2').value }; db.ref(`tournaments/${dbPath}/schedule`).push(scheduledMatch).then(() => { db.ref(`tournaments/${dbPath}/group_matchups/${id}`).remove(); document.getElementById('editScheduleModal').style.display = 'none'; alert("تم تحديد الموعد والمباراة الآن في الجدول."); }); }
+        
+        function saveMatchupToSchedule() { 
+            let id = document.getElementById('editMatchupId').value; let m = allData.group_matchups[id]; if(!m) return; 
+            let date = document.getElementById('esDate').value; let time = document.getElementById('esTime').value; if(!date || !time) return alert("حدد التاريخ والوقت!"); 
+            if (allData.schedule) {
+                let duplicate = false;
+                for (let key in allData.schedule) {
+                    let s = allData.schedule[key];
+                    if ((s.team1 === m.team1 && s.team2 === m.team2) || (s.team1 === m.team2 && s.team2 === m.team1)) { duplicate = true; break; }
+                }
+                if (duplicate) { if(!confirm("⚠️ تنبيه: هذه المواجهة موجودة مسبقاً في الجدول! استمرار؟")) return; }
+            }
+            let scheduledMatch = { team1: m.team1, team2: m.team2, group: m.group || '', round: m.round || '', date: date, time: time, stadium: document.getElementById('esStadium').value, referee1: document.getElementById('esRef1').value, referee2: document.getElementById('esRef2').value, referee3: document.getElementById('esRef3').value, referee4: document.getElementById('esRef4').value }; 
+            db.ref(`tournaments/${dbPath}/schedule`).push(scheduledMatch).then(() => { db.ref(`tournaments/${dbPath}/group_matchups/${id}`).remove(); document.getElementById('editScheduleModal').style.display = 'none'; alert("تم تحديد الموعد والمباراة الآن في الجدول."); }); 
+        }
 
         function editArchiveMatch(id) { 
             let m = allData.saved_matches[id]; if(!m) return; 
@@ -733,6 +700,7 @@
             document.getElementById('arcRound').value = m.round || ''; document.getElementById('arcEvents').value = m.events || ''; 
             populateRefereesDropdowns(); 
             document.getElementById('arcRef1').value = m.referee1 || ''; document.getElementById('arcRef2').value = m.referee2 || ''; 
+            document.getElementById('arcRef3').value = m.referee3 || ''; document.getElementById('arcRef4').value = m.referee4 || '';
             
             let allPOpts = '<option value="">-- بدون رجل مباراة --</option>'; let playersList = '<option value="">اختر اللاعب...</option>';
             if(allData.teams?.[m.team1]?.players) for(let p in allData.teams[m.team1].players) { allPOpts += `<option value="${m.team1}|${p}">${p} (${m.team1})</option>`; playersList += `<option value="${m.team1}|${p}">${p} (${m.team1})</option>`; }
@@ -743,9 +711,9 @@
                 let html = `<label style="color:var(--muted); font-size:11px;">فريق: ${tName}</label>`;
                 let opts = '<option value="">-- اختر --</option>';
                 if(allData.teams?.[tName]?.players) { for(let p in allData.teams[tName].players) opts += `<option value="${p}">${p}</option>`; }
-                ['gk','lb','rb','lm','cm','rm','st'].forEach(pos => { html += `<div class="flex-row" style="margin-bottom:4px;"><select id="${prefix}_${pos}" style="flex:2; font-size:11px; margin:0;">${opts}</select><input type="number" id="${prefix}_r_${pos}" style="flex:1; font-size:11px; margin:0; padding:4px;" placeholder="تقييم" step="0.1" max="10" min="0"></div>`; });
+                ['gk', 'cb', 'lb', 'rb', 'cdm', 'cm', 'cam', 'lm', 'rm', 'lw', 'rw', 'st'].forEach(pos => { html += `<div class="flex-row" style="margin-bottom:4px;"><select id="${prefix}_${pos}" style="flex:2; font-size:11px; margin:0;">${opts}</select><input type="number" id="${prefix}_r_${pos}" style="flex:1; font-size:11px; margin:0; padding:4px;" placeholder="تقييم" step="0.1" max="10" min="0"></div>`; });
                 document.getElementById(containerId).innerHTML = html;
-                setTimeout(() => { ['gk','lb','rb','lm','cm','rm','st'].forEach(pos => { let el = document.getElementById(`${prefix}_${pos}`); let rEl = document.getElementById(`${prefix}_r_${pos}`); if(savedSq && savedSq[pos]) { let pData = savedSq[pos]; if(typeof pData === 'object') { el.value = pData.name || ''; rEl.value = pData.rating || ''; } else { el.value = pData; rEl.value = ''; } } }); }, 50);
+                setTimeout(() => { ['gk', 'cb', 'lb', 'rb', 'cdm', 'cm', 'cam', 'lm', 'rm', 'lw', 'rw', 'st'].forEach(pos => { let el = document.getElementById(`${prefix}_${pos}`); let rEl = document.getElementById(`${prefix}_r_${pos}`); if(savedSq && savedSq[pos]) { let pData = savedSq[pos]; if(typeof pData === 'object') { el.value = pData.name || ''; rEl.value = pData.rating || ''; } else { el.value = pData; rEl.value = ''; } } }); }, 50);
             };
 
             buildSquadUI(m.team1, 'arc_sq1', m.squad1, 'arcSq1Ctr'); buildSquadUI(m.team2, 'arc_sq2', m.squad2, 'arcSq2Ctr');
@@ -764,9 +732,9 @@
                 if(motmTeam && motmName) { db.ref(`tournaments/${dbPath}/teams/${motmTeam}/players/${motmName}/motm`).transaction(c => (c||0)+1); }
             }
 
-            const getSq = (prefix) => { let sq = {}; ['gk','lb','rb','lm','cm','rm','st'].forEach(pos => { sq[pos] = { name: document.getElementById(`${prefix}_${pos}`).value, rating: document.getElementById(`${prefix}_r_${pos}`).value }; }); return sq; };
+            const getSq = (prefix) => { let sq = {}; ['gk', 'cb', 'lb', 'rb', 'cdm', 'cm', 'cam', 'lm', 'rm', 'lw', 'rw', 'st'].forEach(pos => { sq[pos] = { name: document.getElementById(`${prefix}_${pos}`).value, rating: document.getElementById(`${prefix}_r_${pos}`).value }; }); return sq; };
 
-            let updates = { score1: parseInt(document.getElementById('arcS1').value) || 0, score2: parseInt(document.getElementById('arcS2').value) || 0, round: document.getElementById('arcRound').value, events: document.getElementById('arcEvents').value, referee1: document.getElementById('arcRef1').value, referee2: document.getElementById('arcRef2').value, motm: motmName, motmTeam: motmTeam, squad1: getSq('arc_sq1'), squad2: getSq('arc_sq2') }; 
+            let updates = { score1: parseInt(document.getElementById('arcS1').value) || 0, score2: parseInt(document.getElementById('arcS2').value) || 0, round: document.getElementById('arcRound').value, events: document.getElementById('arcEvents').value, referee1: document.getElementById('arcRef1').value, referee2: document.getElementById('arcRef2').value, referee3: document.getElementById('arcRef3').value, referee4: document.getElementById('arcRef4').value, motm: motmName, motmTeam: motmTeam, squad1: getSq('arc_sq1'), squad2: getSq('arc_sq2') }; 
 
             db.ref(`tournaments/${dbPath}/saved_matches/${id}`).update(updates).then(()=>{ alert("تم تحديث الأرشيف!"); document.getElementById('archiveModal').style.display = 'none'; }).catch(e => alert("حدث خطأ")); 
         }
@@ -779,21 +747,49 @@
             db.ref(`tournaments/${dbPath}/teams/${m.team1}/gf`).transaction(c => Math.max(0, (c||0)-s1)); db.ref(`tournaments/${dbPath}/teams/${m.team1}/ga`).transaction(c => Math.max(0, (c||0)-s2)); db.ref(`tournaments/${dbPath}/teams/${m.team2}/gf`).transaction(c => Math.max(0, (c||0)-s2)); db.ref(`tournaments/${dbPath}/teams/${m.team2}/ga`).transaction(c => Math.max(0, (c||0)-s1));
             if(m.motmTeam && m.motm) { db.ref(`tournaments/${dbPath}/teams/${m.motmTeam}/players/${m.motm}/motm`).transaction(c => Math.max(0, (c||0)-1)); }
 
-            await db.ref(`tournaments/${dbPath}/live_match`).update({
-                team1: m.team1, team2: m.team2, score1: s1, score2: s2, round: m.round||'', groupInfo: m.groupInfo||'', status: 'انتهت', events: m.events||'', referee1: m.referee1||'', referee2: m.referee2||'', squad1: m.squad1||{}, squad2: m.squad2||{}, timer: {isRunning:false, savedSeconds:0, startTime:0}, stats: m.stats || {posSec1:0, posSec2:0, possession1:50, possession2:50, shots1:0, shots2:0, corners1:0, corners2:0, fouls1:0, fouls2:0}
-            });
+            await db.ref(`tournaments/${dbPath}/live_match`).update({ team1: m.team1, team2: m.team2, score1: s1, score2: s2, round: m.round||'', groupInfo: m.groupInfo||'', status: 'انتهت', events: m.events||'', referee1: m.referee1||'', referee2: m.referee2||'', referee3: m.referee3||'', referee4: m.referee4||'', squad1: m.squad1||{}, squad2: m.squad2||{}, timer: {isRunning:false, savedSeconds:0, startTime:0}, stats: m.stats || {posSec1:0, posSec2:0, possession1:50, possession2:50, shots1:0, shots2:0, corners1:0, corners2:0, fouls1:0, fouls2:0} });
             await db.ref(`tournaments/${dbPath}/saved_matches/${id}`).remove();
             isInternalUpdate = false; alert("✅ عادت المباراة للبث المباشر!"); openTab('tab-live', document.querySelectorAll('.tab-btn')[0]);
         }
 
         function filterTeamsByGroup(groupId, t1Id, t2Id) { const groupVal = document.getElementById(groupId).value; const t1El = document.getElementById(t1Id); const t2El = document.getElementById(t2Id); const currentVal1 = t1El.value; const currentVal2 = t2El.value; let opts = '<option value="">اختر الفريق...</option>'; if (groupVal && allData.groups && allData.groups[groupVal]) { for (let t in allData.groups[groupVal]) opts += `<option value="${t}">${t}</option>`; } else { if (allData.teams) { for (let t in allData.teams) opts += `<option value="${t}">${t}</option>`; } } t1El.innerHTML = opts; t2El.innerHTML = opts; if(Array.from(t1El.options).some(opt => opt.value === currentVal1)) t1El.value = currentVal1; if(Array.from(t2El.options).some(opt => opt.value === currentVal2)) t2El.value = currentVal2; }
         
-        function addSchedule() { const g = document.getElementById('sGroup').value, r = document.getElementById('sRound').value, t1 = document.getElementById('sTeam1').value, t2 = document.getElementById('sTeam2').value, d = document.getElementById('sDate').value, t = document.getElementById('sTime').value, s = document.getElementById('sStadium').value; const ref1 = document.getElementById('sRef1').value, ref2 = document.getElementById('sRef2').value; if(t1&&t2&&d&&t) { db.ref(`tournaments/${dbPath}/schedule`).push({ group: g, round: r, team1: t1, team2: t2, date: d, time: t, stadium: s, referee1: ref1, referee2: ref2 }).then(()=>{ document.getElementById('sTeam1').value=''; document.getElementById('sTeam2').value=''; document.getElementById('sStadium').value=''; document.getElementById('sRef1').value=''; document.getElementById('sRef2').value=''; alert("تم الجدولة!"); }); } else { alert("يرجى تعبئة الحقول الأساسية"); } }
-        function addGroupMatchup() { const g = document.getElementById('gmGroup').value, r = document.getElementById('gmRound').value, t1 = document.getElementById('gmTeam1').value, t2 = document.getElementById('gmTeam2').value; if(t1 && t2) { db.ref(`tournaments/${dbPath}/group_matchups`).push({ group: g, round: r, team1: t1, team2: t2 }).then(() => { document.getElementById('gmTeam1').value=''; document.getElementById('gmTeam2').value=''; alert("تم إضافة المواجهة!"); }); } else { alert("حدد الفريقين!"); } }
+        function addSchedule() { 
+            const g = document.getElementById('sGroup').value, r = document.getElementById('sRound').value, t1 = document.getElementById('sTeam1').value, t2 = document.getElementById('sTeam2').value, d = document.getElementById('sDate').value, t = document.getElementById('sTime').value, s = document.getElementById('sStadium').value; const ref1 = document.getElementById('sRef1').value, ref2 = document.getElementById('sRef2').value, ref3 = document.getElementById('sRef3').value, ref4 = document.getElementById('sRef4').value; 
+            if(!t1 || !t2 || !d || !t) return alert("يرجى تعبئة الحقول الأساسية"); 
+            
+            if (allData.schedule) {
+                let duplicate = false;
+                for (let key in allData.schedule) {
+                    let match = allData.schedule[key];
+                    if ((match.team1 === t1 && match.team2 === t2) || (match.team1 === t2 && match.team2 === t1)) { duplicate = true; break; }
+                }
+                if (duplicate) { if(!confirm("⚠️ تنبيه: هذه المواجهة (نفس الفريقين) موجودة مسبقاً في الجدول! هل تريد جدولتها مرة أخرى متعمداً؟")) return; }
+            }
+
+            db.ref(`tournaments/${dbPath}/schedule`).push({ group: g, round: r, team1: t1, team2: t2, date: d, time: t, stadium: s, referee1: ref1, referee2: ref2, referee3: ref3, referee4: ref4 }).then(()=>{ document.getElementById('sTeam1').value=''; document.getElementById('sTeam2').value=''; document.getElementById('sStadium').value=''; document.getElementById('sRef1').value=''; document.getElementById('sRef2').value=''; document.getElementById('sRef3').value=''; document.getElementById('sRef4').value=''; alert("تم الجدولة!"); }); 
+        }
+
+        function addGroupMatchup() { 
+            const g = document.getElementById('gmGroup').value, r = document.getElementById('gmRound').value, t1 = document.getElementById('gmTeam1').value, t2 = document.getElementById('gmTeam2').value; 
+            if(!t1 || !t2) return alert("حدد الفريقين!"); 
+            
+            if (allData.group_matchups) {
+                let duplicate = false;
+                for (let key in allData.group_matchups) {
+                    let match = allData.group_matchups[key];
+                    if ((match.team1 === t1 && match.team2 === t2) || (match.team1 === t2 && match.team2 === t1)) { duplicate = true; break; }
+                }
+                if (duplicate) { if(!confirm("⚠️ تنبيه: هذه المواجهة موجودة مسبقاً! هل تريد إضافتها مرة أخرى؟")) return; }
+            }
+
+            db.ref(`tournaments/${dbPath}/group_matchups`).push({ group: g, round: r, team1: t1, team2: t2 }).then(() => { document.getElementById('gmTeam1').value=''; document.getElementById('gmTeam2').value=''; alert("تم إضافة المواجهة!"); }); 
+        }
+
         function updateGroup() { const grp = document.getElementById('gLetter').value, t = document.getElementById('gTeam').value; if(!t) return alert("اختر الفريق"); const p = parseInt(document.getElementById('gP').value) || 0; const gf = parseInt(document.getElementById('gGF').value) || 0; const ga = parseInt(document.getElementById('gGA').value) || 0; const gd = parseInt(document.getElementById('gGD').value) || (gf - ga); const pts = parseInt(document.getElementById('gPts').value) || 0; db.ref(`tournaments/${dbPath}/groups/${grp}/${t}`).set({ played: p, gf: gf, ga: ga, gd: gd, points: pts }).then(() => { alert("تم الإرسال!"); document.getElementById('gP').value = ''; document.getElementById('gGF').value = ''; document.getElementById('gGA').value = ''; document.getElementById('gGD').value = ''; document.getElementById('gPts').value = ''; }); }
         
-        function loadScheduledToLive(id) { const match = allData.schedule[id]; if(!match) return; if(confirm(`بدء المباراة ونقلها للمباشر؟ (ستُحذف من الجدول)`)) { isInternalUpdate = true; db.ref(`tournaments/${dbPath}/live_match`).update({ team1: match.team1, team2: match.team2, round: match.round || '', groupInfo: match.group || '', status: 'الشوط الأول', score1: 0, score2: 0, events: '', referee1: match.referee1 || '', referee2: match.referee2 || '', timer: { isRunning: false, savedSeconds: 0, startTime: 0 }, stats: {posSec1:0, posSec2:0, possession1: 50, possession2: 50, shots1: 0, shots2: 0, corners1: 0, corners2: 0, fouls1: 0, fouls2: 0} }).then(() => { db.ref(`tournaments/${dbPath}/schedule/${id}`).remove(); alert("بدأت المباراة!"); openTab('tab-live', document.querySelectorAll('.tab-btn')[0]); isInternalUpdate = false; }).catch(e => { alert("حدث خطأ."); isInternalUpdate = false; }); } }
-        function loadGroupMatchupToLive(id) { const match = allData.group_matchups[id]; if(!match) return; if(confirm(`بدء المباراة ونقلها للمباشر؟`)) { isInternalUpdate = true; db.ref(`tournaments/${dbPath}/live_match`).update({ team1: match.team1, team2: match.team2, round: match.round || '', groupInfo: match.group || '', status: 'الشوط الأول', score1: 0, score2: 0, events: '', referee1: '', referee2: '', timer: { isRunning: false, savedSeconds: 0, startTime: 0 }, stats: {posSec1:0, posSec2:0, possession1: 50, possession2: 50, shots1: 0, shots2: 0, corners1: 0, corners2: 0, fouls1: 0, fouls2: 0} }).then(() => { alert("بدأت المباراة!"); openTab('tab-live', document.querySelectorAll('.tab-btn')[0]); isInternalUpdate = false; }); } }
+        function loadScheduledToLive(id) { const match = allData.schedule[id]; if(!match) return; if(confirm(`بدء المباراة ونقلها للمباشر؟ (ستُحذف من الجدول)`)) { isInternalUpdate = true; db.ref(`tournaments/${dbPath}/live_match`).update({ team1: match.team1, team2: match.team2, round: match.round || '', groupInfo: match.group || '', status: 'الشوط الأول', score1: 0, score2: 0, events: '', referee1: match.referee1 || '', referee2: match.referee2 || '', referee3: match.referee3 || '', referee4: match.referee4 || '', timer: { isRunning: false, savedSeconds: 0, startTime: 0 }, stats: {posSec1:0, posSec2:0, possession1: 50, possession2: 50, shots1: 0, shots2: 0, corners1: 0, corners2: 0, fouls1: 0, fouls2: 0} }).then(() => { db.ref(`tournaments/${dbPath}/schedule/${id}`).remove(); alert("بدأت المباراة!"); openTab('tab-live', document.querySelectorAll('.tab-btn')[0]); isInternalUpdate = false; }).catch(e => { alert("حدث خطأ."); isInternalUpdate = false; }); } }
+        function loadGroupMatchupToLive(id) { const match = allData.group_matchups[id]; if(!match) return; if(confirm(`بدء المباراة ونقلها للمباشر؟`)) { isInternalUpdate = true; db.ref(`tournaments/${dbPath}/live_match`).update({ team1: match.team1, team2: match.team2, round: match.round || '', groupInfo: match.group || '', status: 'الشوط الأول', score1: 0, score2: 0, events: '', referee1: '', referee2: '', referee3: '', referee4: '', timer: { isRunning: false, savedSeconds: 0, startTime: 0 }, stats: {posSec1:0, posSec2:0, possession1: 50, possession2: 50, shots1: 0, shots2: 0, corners1: 0, corners2: 0, fouls1: 0, fouls2: 0} }).then(() => { alert("بدأت المباراة!"); openTab('tab-live', document.querySelectorAll('.tab-btn')[0]); isInternalUpdate = false; }); } }
 
         async function recalculateMatchesPlayed() {
             if(!confirm("إعادة حساب 'المباريات الملعوبة' لجميع اللاعبين؟")) return;
