@@ -1,9 +1,10 @@
+
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
     <link rel="manifest" href="manifest.json">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>بطولة دوائر خانقين</title>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&display=swap" rel="stylesheet">
     <meta name="theme-color" content="#3b82f6">
@@ -22,7 +23,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <style>
        :root { --bg: #0e1318; --card: #1a222b; --primary: #3b82f6; --accent: #ffffff; --text: #ffffff; --muted: #8d939e; --border: #2a2b31; --live: #ffffff; }
-        body { background: radial-gradient(circle at top, #1a222b 0%, #0e1318 100%); color: var(--text); font-family: 'Cairo', Tahoma, sans-serif; margin: 0; padding: 0; display: flex; justify-content: center; -webkit-tap-highlight-color: transparent; }
+        body { background: radial-gradient(circle at top, #1a222b 0%, #0e1318 100%); color: var(--text); font-family: 'Cairo', Tahoma, sans-serif; margin: 0; padding: 0; display: flex; justify-content: center; -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
         .app { width: 100%; max-width: 480px; min-height: 100vh; position: relative; padding-bottom: 100px; overflow-x: hidden;}
         
         .header { padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 50; background: rgba(26, 34, 43, 0.95); backdrop-filter: blur(10px); border-bottom: 1px solid var(--border); }
@@ -116,28 +117,30 @@
         .modern-referees span { color: #fff; display: flex; align-items: center; gap: 8px; font-weight: 700; text-shadow:0 1px 2px #000;}
         .modern-referees span span { color: var(--primary); font-weight: 800; font-size: 13px; display:flex; align-items:center; gap:5px;}
 
-        /* تحديثات الملعب المتجاوب */
+        /* --- تحديثات الملعب ليكون متجاوب ويملأ الشاشة --- */
         .pitch-container {
-            width: 100%; max-width: 420px; margin: 0 auto;
-            aspect-ratio: 3 / 4; /* يحافظ على نسبة الملعب في جميع الشاشات */
-            height: auto; 
+            width: 100%; 
+            height: 75vh; /* يغطي 75% من ارتفاع الشاشة */
+            min-height: 500px; /* أقل ارتفاع حتى ما يتشوه بالشاشات الصغيرة */
+            max-height: 800px;
+            margin: 0 auto;
             background-color: #03200a; 
             background-image: repeating-linear-gradient(0deg, transparent, transparent 10%, rgba(0,0,0,0.1) 10%, rgba(0,0,0,0.1) 20%), radial-gradient(circle at center, rgba(255,255,255,0.05) 0%, transparent 100%);
             border: 2px solid rgba(255,255,255,0.3); position: relative; overflow: hidden; border-radius: 12px; box-shadow: inset 0 0 80px rgba(0,0,0,0.8);
         }
         .p-center-line { position: absolute; top: 50%; left: 0; width: 100%; height: 1px; background: rgba(255,255,255,0.2); transform: translateY(-50%); }
-        .p-center-circle { position: absolute; top: 50%; left: 50%; width: 25%; aspect-ratio: 1/1; height: auto; border: 1px solid rgba(255,255,255,0.2); border-radius: 50%; transform: translate(-50%, -50%); }
-        .p-pen-top { position: absolute; top: 0; left: 50%; width: 45%; height: 15%; border: 1px solid rgba(255,255,255,0.2); border-top:none; transform: translateX(-50%); }
-        .p-pen-bottom { position: absolute; bottom: 0; left: 50%; width: 45%; height: 15%; border: 1px solid rgba(255,255,255,0.2); border-bottom:none; transform: translateX(-50%); }
+        .p-center-circle { position: absolute; top: 50%; left: 50%; width: 90px; height: 90px; border: 1px solid rgba(255,255,255,0.2); border-radius: 50%; transform: translate(-50%, -50%); }
+        .p-pen-top { position: absolute; top: 0; left: 50%; width: 45%; height: 12%; border: 1px solid rgba(255,255,255,0.2); border-top:none; transform: translateX(-50%); }
+        .p-pen-bottom { position: absolute; bottom: 0; left: 50%; width: 45%; height: 12%; border: 1px solid rgba(255,255,255,0.2); border-bottom:none; transform: translateX(-50%); }
         
-        .pitch-player { position: absolute; display: flex; flex-direction: column; align-items: center; transform: translate(-50%, -50%); width: 60px; max-width: 20%; z-index: 10; cursor:pointer; transition:0.2s;} 
+        .pitch-player { position: absolute; display: flex; flex-direction: column; align-items: center; transform: translate(-50%, -50%); width: 14%; max-width: 60px; min-width: 45px; z-index: 10; cursor:pointer; transition:0.2s;} 
         .pitch-player:hover { z-index:20; transform: translate(-50%, -50%) scale(1.15);}
-        .pitch-player-img-wrapper { position: relative; width: 36px; height: 36px; border-radius: 50%; border: 2px solid #fff; background: #1a1c21; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 8px rgba(0,0,0,0.6); margin-bottom:5px; } 
+        .pitch-player-img-wrapper { position: relative; width: 100%; aspect-ratio: 1/1; border-radius: 50%; border: 2px solid #fff; background: #1a1c21; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 8px rgba(0,0,0,0.6); margin-bottom:5px; } 
         .pitch-player-img-wrapper img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; }
         .pitch-player-img-wrapper i { font-size:16px; color:var(--muted); }
         .pitch-player-pos { position: absolute; top: -6px; left: -10px; font-size: 8px; font-weight: 900; background: #3b82f6; color: #fff; padding: 2px 5px; border-radius: 4px; border: 1px solid rgba(255,255,255,0.2); }
         .pitch-player-rating { position: absolute; bottom: -6px; right: -10px; font-size: 9px; font-weight: 900; padding: 2px 5px; border-radius: 4px; border: 1px solid rgba(255,255,255,0.2); color: #fff;}
-        .pitch-player-info { background: rgba(0,0,0,0.8); border: 1px solid rgba(255,255,255,0.1); border-radius: 6px; padding: 3px 2px; text-align: center; width: 100%;}
+        .pitch-player-info { background: rgba(0,0,0,0.8); border: 1px solid rgba(255,255,255,0.1); border-radius: 6px; padding: 3px 2px; text-align: center; width: 120%; margin-left:-10%;}
         .pitch-player-name { font-size: 8px; font-weight: bold; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-family:'Cairo'; }
         .pitch-player-team { font-size: 7px; color: #aaa; white-space: nowrap; font-family:'Cairo'; margin-top:2px; display:none;} /* تم إخفاء اسم الفريق لترتيب الشكل */
 
@@ -281,12 +284,15 @@
         </div>
         
         <div style="padding:15px;" id="pitchExportArea">
-            <div style="display:flex; background:rgba(255,255,255,0.05); border-radius:12px; padding:5px; margin-bottom:15px; gap:5px;">
-                <button id="tabSq1" onclick="switchSquadTab(1)" style="flex:1; background:var(--primary); color:#fff; border:none; padding:10px; border-radius:8px; font-family:'Cairo'; font-weight:bold; display:flex; align-items:center; justify-content:center; gap:8px; cursor:pointer; transition:0.3s;">
-                    <div id="sqLogo1" style="width:24px;height:24px;"></div> <span id="sqT1Name">فريق 1</span>
+            <div style="display:flex; background:rgba(255,255,255,0.05); border-radius:12px; padding:5px; margin-bottom:15px; gap:5px; overflow-x:auto;">
+                <button id="tabSq1" onclick="switchSquadTab(1)" style="flex:1; min-width:80px; background:var(--primary); color:#fff; border:none; padding:10px; border-radius:8px; font-family:'Cairo'; font-weight:bold; cursor:pointer; transition:0.3s; white-space:nowrap;">
+                    <span id="tabName1">فريق 1</span>
                 </button>
-                <button id="tabSq2" onclick="switchSquadTab(2)" style="flex:1; background:transparent; color:var(--muted); border:none; padding:10px; border-radius:8px; font-family:'Cairo'; font-weight:bold; display:flex; align-items:center; justify-content:center; gap:8px; cursor:pointer; transition:0.3s;">
-                    <div id="sqLogo2" style="width:24px;height:24px;"></div> <span id="sqT2Name">فريق 2</span>
+                <button id="tabSqBoth" onclick="switchSquadTab(3)" style="flex:1; min-width:80px; background:transparent; color:var(--muted); border:none; padding:10px; border-radius:8px; font-family:'Cairo'; font-weight:bold; cursor:pointer; transition:0.3s; white-space:nowrap;">
+                    الفريقين
+                </button>
+                <button id="tabSq2" onclick="switchSquadTab(2)" style="flex:1; min-width:80px; background:transparent; color:var(--muted); border:none; padding:10px; border-radius:8px; font-family:'Cairo'; font-weight:bold; cursor:pointer; transition:0.3s; white-space:nowrap;">
+                    <span id="tabName2">فريق 2</span>
                 </button>
             </div>
             
@@ -296,6 +302,10 @@
             
             <div id="pitchWrapper2" style="display:none; width:100%;">
                 <div class="pitch-container" id="pitchTeam2"></div>
+            </div>
+
+            <div id="pitchWrapperBoth" style="display:none; width:100%;">
+                <div class="pitch-container" id="pitchBothTeams"></div>
             </div>
         </div>
     </div>
@@ -595,55 +605,104 @@
             const originalOpenScheduled = window.openScheduledMatch; window.openScheduledMatch = function(key) { try{ history.pushState({ modal: 'matchDetailsModal' }, "", "#scheduled"); }catch(e){} originalOpenScheduled(key); };
             const originalOpenGroupMatchup = window.openGroupMatchup; window.openGroupMatchup = function(key) { try{ history.pushState({ modal: 'matchDetailsModal' }, "", "#matchup"); }catch(e){} originalOpenGroupMatchup(key); };
 
-            // دالة التبديل بين التابات داخل التشكيلة
+            // --- دالة التبديل بين التابات داخل التشكيلة (الكل أو مفرد) ---
             window.switchSquadTab = function(tabNum) {
                 if(tabNum === 1) {
                     document.getElementById('pitchWrapper1').style.display = 'block';
                     document.getElementById('pitchWrapper2').style.display = 'none';
+                    document.getElementById('pitchWrapperBoth').style.display = 'none';
                     document.getElementById('tabSq1').style.background = 'var(--primary)';
                     document.getElementById('tabSq1').style.color = '#fff';
                     document.getElementById('tabSq2').style.background = 'transparent';
                     document.getElementById('tabSq2').style.color = 'var(--muted)';
-                } else {
+                    document.getElementById('tabSqBoth').style.background = 'transparent';
+                    document.getElementById('tabSqBoth').style.color = 'var(--muted)';
+                } else if (tabNum === 2) {
                     document.getElementById('pitchWrapper1').style.display = 'none';
                     document.getElementById('pitchWrapper2').style.display = 'block';
+                    document.getElementById('pitchWrapperBoth').style.display = 'none';
                     document.getElementById('tabSq1').style.background = 'transparent';
                     document.getElementById('tabSq1').style.color = 'var(--muted)';
                     document.getElementById('tabSq2').style.background = 'var(--primary)';
                     document.getElementById('tabSq2').style.color = '#fff';
+                    document.getElementById('tabSqBoth').style.background = 'transparent';
+                    document.getElementById('tabSqBoth').style.color = 'var(--muted)';
+                } else {
+                    document.getElementById('pitchWrapper1').style.display = 'none';
+                    document.getElementById('pitchWrapper2').style.display = 'none';
+                    document.getElementById('pitchWrapperBoth').style.display = 'block';
+                    document.getElementById('tabSq1').style.background = 'transparent';
+                    document.getElementById('tabSq1').style.color = 'var(--muted)';
+                    document.getElementById('tabSq2').style.background = 'transparent';
+                    document.getElementById('tabSq2').style.color = 'var(--muted)';
+                    document.getElementById('tabSqBoth').style.background = 'var(--primary)';
+                    document.getElementById('tabSqBoth').style.color = '#fff';
                 }
             };
 
             window.openSquads = function(t1, t2, sq1, sq2) {
-                document.getElementById('sqT1Name').innerText = t1 || 'فريق 1'; document.getElementById('sqT2Name').innerText = t2 || 'فريق 2';
-                let d1 = teamsDataGlobal[t1]; let d2 = teamsDataGlobal[t2];
-                if(document.getElementById('sqLogo1')) document.getElementById('sqLogo1').innerHTML = d1?.logo ? `<img src="${d1.logo}" style="width:100%;height:100%;object-fit:contain;">` : `<i class="fa-solid fa-shield"></i>`;
-                if(document.getElementById('sqLogo2')) document.getElementById('sqLogo2').innerHTML = d2?.logo ? `<img src="${d2.logo}" style="width:100%;height:100%;object-fit:contain;">` : `<i class="fa-solid fa-shield"></i>`;
+                document.getElementById('tabName1').innerText = t1 || 'فريق 1'; document.getElementById('tabName2').innerText = t2 || 'فريق 2';
                 
-                // تخطيط الملعب الكامل (اللاعبين يتوزعون على كامل الشاشة بدلاً من نصفها)
-                const singleLayout = { 
+                // --- توزيعات الملاعب (الملعب الكامل مقابل الملعب المقسوم) ---
+                const posNames = { gk:'GK', cb:'CB', lb:'LB', rb:'RB', cdm:'CDM', cm:'CM', cam:'CAM', lm:'LM', rm:'RM', lw:'LW', rw:'RW', st:'ST' };
+
+                // 1. توزيع الملعب الكامل (لفريق واحد، الحارس جوة والهجوم فوگ)
+                const layoutFull = { 
                     gk: {top:'90%', left:'50%'}, 
                     cb: {top:'78%', left:'50%'}, 
-                    lb: {top:'72%', left:'18%'}, 
-                    rb: {top:'72%', left:'82%'}, 
-                    cdm: {top:'62%', left:'50%'}, 
-                    cm: {top:'48%', left:'50%'}, 
-                    lm: {top:'45%', left:'18%'}, 
-                    rm: {top:'45%', left:'82%'}, 
+                    lb: {top:'75%', left:'20%'}, 
+                    rb: {top:'75%', left:'80%'}, 
+                    cdm: {top:'65%', left:'50%'}, 
+                    cm: {top:'50%', left:'50%'}, 
+                    lm: {top:'50%', left:'20%'}, 
+                    rm: {top:'50%', left:'80%'}, 
                     cam: {top:'35%', left:'50%'}, 
-                    lw: {top:'22%', left:'25%'}, 
-                    rw: {top:'22%', left:'75%'}, 
-                    st: {top:'12%', left:'50%'} 
+                    lw: {top:'25%', left:'25%'}, 
+                    rw: {top:'25%', left:'75%'}, 
+                    st: {top:'15%', left:'50%'} 
                 };
 
-                const renderPitch = (sq, containerId, teamName) => {
+                // 2. توزيع النصف الأعلى (للفريقين معاً - فريق 1 يهاجم لأسفل)
+                const layoutTop = { 
+                    gk: {top:'8%', left:'50%'}, 
+                    cb: {top:'18%', left:'50%'}, 
+                    lb: {top:'22%', left:'80%'}, 
+                    rb: {top:'22%', left:'20%'}, 
+                    cdm: {top:'30%', left:'50%'}, 
+                    cm: {top:'38%', left:'50%'}, 
+                    lm: {top:'38%', left:'80%'}, 
+                    rm: {top:'38%', left:'20%'}, 
+                    cam: {top:'45%', left:'50%'}, 
+                    lw: {top:'48%', left:'70%'}, 
+                    rw: {top:'48%', left:'30%'}, 
+                    st: {top:'48%', left:'50%'} 
+                };
+
+                // 3. توزيع النصف الأسفل (للفريقين معاً - فريق 2 يهاجم لأعلى)
+                const layoutBottom = { 
+                    gk: {top:'92%', left:'50%'}, 
+                    cb: {top:'82%', left:'50%'}, 
+                    lb: {top:'78%', left:'20%'}, 
+                    rb: {top:'78%', left:'80%'}, 
+                    cdm: {top:'70%', left:'50%'}, 
+                    cm: {top:'62%', left:'50%'}, 
+                    lm: {top:'62%', left:'20%'}, 
+                    rm: {top:'62%', left:'80%'}, 
+                    cam: {top:'55%', left:'50%'}, 
+                    lw: {top:'52%', left:'30%'}, 
+                    rw: {top:'52%', left:'70%'}, 
+                    st: {top:'52%', left:'50%'} 
+                };
+
+                const renderPitch = (sq, containerId, layout, teamName, clearContent = true) => {
                     const cont = document.getElementById(containerId); if(!cont) return; 
-                    cont.innerHTML = '<div class="p-center-line"></div><div class="p-center-circle"></div><div class="p-pen-top"></div><div class="p-pen-bottom"></div>';
-                    const posNames = { gk:'GK', cb:'CB', lb:'LB', rb:'RB', cdm:'CDM', cm:'CM', cam:'CAM', lm:'LM', rm:'RM', lw:'LW', rw:'RW', st:'ST' };
+                    if(clearContent) {
+                        cont.innerHTML = '<div class="p-center-line"></div><div class="p-center-circle"></div><div class="p-pen-top"></div><div class="p-pen-bottom"></div>';
+                    }
                     
                     for(let pos in sq) {
                         let pData = sq[pos]; if(!pData) continue; let name = typeof pData === 'object' ? pData.name : pData; let rating = typeof pData === 'object' ? pData.rating : ''; if(!name || name.trim() === '') continue;
-                        let posCoords = singleLayout[pos]; if(!posCoords) continue; let posLabel = posNames[pos] || pos.toUpperCase();
+                        let posCoords = layout[pos]; if(!posCoords) continue; let posLabel = posNames[pos] || pos.toUpperCase();
                         let pPhoto = teamsDataGlobal[teamName]?.players?.[name]?.photo || ''; let imgHtml = pPhoto ? `<img src="${pPhoto}">` : `<i class="fa-solid fa-user"></i>`;
                         let ratingHtml = ''; if(rating && rating !== "") { let rNum = parseFloat(rating); let bg = '#3f3f46'; let color = '#fff'; if(rNum >= 8.0) { bg = '#10b981'; color = '#000'; } else if(rNum < 6.0) { bg = '#ef4444'; color = '#fff'; } ratingHtml = `<div class="pitch-player-rating" style="background:${bg}; color:${color};">${rating}</div>`; }
 
@@ -651,10 +710,16 @@
                     }
                 };
                 
-                renderPitch(sq1, 'pitchTeam1', t1);
-                renderPitch(sq2, 'pitchTeam2', t2);
+                // رسم فريق 1 (ملعب كامل)
+                renderPitch(sq1, 'pitchTeam1', layoutFull, t1, true);
+                // رسم فريق 2 (ملعب كامل)
+                renderPitch(sq2, 'pitchTeam2', layoutFull, t2, true);
                 
-                switchSquadTab(1); // إظهار التاب الأول كافتراضي
+                // رسم الفريقين معاً (نفس الملعب)
+                renderPitch(sq1, 'pitchBothTeams', layoutTop, t1, true); // يمسح ويرسم الأول
+                renderPitch(sq2, 'pitchBothTeams', layoutBottom, t2, false); // يضيف الثاني بدون مسح
+                
+                switchSquadTab(3); // إظهار التاب "الفريقين" كافتراضي
                 
                 const modal = document.getElementById('squadsModal'); if(modal) { modal.style.display = 'flex'; modal.onclick = function(e) { if(e.target === modal) modal.style.display = 'none'; }; }
                 try { history.pushState({ modal: 'squadsModal' }, "", "#squads"); } catch(e){}
