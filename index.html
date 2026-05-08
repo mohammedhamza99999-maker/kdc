@@ -113,7 +113,7 @@
         .premium-poster.stats-export-mode tbody tr { display: none !important; }
         .premium-poster.stats-export-mode tbody tr:nth-child(-n+5) { display: table-row !important; }
         
-        .modern-referees { display: flex; justify-content: space-around; padding: 12px; margin-top: 15px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; font-size: 12px; backdrop-filter:blur(4px); }
+        .modern-referees { display: flex; flex-wrap: wrap; justify-content: space-around; gap: 8px; padding: 12px; margin-top: 15px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; font-size: 12px; backdrop-filter:blur(4px); }
         .modern-referees span { color: #fff; display: flex; align-items: center; gap: 8px; font-weight: 700; text-shadow:0 1px 2px #000;}
         .modern-referees span span { color: var(--primary); font-weight: 800; font-size: 13px; display:flex; align-items:center; gap:5px;}
 
@@ -191,7 +191,12 @@
                     <div class="score-info"><div class="live-timer" id="lTimer">00:00</div><div class="score" id="lScore">- : -</div><div class="status" id="lStatus">انتظار</div></div>
                     <div class="team team-clickable" id="lTeam2Container"><div class="logo-ph" id="lLogo2"></div><div class="team-name" id="lTeam2">--</div></div>
                 </div>
-                <div id="lReferees" class="modern-referees glass-box" style="display:none; margin: 0 15px 15px;"><span>حكم الساحة: <span id="lRef1Txt">--</span></span><span>مساعد الحكم: <span id="lRef2Txt">--</span></span></div>
+                <div id="lReferees" class="modern-referees glass-box" style="display:none; margin: 0 15px 15px;">
+                    <span id="lRef1Wrap">ساحة: <span id="lRef1Txt">--</span></span>
+                    <span id="lRef2Wrap">مساعد: <span id="lRef2Txt">--</span></span>
+                    <span id="lRef3Wrap" style="display:none;">رابع: <span id="lRef3Txt">--</span></span>
+                    <span id="lRef4Wrap" style="display:none;">VAR: <span id="lRef4Txt">--</span></span>
+                </div>
                 <div id="lStats" class="glass-box" style="display:none; margin: 0 15px 15px; border-radius:12px;">
                     <div style="font-size: 12px; color: #fff; text-align: center; margin-bottom: 5px; font-weight:bold;">الاستحواذ</div>
                     <div style="display: flex; justify-content: space-between; font-size: 13px; font-weight: bold; margin-bottom: 5px; text-shadow:0 1px 3px #000;"><span id="pos1Txt" style="color: var(--primary);">50%</span><span id="pos2Txt" style="color: var(--accent);">50%</span></div>
@@ -285,12 +290,19 @@
     </div>
     <div id="playerModal" class="modal" style="z-index: 106;">
         <div class="modal-header-nav"><button class="close-btn" onclick="closeModal('playerModal')"><i class="fa-solid fa-arrow-right"></i></button><div style="font-weight:bold; font-size:16px;">إحصائيات اللاعب</div><div style="width:20px;"></div></div>
-        <div style="padding:30px 20px; text-align:center;"><div class="logo-ph" id="pModalLogo" style="width:110px; height:110px; margin:0 auto 15px; border-radius:50%; overflow:hidden; background:var(--card); border:2px solid var(--primary);"></div><h2 id="pModalName" style="margin:0; font-size:26px;">الاسم</h2><div id="pModalTeam" class="team-clickable" style="color:var(--primary); font-weight:bold; font-size:15px; margin-top:5px; cursor:pointer;">الفريق</div><div style="display:flex; flex-wrap:wrap; gap:10px; margin-top:30px; justify-content:center;"><div class="stat-box" style="width:30%; border-color:var(--border);"><div id="pModalMatches" class="stat-box-num">0</div><div class="stat-box-label">لعب</div></div><div class="stat-box" style="width:30%; border-color:var(--primary);"><div id="pModalGoals" class="stat-box-num">0</div><div class="stat-box-label">أهداف</div></div><div class="stat-box" style="width:30%; border-color:var(--accent);"><div id="pModalAssists" class="stat-box-num">0</div><div class="stat-box-label">صناعة</div></div><div class="stat-box" style="width:30%; border-color:#facc15;"><div id="pModalMotm" class="stat-box-num">0</div><div class="stat-box-label">نجومية</div></div><div class="stat-box" style="width:30%; border-color:#facc15;"><div id="pModalY" class="stat-box-num">0</div><div class="stat-box-label">🟨</div></div><div class="stat-box" style="width:30%; border-color:#ef4444;"><div id="pModalR" class="stat-box-num">0</div><div class="stat-box-label">🟥</div></div></div></div>
+        <div style="padding:30px 20px; text-align:center;"><div class="logo-ph" id="pModalLogo" style="width:110px; height:110px; margin:0 auto 15px; border-radius:50%; overflow:hidden; background:var(--card); border:2px solid var(--primary);"></div><h2 id="pModalName" style="margin:0; font-size:26px;">الاسم</h2><div id="pModalTeam" class="team-clickable" style="color:var(--primary); font-weight:bold; font-size:15px; margin-top:5px; cursor:pointer;">الفريق</div><div id="pModalPosDisplay" style="font-size:13px; color:var(--text); background:var(--border); display:inline-block; padding:3px 10px; border-radius:12px; font-weight:bold; margin-top:8px; display:none;"></div><div style="display:flex; flex-wrap:wrap; gap:10px; margin-top:30px; justify-content:center;"><div class="stat-box" style="width:30%; border-color:var(--border);"><div id="pModalMatches" class="stat-box-num">0</div><div class="stat-box-label">لعب</div></div><div class="stat-box" style="width:30%; border-color:var(--primary);"><div id="pModalGoals" class="stat-box-num">0</div><div class="stat-box-label">أهداف</div></div><div class="stat-box" style="width:30%; border-color:var(--accent);"><div id="pModalAssists" class="stat-box-num">0</div><div class="stat-box-label">صناعة</div></div><div class="stat-box" style="width:30%; border-color:#facc15;"><div id="pModalMotm" class="stat-box-num">0</div><div class="stat-box-label">نجومية</div></div><div class="stat-box" style="width:30%; border-color:#facc15;"><div id="pModalY" class="stat-box-num">0</div><div class="stat-box-label">🟨</div></div><div class="stat-box" style="width:30%; border-color:#ef4444;"><div id="pModalR" class="stat-box-num">0</div><div class="stat-box-label">🟥</div></div></div></div>
     </div>
     <div id="matchDetailsModal" class="modal" style="z-index: 102;">
         <div class="modal-header-nav"><button class="close-btn" onclick="closeModal('matchDetailsModal')"><i class="fa-solid fa-arrow-right"></i></button><div style="font-weight:bold; font-size:16px;">تفاصيل المباراة</div><button class="export-btn" onclick="shareAsImage('mdContentArea')" style="background:transparent; color:var(--primary); border:none; font-size:18px; cursor:pointer; padding:0;"><i class="fa-solid fa-camera"></i></button></div>
         <div style="padding:20px;" id="mdContentArea">
-            <div class="card" style="background:var(--card); text-align:center;"><div style="font-size:13px; color:var(--primary); font-weight:bold; margin-bottom:15px; background:rgba(255,255,255,0.05); padding:8px; border-radius:8px; border:1px solid var(--primary);" id="mdRound"></div><div style="display:flex; justify-content:space-between; align-items:center;"><div class="team-clickable" style="width:30%; font-weight:bold; font-size:15px; display:flex; flex-direction:column; align-items:center;" id="mdTeam1Container"><div class="logo-ph" id="mdLogo1" style="width:45px; height:45px; margin-bottom:5px;"></div><span id="mdT1Name"></span></div><div style="width:40%; font-size:40px; font-weight:900; letter-spacing:2px; color:var(--accent);" id="mdScore"></div><div class="team-clickable" style="width:30%; font-weight:bold; font-size:15px; display:flex; flex-direction:column; align-items:center;" id="mdTeam2Container"><div class="logo-ph" id="mdLogo2" style="width:45px; height:45px; margin-bottom:5px;"></div><span id="mdT2Name"></span></div></div><div id="mdReferees" class="modern-referees" style="display:none; margin: 15px 10px 10px;"><span>حكم الساحة: <span id="mdRef1Txt">--</span></span><span>مساعد الحكم: <span id="mdRef2Txt">--</span></span></div></div>
+            <div class="card" style="background:var(--card); text-align:center;"><div style="font-size:13px; color:var(--primary); font-weight:bold; margin-bottom:15px; background:rgba(255,255,255,0.05); padding:8px; border-radius:8px; border:1px solid var(--primary);" id="mdRound"></div><div style="display:flex; justify-content:space-between; align-items:center;"><div class="team-clickable" style="width:30%; font-weight:bold; font-size:15px; display:flex; flex-direction:column; align-items:center;" id="mdTeam1Container"><div class="logo-ph" id="mdLogo1" style="width:45px; height:45px; margin-bottom:5px;"></div><span id="mdT1Name"></span></div><div style="width:40%; font-size:40px; font-weight:900; letter-spacing:2px; color:var(--accent);" id="mdScore"></div><div class="team-clickable" style="width:30%; font-weight:bold; font-size:15px; display:flex; flex-direction:column; align-items:center;" id="mdTeam2Container"><div class="logo-ph" id="mdLogo2" style="width:45px; height:45px; margin-bottom:5px;"></div><span id="mdT2Name"></span></div></div>
+                <div id="mdReferees" class="modern-referees" style="display:none; margin: 15px 10px 10px;">
+                    <span id="mdRef1Wrap">ساحة: <span id="mdRef1Txt">--</span></span>
+                    <span id="mdRef2Wrap">مساعد: <span id="mdRef2Txt">--</span></span>
+                    <span id="mdRef3Wrap" style="display:none;">رابع: <span id="mdRef3Txt">--</span></span>
+                    <span id="mdRef4Wrap" style="display:none;">VAR: <span id="mdRef4Txt">--</span></span>
+                </div>
+            </div>
             <div class="card glass-box" id="mdStats" style="display:none; margin-bottom:15px; border-radius:12px;"><div style="font-size: 12px; color: #fff; text-align: center; margin-bottom: 5px; font-weight:bold;">الاستحواذ</div><div style="display: flex; justify-content: space-between; font-size: 12px; font-weight: bold; margin-bottom: 5px;"><span id="mdPos1Txt" style="color: var(--primary);">50%</span><span id="mdPos2Txt" style="color: var(--accent);">50%</span></div><div style="display: flex; height: 6px; border-radius: 3px; overflow: hidden; margin-bottom: 15px; background: rgba(255,255,255,0.2);"><div id="mdPos1Bar" style="width: 50%; background: var(--primary);"></div><div id="mdPos2Bar" style="width: 50%; background: var(--accent);"></div></div><div style="display: flex; justify-content: space-between; text-align: center; font-size: 12px;"><div style="flex: 1;"><div style="color: #facc15; margin-bottom: 3px;">التسديدات</div><div style="font-size: 16px; font-weight: bold;"><span id="mdShots1Txt">0</span> - <span id="mdShots2Txt">0</span></div></div><div style="flex: 1;"><div style="color: #fff; margin-bottom: 3px;">الركنيات</div><div style="font-size: 16px; font-weight: bold;"><span id="mdCorn1Txt">0</span> - <span id="mdCorn2Txt">0</span></div></div><div style="flex: 1;"><div style="color: #ef4444; margin-bottom: 3px;">الفاولات</div><div style="font-size: 16px; font-weight: bold;"><span id="mdFouls1Txt">0</span> - <span id="mdFouls2Txt">0</span></div></div></div></div>
             <div class="title-section" id="mdEventsTitle">أحداث المباراة</div><div class="card glass-box" id="mdEvents" style="font-size:13px; color:var(--text); line-height:2.2; text-align:right; border-radius:12px;"></div><div id="mdMotm" class="team-clickable" style="margin-top:15px; text-align:center; font-size:14px; color:#facc15; font-weight:bold;"></div>
             <div class="export-btn" style="display:flex; gap:10px; margin-top:20px; border:none; padding:0; background:transparent;"><button id="mdSquadBtn" style="flex:1; padding:12px; background:rgba(0,0,0,0.6); color:var(--primary); border:1px solid var(--primary); border-radius:12px; font-weight:bold; font-size:14px; cursor:pointer; font-family:'Cairo'; display:none;"><i class="fa-solid fa-users"></i> التشكيلة</button><button onclick="shareAsImage('mdContentArea')" style="flex:1; padding:12px; background:var(--primary); color:#fff; border:none; border-radius:12px; font-weight:bold; font-size:14px; cursor:pointer; font-family:'Cairo';"><i class="fa-solid fa-camera"></i> حفظ بوستر</button></div>
@@ -332,13 +344,10 @@
                 if(s.adLink && s.adLink.trim() !== '') { adWrapper.href = s.adLink; adWrapper.style.pointerEvents = 'auto'; } else { adWrapper.href = '#'; adWrapper.style.pointerEvents = 'none'; }
                 
                 if(s.active_adBg) { 
-                    // في حالة وجود صورة للإعلان
                     adArea.style.backgroundImage = `url('${s.active_adBg}')`; 
                     adArea.style.border = 'none'; 
-                    adOverlay.style.display = 'none'; // إزالة التظليل حتى تبرز الصورة
-                    adIcon.style.display = 'none'; // إخفاء الأيقونة
-                    
-                    // إخفاء النص إذا لم يكتب الأدمن نصاً مخصصاً
+                    adOverlay.style.display = 'none';
+                    adIcon.style.display = 'none';
                     if(s.adText && s.adText.trim() !== '') {
                         adTextDisplay.style.display = 'block';
                         adTextDisplay.innerText = s.adText;
@@ -346,13 +355,12 @@
                         adTextDisplay.style.display = 'none';
                     }
                 } else { 
-                    // في حالة عدم وجود صورة (الوضع الافتراضي)
                     adArea.style.backgroundImage = 'none'; 
                     adArea.style.border = '1px dashed var(--border)'; 
                     adOverlay.style.display = 'none'; 
-                    adIcon.style.display = 'block'; // إظهار الأيقونة
+                    adIcon.style.display = 'block'; 
                     adIcon.style.color = 'var(--primary)'; 
-                    adTextDisplay.style.display = 'block'; // إظهار النص
+                    adTextDisplay.style.display = 'block'; 
                     adTextDisplay.innerText = s.adText || 'مساحة إعلانية لبطولة دوائر خانقين';
                 }
             }
@@ -363,7 +371,6 @@
         function getRefHtml(name) { if(!name || name === '--') return '--'; let photo = refereesDataGlobal[name]?.photo; let imgHtml = photo ? `<img src="${photo}" style="width:24px;height:24px;border-radius:50%;object-fit:cover;border:1px solid var(--primary);">` : `<i class="fa-solid fa-user" style="color:var(--primary); font-size:14px;"></i>`; return `${imgHtml} <span>${name}</span>`; }
         function getPlayerImageHtml(pName, tName, fallbackColorClass) { let pPhoto = teamsDataGlobal[tName]?.players?.[pName]?.photo || ''; if(pPhoto) return `<img src="${pPhoto}" style="width:30px;height:30px;border-radius:50%;object-fit:cover;border:1px solid var(--primary); margin-left:8px;">`; return `<div style="width:30px;height:30px;border-radius:50%;background:rgba(255,255,255,0.05);display:inline-flex;align-items:center;justify-content:center;margin-left:8px;border:1px solid var(--primary);font-size:12px;color:${fallbackColorClass};"><i class="fa-solid fa-user"></i></div>`; }
 
-        // --- دالة تحويل سجل الأحداث إلى كروت تصميمية رائعة ---
         function formatEvents(eventsStr) {
             if(!eventsStr || eventsStr.trim() === '') return '<div style="text-align:center; color:var(--muted); padding:10px;">لا توجد أحداث مسجلة</div>';
             let lines = eventsStr.split('\n');
@@ -374,7 +381,7 @@
                 let icon = '⏱️'; let text = line; let bg = 'rgba(255,255,255,0.05)'; let borderColor = 'var(--border)';
                 if(iconMatch) {
                     icon = iconMatch[1]; text = iconMatch[2];
-                    if(icon === '⚽') { bg = 'rgba(74,222,128,0.1)'; borderColor = 'var(--accent)'; }
+                    if(icon === '⚽') { bg = 'rgba(74,222,128,0.1)'; borderColor = 'var(--accent)'; if(text.includes('(عكسي)')) { bg = 'rgba(239,68,68,0.1)'; borderColor = '#ef4444'; } }
                     if(icon === '🅰️') { bg = 'rgba(139,92,246,0.1)'; borderColor = '#8b5cf6'; }
                     if(icon === '🟨') { bg = 'rgba(250,204,21,0.1)'; borderColor = '#facc15'; }
                     if(icon === '🟥') { bg = 'rgba(239,68,68,0.1)'; borderColor = '#ef4444'; }
@@ -414,7 +421,15 @@
             document.getElementById('lEvents').innerHTML = formatEvents(d.events);
             
             document.getElementById('lLogo1').innerHTML = teamsDataGlobal[d.team1]?.logo ? `<img src="${teamsDataGlobal[d.team1].logo}">` : `<i class="fa-solid fa-shield-halved"></i>`; document.getElementById('lLogo2').innerHTML = teamsDataGlobal[d.team2]?.logo ? `<img src="${teamsDataGlobal[d.team2].logo}">` : `<i class="fa-solid fa-shield-halved"></i>`;
-            if(d.referee1 || d.referee2) { document.getElementById('lReferees').style.display = 'flex'; document.getElementById('lRef1Txt').innerHTML = getRefHtml(d.referee1); document.getElementById('lRef2Txt').innerHTML = getRefHtml(d.referee2); } else { document.getElementById('lReferees').style.display = 'none'; }
+            
+            if(d.referee1 || d.referee2 || d.referee3 || d.referee4) { 
+                document.getElementById('lReferees').style.display = 'flex'; 
+                document.getElementById('lRef1Txt').innerHTML = getRefHtml(d.referee1); 
+                document.getElementById('lRef2Txt').innerHTML = getRefHtml(d.referee2); 
+                if(d.referee3) { document.getElementById('lRef3Wrap').style.display = 'flex'; document.getElementById('lRef3Txt').innerHTML = getRefHtml(d.referee3); } else { document.getElementById('lRef3Wrap').style.display = 'none'; }
+                if(d.referee4) { document.getElementById('lRef4Wrap').style.display = 'flex'; document.getElementById('lRef4Txt').innerHTML = getRefHtml(d.referee4); } else { document.getElementById('lRef4Wrap').style.display = 'none'; }
+            } else { document.getElementById('lReferees').style.display = 'none'; }
+
             if(d.stats && (d.stats.possession1 !== undefined || d.stats.shots1 !== undefined)) { document.getElementById('lStats').style.display = 'block'; document.getElementById('pos1Txt').innerText = (d.stats.possession1 || 50) + '%'; document.getElementById('pos2Txt').innerText = (d.stats.possession2 || 50) + '%'; document.getElementById('pos1Bar').style.width = (d.stats.possession1 || 50) + '%'; document.getElementById('pos2Bar').style.width = (d.stats.possession2 || 50) + '%'; document.getElementById('shots1Txt').innerText = d.stats.shots1 || 0; document.getElementById('shots2Txt').innerText = d.stats.shots2 || 0; document.getElementById('corn1Txt').innerText = d.stats.corners1 || 0; document.getElementById('corn2Txt').innerText = d.stats.corners2 || 0; document.getElementById('fouls1Txt').innerText = d.stats.fouls1 || 0; document.getElementById('fouls2Txt').innerText = d.stats.fouls2 || 0; } else { document.getElementById('lStats').style.display = 'none'; }
             document.getElementById('lTeam1Container').onclick = function() { if(d.team1) openTeam(d.team1); }; document.getElementById('lTeam2Container').onclick = function() { if(d.team2) openTeam(d.team2); };
             let btnSq = document.getElementById('liveSquadBtn'); if(btnSq) { if((liveSquad1 && Object.keys(liveSquad1).length > 0) || (liveSquad2 && Object.keys(liveSquad2).length > 0)) { btnSq.style.display = 'block'; btnSq.onclick = function() { openSquads(d.team1, d.team2, liveSquad1, liveSquad2); }; } else { btnSq.style.display = 'none'; } }
@@ -479,7 +494,15 @@
             document.getElementById('mdEvents').innerHTML = formatEvents(m.events);
             
             if(m.motm && m.motm !== '') { document.getElementById('mdMotm').innerHTML = `<i class="fa-solid fa-star" style="color:var(--accent);"></i> نجم المباراة: ${m.motm} <small>(${m.motmTeam || m.team1})</small>`; document.getElementById('mdMotm').onclick = () => openPlayerProfile(m.motm, m.motmTeam || m.team1); } else { document.getElementById('mdMotm').innerHTML = '<div style="color:var(--muted); font-size:12px;">لم يتم تحديد أفضل لاعب</div>'; document.getElementById('mdMotm').onclick = null; }
-            if(m.referee1 || m.referee2) { document.getElementById('mdReferees').style.display = 'flex'; document.getElementById('mdRef1Txt').innerHTML = getRefHtml(m.referee1); document.getElementById('mdRef2Txt').innerHTML = getRefHtml(m.referee2); } else { document.getElementById('mdReferees').style.display = 'none'; }
+            
+            if(m.referee1 || m.referee2 || m.referee3 || m.referee4) { 
+                document.getElementById('mdReferees').style.display = 'flex'; 
+                document.getElementById('mdRef1Txt').innerHTML = getRefHtml(m.referee1); 
+                document.getElementById('mdRef2Txt').innerHTML = getRefHtml(m.referee2); 
+                if(m.referee3) { document.getElementById('mdRef3Wrap').style.display = 'flex'; document.getElementById('mdRef3Txt').innerHTML = getRefHtml(m.referee3); } else { document.getElementById('mdRef3Wrap').style.display = 'none'; }
+                if(m.referee4) { document.getElementById('mdRef4Wrap').style.display = 'flex'; document.getElementById('mdRef4Txt').innerHTML = getRefHtml(m.referee4); } else { document.getElementById('mdRef4Wrap').style.display = 'none'; }
+            } else { document.getElementById('mdReferees').style.display = 'none'; }
+
             if(m.stats && (m.stats.possession1 !== undefined || m.stats.shots1 !== undefined)) { document.getElementById('mdStats').style.display = 'block'; document.getElementById('mdPos1Txt').innerText = (m.stats.possession1 || 50) + '%'; document.getElementById('mdPos2Txt').innerText = (m.stats.possession2 || 50) + '%'; document.getElementById('mdPos1Bar').style.width = (m.stats.possession1 || 50) + '%'; document.getElementById('mdPos2Bar').style.width = (m.stats.possession2 || 50) + '%'; document.getElementById('mdShots1Txt').innerText = m.stats.shots1 || 0; document.getElementById('mdShots2Txt').innerText = m.stats.shots2 || 0; document.getElementById('mdCorn1Txt').innerText = m.stats.corners1 || 0; document.getElementById('mdCorn2Txt').innerText = m.stats.corners2 || 0; document.getElementById('mdFouls1Txt').innerText = m.stats.fouls1 || 0; document.getElementById('mdFouls2Txt').innerText = m.stats.fouls2 || 0; } else { document.getElementById('mdStats').style.display = 'none'; }
             document.getElementById('mdTeam1Container').onclick = function() { openTeam(m.team1); }; document.getElementById('mdTeam2Container').onclick = function() { openTeam(m.team2); };
             let btnSq = document.getElementById('mdSquadBtn'); if(btnSq) { if((m.squad1 && Object.keys(m.squad1).length > 0) || (m.squad2 && Object.keys(m.squad2).length > 0)) { btnSq.style.display = 'block'; btnSq.onclick = function() { openSquads(m.team1, m.team2, m.squad1, m.squad2); }; } else { btnSq.style.display = 'none'; } }
@@ -489,7 +512,15 @@
         window.openScheduledMatch = function(key) {
             let m = scheduleGlobal[key]; if(!m) return; let info = []; if(m.group) info.push(`مجموعة ${m.group}`); if(m.round) info.push(m.round);
             document.getElementById('mdRound').innerText = info.length > 0 ? info.join(' - ') : 'مباراة قادمة'; document.getElementById('mdT1Name').innerText = m.team1 || '--'; document.getElementById('mdT2Name').innerText = m.team2 || '--'; document.getElementById('mdLogo1').innerHTML = teamsDataGlobal[m.team1]?.logo ? `<img src="${teamsDataGlobal[m.team1].logo}">` : `<i class="fa-solid fa-shield"></i>`; document.getElementById('mdLogo2').innerHTML = teamsDataGlobal[m.team2]?.logo ? `<img src="${teamsDataGlobal[m.team2].logo}">` : `<i class="fa-solid fa-shield"></i>`; document.getElementById('mdScore').innerText = `VS`; document.getElementById('mdScore').style.fontSize = '24px'; document.getElementById('mdEventsTitle').style.display = 'none'; document.getElementById('mdStats').style.display = 'none'; document.getElementById('mdEvents').innerHTML = `<div style="text-align:center; padding: 20px;"><i class="fa-regular fa-clock" style="font-size:30px; color:var(--primary); margin-bottom:15px; display:block;"></i><strong style="font-size:14px; color:var(--text);">المباراة لم تبدأ بعد</strong><br><br><span style="color:var(--muted); font-size:12px;">موعد المباراة: ${m.time} | ${m.date}</span><br><span style="color:var(--muted); font-size:12px;"><i class="fa-solid fa-location-dot"></i> الملعب: ${m.stadium || 'لم يحدد'}</span></div>`; document.getElementById('mdMotm').innerHTML = '';
-            if(m.referee1 || m.referee2) { document.getElementById('mdReferees').style.display = 'flex'; document.getElementById('mdRef1Txt').innerHTML = getRefHtml(m.referee1); document.getElementById('mdRef2Txt').innerHTML = getRefHtml(m.referee2); } else { document.getElementById('mdReferees').style.display = 'none'; }
+            
+            if(m.referee1 || m.referee2 || m.referee3 || m.referee4) { 
+                document.getElementById('mdReferees').style.display = 'flex'; 
+                document.getElementById('mdRef1Txt').innerHTML = getRefHtml(m.referee1); 
+                document.getElementById('mdRef2Txt').innerHTML = getRefHtml(m.referee2); 
+                if(m.referee3) { document.getElementById('mdRef3Wrap').style.display = 'flex'; document.getElementById('mdRef3Txt').innerHTML = getRefHtml(m.referee3); } else { document.getElementById('mdRef3Wrap').style.display = 'none'; }
+                if(m.referee4) { document.getElementById('mdRef4Wrap').style.display = 'flex'; document.getElementById('mdRef4Txt').innerHTML = getRefHtml(m.referee4); } else { document.getElementById('mdRef4Wrap').style.display = 'none'; }
+            } else { document.getElementById('mdReferees').style.display = 'none'; }
+
             document.getElementById('mdTeam1Container').onclick = function() { openTeam(m.team1); }; document.getElementById('mdTeam2Container').onclick = function() { openTeam(m.team2); };
             let btnSq = document.getElementById('mdSquadBtn'); if(btnSq) btnSq.style.display = 'none'; document.getElementById('matchDetailsModal').style.display = 'block';
         }
@@ -507,14 +538,35 @@
             let jerseyHtml = ''; if (d.jerseyColor || d.jerseyImage || d.jerseyImage2) { let colorBox = d.jerseyColor ? `<div style="width:16px; height:16px; border-radius:4px; background-color:${d.jerseyColor}; border:1px solid var(--border); display:inline-block;"></div>` : ''; let imgBox1 = d.jerseyImage ? `<img src="${d.jerseyImage}" onclick="openImageViewer('${d.jerseyImage}')" style="width:35px; height:35px; object-fit:contain; border-radius:6px; cursor:pointer; background:rgba(255,255,255,0.05); padding:3px; border:1px solid var(--border);">` : ''; let imgBox2 = d.jerseyImage2 ? `<img src="${d.jerseyImage2}" onclick="openImageViewer('${d.jerseyImage2}')" style="width:35px; height:35px; object-fit:contain; border-radius:6px; cursor:pointer; background:rgba(255,255,255,0.05); padding:3px; border:1px solid var(--border);">` : ''; jerseyHtml = `<div style="background:rgba(255,255,255,0.05); padding:8px 12px; border-radius:8px; border:1px solid var(--primary); font-size:12px; color:var(--text); display:flex; align-items:center; gap:8px;"> الطقم: ${colorBox} ${imgBox1} ${imgBox2}</div>`; }
             document.getElementById('modalStaffArea').innerHTML = staff + jerseyHtml; 
             const tbody = document.getElementById('modalPlayers'); tbody.innerHTML = ''; 
-            if(d.players) { for(let p in d.players) { let s = d.players[p]; let pImgHtml = s.photo ? `<img src="${s.photo}" style="width:30px;height:30px;border-radius:50%;object-fit:cover;vertical-align:middle;margin-left:8px;border:1px solid var(--primary);">` : `<div style="width:30px;height:30px;border-radius:50%;background:rgba(255,255,255,0.05);display:inline-flex;align-items:center;justify-content:center;vertical-align:middle;margin-left:8px;border:1px solid var(--primary);font-size:12px;color:var(--primary);"><i class="fa-solid fa-user"></i></div>`; tbody.innerHTML += `<tr class="clickable-player" onclick="openPlayerProfile('${p}','${tName}')"><td style="text-align:right; padding-right:15px; display:flex; align-items:center; font-weight:bold;">${pImgHtml}<span>${p}</span></td><td style="font-size:14px; color:var(--primary);">${s.goals||0}</td><td style="font-size:14px; color:#facc15;">${s.motm||0}</td><td style="font-size:14px;">${s.yellow||0}</td><td style="font-size:14px;">${s.red||0}</td></tr>`; } }
+            if(d.players) { 
+                for(let p in d.players) { 
+                    let s = d.players[p]; 
+                    let pImgHtml = s.photo ? `<img src="${s.photo}" style="width:30px;height:30px;border-radius:50%;object-fit:cover;vertical-align:middle;margin-left:8px;border:1px solid var(--primary);">` : `<div style="width:30px;height:30px;border-radius:50%;background:rgba(255,255,255,0.05);display:inline-flex;align-items:center;justify-content:center;vertical-align:middle;margin-left:8px;border:1px solid var(--primary);font-size:12px;color:var(--primary);"><i class="fa-solid fa-user"></i></div>`; 
+                    let posBadge = s.position ? `<div style="background:#27272a; padding:1px 6px; border-radius:4px; font-size:9px; color:var(--muted); display:inline-block; margin-top:2px;">${s.position}</div>` : '';
+                    tbody.innerHTML += `<tr class="clickable-player" onclick="openPlayerProfile('${p}','${tName}')"><td style="text-align:right; padding-right:15px; display:flex; align-items:center; font-weight:bold;">${pImgHtml}<div style="display:flex; flex-direction:column;"><span>${p}</span>${posBadge}</div></td><td style="font-size:14px; color:var(--primary);">${s.goals||0}</td><td style="font-size:14px; color:#facc15;">${s.motm||0}</td><td style="font-size:14px;">${s.yellow||0}</td><td style="font-size:14px;">${s.red||0}</td></tr>`; 
+                } 
+            }
             document.getElementById('teamModal').style.display = 'block'; 
         }
         
         window.openPlayerProfile = function(pName, tName) { 
             const p = teamsDataGlobal[tName].players[pName]; 
             const pLogo = p.photo ? `<img src="${p.photo}" onclick="openImageViewer('${p.photo}')" style="width:100%; height:100%; object-fit:cover; cursor:pointer;">` : teamsDataGlobal[tName].logo ? `<img src="${teamsDataGlobal[tName].logo}">` : `<i class="fa-solid fa-user" style="font-size:40px;"></i>`; 
-            document.getElementById('pModalLogo').innerHTML = pLogo; document.getElementById('pModalName').innerText = pName; document.getElementById('pModalTeam').innerText = tName; document.getElementById('pModalTeam').onclick = () => openTeam(tName); document.getElementById('pModalMatches').innerText = p.matches || 0; document.getElementById('pModalGoals').innerText = p.goals || 0; document.getElementById('pModalAssists').innerText = p.assists || 0; document.getElementById('pModalMotm').innerText = p.motm || 0; document.getElementById('pModalY').innerText = p.yellow || 0; document.getElementById('pModalR').innerText = p.red || 0; document.getElementById('playerModal').style.display = 'block'; 
+            document.getElementById('pModalLogo').innerHTML = pLogo; 
+            document.getElementById('pModalName').innerText = pName; 
+            document.getElementById('pModalTeam').innerText = tName; 
+            document.getElementById('pModalTeam').onclick = () => openTeam(tName); 
+            
+            let pPosDisplay = document.getElementById('pModalPosDisplay');
+            if(p.position) { pPosDisplay.innerText = "المركز: " + p.position; pPosDisplay.style.display = 'inline-block'; } else { pPosDisplay.style.display = 'none'; }
+            
+            document.getElementById('pModalMatches').innerText = p.matches || 0; 
+            document.getElementById('pModalGoals').innerText = p.goals || 0; 
+            document.getElementById('pModalAssists').innerText = p.assists || 0; 
+            document.getElementById('pModalMotm').innerText = p.motm || 0; 
+            document.getElementById('pModalY').innerText = p.yellow || 0; 
+            document.getElementById('pModalR').innerText = p.red || 0; 
+            document.getElementById('playerModal').style.display = 'block'; 
         }
 
         window.addEventListener('beforeinstallprompt', (e) => { e.preventDefault(); });
@@ -535,8 +587,17 @@
                 
                 const renderPitch = (sq, containerId, isTop) => {
                     const cont = document.getElementById(containerId); if(!cont) return; cont.innerHTML = '';
-                    const posNames = { gk:'GK', lb:'LB', rb:'RB', lm:'LM', cm:'CM', rm:'RM', st:'ST' };
-                    const layout = isTop ? { gk: {top:'7%', left:'50%'}, lb: {top:'18%', left:'84%'}, rb: {top:'18%', left:'16%'}, lm: {top:'32%', left:'84%'}, cm: {top:'30%', left:'50%'}, rm: {top:'32%', left:'16%'}, st: {top:'44%', left:'50%'} } : { gk: {top:'93%', left:'50%'}, lb: {top:'82%', left:'16%'}, rb: {top:'82%', left:'84%'}, lm: {top:'68%', left:'16%'}, cm: {top:'70%', left:'50%'}, rm: {top:'68%', left:'84%'}, st: {top:'56%', left:'50%'} };
+                    const posNames = { gk:'GK', cb:'CB', lb:'LB', rb:'RB', cdm:'CDM', cm:'CM', cam:'CAM', lm:'LM', rm:'RM', lw:'LW', rw:'RW', st:'ST' };
+                    
+                    const layout = isTop ? { 
+                        gk: {top:'7%', left:'50%'}, cb: {top:'15%', left:'50%'}, lb: {top:'18%', left:'84%'}, rb: {top:'18%', left:'16%'}, 
+                        cdm: {top:'25%', left:'50%'}, cm: {top:'32%', left:'50%'}, lm: {top:'32%', left:'84%'}, rm: {top:'32%', left:'16%'}, 
+                        cam: {top:'38%', left:'50%'}, lw: {top:'44%', left:'75%'}, rw: {top:'44%', left:'25%'}, st: {top:'46%', left:'50%'} 
+                    } : { 
+                        gk: {top:'93%', left:'50%'}, cb: {top:'85%', left:'50%'}, lb: {top:'82%', left:'16%'}, rb: {top:'82%', left:'84%'}, 
+                        cdm: {top:'75%', left:'50%'}, cm: {top:'68%', left:'50%'}, lm: {top:'68%', left:'16%'}, rm: {top:'68%', left:'84%'}, 
+                        cam: {top:'62%', left:'50%'}, lw: {top:'56%', left:'25%'}, rw: {top:'56%', left:'75%'}, st: {top:'54%', left:'50%'} 
+                    };
                     
                     for(let pos in sq) {
                         let pData = sq[pos]; if(!pData) continue; let name = typeof pData === 'object' ? pData.name : pData; let rating = typeof pData === 'object' ? pData.rating : ''; if(!name || name.trim() === '') continue;
