@@ -42,7 +42,7 @@
         
         #liveMatchCard { background-size: cover; background-position: center top; background-repeat: no-repeat; border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); margin-bottom: 16px; overflow: hidden; }
         .card-header { padding: 12px 15px; display: flex; justify-content: space-between; font-size: 11px; border-bottom: 1px solid rgba(255,255,255,0.05); font-weight: 700; color: #fff; text-transform: uppercase; background:rgba(0,0,0,0.25);}
-        .card-body { padding: 25px 15px; display: flex; justify-content: space-between; align-items: center; }
+        .card-body { padding: 25px 15px 15px; display: flex; justify-content: space-between; align-items: center; }
         
         .team { display: flex; flex-direction: column; align-items: center; width: 32%; gap: 10px;}
         .team-name { font-size: 13px; font-weight: 800; text-align: center; color: var(--text); text-shadow: 0 2px 4px rgba(0,0,0,0.8);}
@@ -54,9 +54,20 @@
         .score { font-size: 34px; font-weight: 900; margin: 0; color: var(--text); text-shadow: 0 2px 10px rgba(0,0,0,0.9); letter-spacing: 2px;}
         .status { font-size: 11px; color: #fff; margin-top: 10px; background: var(--primary); padding: 4px 15px; border-radius: 20px; font-weight: 800; box-shadow: 0 2px 5px rgba(0,0,0,0.5);}
         
-        /* التعديل الجذري على البوكسات الزجاجية لإظهار الخلفية */
         .glass-box { background: rgba(0, 0, 0, 0.15); backdrop-filter: blur(2px); border: 1px solid rgba(255, 255, 255, 0.08); padding: 15px; }
         
+        .match-tabs { display: flex; gap: 5px; margin: 0 15px 15px; background: rgba(0,0,0,0.3); padding: 5px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.08); backdrop-filter: blur(4px); }
+        .match-tab-btn { flex: 1; background: transparent; color: #b3b3b3; border: none; padding: 10px; border-radius: 8px; font-weight: bold; font-size: 12px; cursor: pointer; font-family: 'Cairo'; transition: 0.3s; }
+        .match-tab-btn.active { background: var(--primary); color: #fff; box-shadow: 0 2px 8px rgba(0,0,0,0.4); }
+
+        /* ستايل صفوف الإحصائيات الجديد */
+        .stat-list-row { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.05); }
+        .stat-list-row:last-child { border-bottom: none; padding-bottom: 0; }
+        .stat-item-title { flex: 1; text-align: center; font-size: 12px; font-weight: 900; color: var(--text); text-shadow: 0 1px 2px rgba(0,0,0,0.8); letter-spacing: 0.5px;}
+        .stat-item-val { width: 40px; font-size: 18px; font-weight: 900; text-shadow: 0 1px 2px rgba(0,0,0,0.8); }
+        .stat-item-val.right { text-align: right; color: var(--primary); }
+        .stat-item-val.left { text-align: left; color: var(--accent); }
+
         /* الأحداث (Timeline) */
         .events-container { padding: 20px 15px; position: relative; }
         .modern-timeline { position: relative; max-width: 100%; margin: 0 auto; }
@@ -137,7 +148,7 @@
         
         .premium-poster { background: #111215 !important; border: none !important; border-radius: 20px !important; padding: 30px 20px !important; box-shadow: inset 0 0 30px rgba(0, 0, 0, 0.8) !important; }
         .premium-poster .title-section, .premium-poster .card-header { background: transparent !important; border-color: var(--border) !important; color: var(--muted) !important; }
-        .premium-poster .export-btn, .premium-poster .btn-enter-match, .premium-poster .close-btn, .premium-poster .squad-btn { display: none !important; }
+        .premium-poster .export-btn, .premium-poster .btn-enter-match, .premium-poster .close-btn, .premium-poster .squad-btn, .premium-poster .match-tabs { display: none !important; }
         .premium-poster.stats-export-mode tbody tr { display: none !important; }
         .premium-poster.stats-export-mode tbody tr:nth-child(-n+5) { display: table-row !important; }
         
@@ -183,6 +194,36 @@
             document.getElementById(tabId).style.display = 'block'; btn.style.background = 'var(--primary)'; btn.style.color = '#000';
         }
         function closeModal(id) { document.getElementById(id).style.display = 'none'; }
+        
+        function switchMatchTab(context, tab) {
+            if(context === 'live') {
+                document.getElementById('btnLiveEvents').classList.remove('active');
+                document.getElementById('btnLiveStats').classList.remove('active');
+                document.getElementById('live-content-events').style.display = 'none';
+                document.getElementById('live-content-stats').style.display = 'none';
+                
+                if(tab === 'events') {
+                    document.getElementById('btnLiveEvents').classList.add('active');
+                    document.getElementById('live-content-events').style.display = 'block';
+                } else {
+                    document.getElementById('btnLiveStats').classList.add('active');
+                    document.getElementById('live-content-stats').style.display = 'block';
+                }
+            } else if (context === 'md') {
+                document.getElementById('btnMdEvents').classList.remove('active');
+                document.getElementById('btnMdStats').classList.remove('active');
+                document.getElementById('md-content-events').style.display = 'none';
+                document.getElementById('md-content-stats').style.display = 'none';
+                
+                if(tab === 'events') {
+                    document.getElementById('btnMdEvents').classList.add('active');
+                    document.getElementById('md-content-events').style.display = 'block';
+                } else {
+                    document.getElementById('btnMdStats').classList.add('active');
+                    document.getElementById('md-content-stats').style.display = 'block';
+                }
+            }
+        }
     </script>
 </head>
 <body>
@@ -214,25 +255,60 @@
                     <div class="score-info"><div class="live-timer" id="lTimer">00:00</div><div class="score" id="lScore">- : -</div><div class="status" id="lStatus">انتظار</div></div>
                     <div class="team team-clickable" id="lTeam2Container"><div class="logo-ph" id="lLogo2"></div><div class="team-name" id="lTeam2">--</div></div>
                 </div>
+                
                 <div id="lReferees" class="modern-referees glass-box" style="display:none; margin: 0 15px 15px;">
                     <span id="lRef1Wrap">ساحة: <span id="lRef1Txt">--</span></span>
                     <span id="lRef2Wrap">مساعد: <span id="lRef2Txt">--</span></span>
                     <span id="lRef3Wrap" style="display:none;">رابع: <span id="lRef3Txt">--</span></span>
                     <span id="lRef4Wrap" style="display:none;">VAR: <span id="lRef4Txt">--</span></span>
                 </div>
-                <div id="lStats" class="glass-box" style="display:none; margin: 0 15px 15px; border-radius:12px;">
-                    <div style="font-size: 12px; color: #fff; text-align: center; margin-bottom: 5px; font-weight:bold;">الاستحواذ</div>
-                    <div style="display: flex; justify-content: space-between; font-size: 13px; font-weight: bold; margin-bottom: 5px; text-shadow:0 1px 3px rgba(0,0,0,0.8);"><span id="pos1Txt" style="color: var(--primary);">50%</span><span id="pos2Txt" style="color: var(--accent);">50%</span></div>
-                    <div style="display: flex; height: 6px; border-radius: 3px; overflow: hidden; margin-bottom: 15px; background: rgba(255,255,255,0.1);"><div id="pos1Bar" style="width: 50%; background: var(--primary);"></div><div id="pos2Bar" style="width: 50%; background: var(--accent);"></div></div>
-                    <div style="display: flex; justify-content: space-between; text-align: center; font-size: 12px;">
-                        <div style="flex: 1;"><div style="color: #facc15; margin-bottom: 3px; font-weight:bold; text-shadow:0 1px 2px rgba(0,0,0,0.8);">التسديدات</div><div style="font-size: 16px; font-weight: bold; text-shadow:0 1px 2px rgba(0,0,0,0.8);"><span id="shots1Txt">0</span> - <span id="shots2Txt">0</span></div></div>
-                        <div style="flex: 1;"><div style="color: #fff; margin-bottom: 3px; font-weight:bold; text-shadow:0 1px 2px rgba(0,0,0,0.8);">الركنيات</div><div style="font-size: 16px; font-weight: bold; text-shadow:0 1px 2px rgba(0,0,0,0.8);"><span id="corn1Txt">0</span> - <span id="corn2Txt">0</span></div></div>
-                        <div style="flex: 1;"><div style="color: #ef4444; margin-bottom: 3px; font-weight:bold; text-shadow:0 1px 2px rgba(0,0,0,0.8);">الفاولات</div><div style="font-size: 16px; font-weight: bold; text-shadow:0 1px 2px rgba(0,0,0,0.8);"><span id="fouls1Txt">0</span> - <span id="fouls2Txt">0</span></div></div>
+
+                <!-- تبويبات المباشر -->
+                <div class="match-tabs" id="lTabs" style="display:none;">
+                    <button class="match-tab-btn active" id="btnLiveEvents" onclick="switchMatchTab('live', 'events')"><i class="fa-solid fa-clock-rotate-left"></i> الأحداث</button>
+                    <button class="match-tab-btn" id="btnLiveStats" onclick="switchMatchTab('live', 'stats')"><i class="fa-solid fa-chart-pie"></i> الإحصائيات</button>
+                </div>
+
+                <!-- محتوى تبويب الأحداث (بدون استحواذ) -->
+                <div id="live-content-events">
+                    <div id="lEventsTimeline" class="events-container glass-box" style="margin:0 15px 15px; border-radius:12px;">
+                        <div class="modern-timeline" id="lTimelineList"></div>
                     </div>
                 </div>
-                <div id="lEventsTimeline" class="events-container glass-box" style="margin:0 15px 15px; border-radius:12px;">
-                    <div class="modern-timeline" id="lTimelineList"></div>
+
+                <!-- محتوى تبويب الإحصائيات الجديد -->
+                <div id="live-content-stats" style="display:none;">
+                    <div id="lStats" class="glass-box" style="margin: 0 15px 15px; border-radius:12px;">
+                        <!-- الاستحواذ -->
+                        <div style="font-size: 13px; color: #fff; text-align: center; margin-bottom: 8px; font-weight:900; text-shadow:0 1px 2px rgba(0,0,0,0.8);">الاستحواذ</div>
+                        <div style="display: flex; justify-content: space-between; font-size: 16px; font-weight: 900; margin-bottom: 8px; text-shadow:0 1px 3px rgba(0,0,0,0.8);">
+                            <span id="pos1Txt" style="color: var(--primary);">50%</span>
+                            <span id="pos2Txt" style="color: var(--accent);">50%</span>
+                        </div>
+                        <div style="display: flex; height: 8px; border-radius: 4px; overflow: hidden; margin-bottom: 20px; background: rgba(255,255,255,0.1); box-shadow: inset 0 1px 3px rgba(0,0,0,0.5);">
+                            <div id="pos1Bar" style="width: 50%; background: var(--primary);"></div>
+                            <div id="pos2Bar" style="width: 50%; background: var(--accent);"></div>
+                        </div>
+                        
+                        <!-- باقي الإحصائيات بشكل صفوف مرتبة -->
+                        <div class="stat-list-row">
+                            <div class="stat-item-val right" id="shots1Txt">0</div>
+                            <div class="stat-item-title" style="color:#facc15;">التسديدات</div>
+                            <div class="stat-item-val left" id="shots2Txt">0</div>
+                        </div>
+                        <div class="stat-list-row">
+                            <div class="stat-item-val right" id="corn1Txt">0</div>
+                            <div class="stat-item-title" style="color:#fff;">الركنيات</div>
+                            <div class="stat-item-val left" id="corn2Txt">0</div>
+                        </div>
+                        <div class="stat-list-row">
+                            <div class="stat-item-val right" id="fouls1Txt">0</div>
+                            <div class="stat-item-title" style="color:#ef4444;">الفاولات</div>
+                            <div class="stat-item-val left" id="fouls2Txt">0</div>
+                        </div>
+                    </div>
                 </div>
+
                 <div class="share-actions" style="border:none; padding-top:0;">
                     <button class="export-btn" id="liveSquadBtn" style="display:none; margin-left:10px;"><i class="fa-solid fa-users"></i> التشكيلة</button>
                     <button class="export-btn" onclick="shareAsImage('liveMatchCard')" style="background:var(--primary); color:#fff; border:none;"><i class="fa-solid fa-camera"></i> بوستر</button>
@@ -322,17 +398,65 @@
         <div style="padding:30px 20px; text-align:center;"><div class="logo-ph" id="pModalLogo" style="width:110px; height:110px; margin:0 auto 15px; border-radius:50%; overflow:hidden; background:var(--card); border:2px solid var(--primary);"></div><h2 id="pModalName" style="margin:0; font-size:26px;">الاسم</h2><div id="pModalTeam" class="team-clickable" style="color:var(--primary); font-weight:bold; font-size:15px; margin-top:5px; cursor:pointer;">الفريق</div><div id="pModalPosDisplay" style="font-size:13px; color:var(--text); background:var(--border); display:inline-block; padding:3px 10px; border-radius:12px; font-weight:bold; margin-top:8px; display:none;"></div><div style="display:flex; flex-wrap:wrap; gap:10px; margin-top:30px; justify-content:center;"><div class="stat-box" style="width:30%; border-color:var(--border);"><div id="pModalMatches" class="stat-box-num">0</div><div class="stat-box-label">لعب</div></div><div class="stat-box" style="width:30%; border-color:var(--primary);"><div id="pModalGoals" class="stat-box-num">0</div><div class="stat-box-label">أهداف</div></div><div class="stat-box" style="width:30%; border-color:var(--accent);"><div id="pModalAssists" class="stat-box-num">0</div><div class="stat-box-label">صناعة</div></div><div class="stat-box" style="width:30%; border-color:#facc15;"><div id="pModalMotm" class="stat-box-num">0</div><div class="stat-box-label">نجومية</div></div><div class="stat-box" style="width:30%; border-color:#facc15;"><div id="pModalY" class="stat-box-num">0</div><div class="stat-box-label">🟨</div></div><div class="stat-box" style="width:30%; border-color:#ef4444;"><div id="pModalR" class="stat-box-num">0</div><div class="stat-box-label">🟥</div></div></div></div>
     </div>
 
+    <!-- نافذة تفاصيل المباراة (للمباريات المنتهية) -->
     <div id="matchDetailsModal" class="modal" style="z-index: 102;">
         <div class="modal-header-nav"><button class="close-btn" onclick="closeModal('matchDetailsModal')"><i class="fa-solid fa-arrow-right"></i></button><div style="font-weight:bold; font-size:16px;">تفاصيل المباراة</div><button class="export-btn" onclick="shareAsImage('mdContentArea')" style="background:transparent; color:var(--primary); border:none; font-size:18px; cursor:pointer; padding:0;"><i class="fa-solid fa-camera"></i></button></div>
         <div style="padding:20px;" id="mdContentArea">
-            <div class="card" style="background:var(--card); text-align:center;"><div style="font-size:13px; color:var(--primary); font-weight:bold; margin-bottom:15px; background:rgba(255,255,255,0.05); padding:8px; border-radius:8px; border:1px solid var(--primary);" id="mdRound"></div><div style="display:flex; justify-content:space-between; align-items:center;"><div class="team-clickable" style="width:30%; font-weight:bold; font-size:15px; display:flex; flex-direction:column; align-items:center;" id="mdTeam1Container"><div class="logo-ph" id="mdLogo1" style="width:45px; height:45px; margin-bottom:5px;"></div><span id="mdT1Name"></span></div><div style="width:40%; font-size:40px; font-weight:900; letter-spacing:2px; color:var(--accent);" id="mdScore"></div><div class="team-clickable" style="width:30%; font-weight:bold; font-size:15px; display:flex; flex-direction:column; align-items:center;" id="mdTeam2Container"><div class="logo-ph" id="mdLogo2" style="width:45px; height:45px; margin-bottom:5px;"></div><span id="mdT2Name"></span></div></div>
+            <div class="card" style="background:var(--card); text-align:center;">
+                <div style="font-size:13px; color:var(--primary); font-weight:bold; margin-bottom:15px; background:rgba(255,255,255,0.05); padding:8px; border-radius:8px; border:1px solid var(--primary);" id="mdRound"></div>
+                <div style="display:flex; justify-content:space-between; align-items:center;">
+                    <div class="team-clickable" style="width:30%; font-weight:bold; font-size:15px; display:flex; flex-direction:column; align-items:center;" id="mdTeam1Container"><div class="logo-ph" id="mdLogo1" style="width:45px; height:45px; margin-bottom:5px;"></div><span id="mdT1Name"></span></div>
+                    <div style="width:40%; font-size:40px; font-weight:900; letter-spacing:2px; color:var(--accent);" id="mdScore"></div>
+                    <div class="team-clickable" style="width:30%; font-weight:bold; font-size:15px; display:flex; flex-direction:column; align-items:center;" id="mdTeam2Container"><div class="logo-ph" id="mdLogo2" style="width:45px; height:45px; margin-bottom:5px;"></div><span id="mdT2Name"></span></div>
+                </div>
                 <div id="mdReferees" class="modern-referees" style="display:none; margin: 15px 10px 10px;"><span id="mdRef1Wrap">ساحة: <span id="mdRef1Txt">--</span></span><span id="mdRef2Wrap">مساعد: <span id="mdRef2Txt">--</span></span><span id="mdRef3Wrap" style="display:none;">رابع: <span id="mdRef3Txt">--</span></span><span id="mdRef4Wrap" style="display:none;">VAR: <span id="mdRef4Txt">--</span></span></div>
             </div>
-            <div class="card glass-box" id="mdStats" style="display:none; margin-bottom:15px; border-radius:12px;"><div style="font-size: 12px; color: #fff; text-align: center; margin-bottom: 5px; font-weight:bold;">الاستحواذ</div><div style="display: flex; justify-content: space-between; font-size: 12px; font-weight: bold; margin-bottom: 5px;"><span id="mdPos1Txt" style="color: var(--primary);">50%</span><span id="mdPos2Txt" style="color: var(--accent);">50%</span></div><div style="display: flex; height: 6px; border-radius: 3px; overflow: hidden; margin-bottom: 15px; background: rgba(255,255,255,0.2);"><div id="mdPos1Bar" style="width: 50%; background: var(--primary);"></div><div id="mdPos2Bar" style="width: 50%; background: var(--accent);"></div></div><div style="display: flex; justify-content: space-between; text-align: center; font-size: 12px;"><div style="flex: 1;"><div style="color: #facc15; margin-bottom: 3px;">التسديدات</div><div style="font-size: 16px; font-weight: bold;"><span id="mdShots1Txt">0</span> - <span id="mdShots2Txt">0</span></div></div><div style="flex: 1;"><div style="color: #fff; margin-bottom: 3px;">الركنيات</div><div style="font-size: 16px; font-weight: bold;"><span id="mdCorn1Txt">0</span> - <span id="mdCorn2Txt">0</span></div></div><div style="flex: 1;"><div style="color: #ef4444; margin-bottom: 3px;">الفاولات</div><div style="font-size: 16px; font-weight: bold;"><span id="mdFouls1Txt">0</span> - <span id="mdFouls2Txt">0</span></div></div></div></div>
-            <div class="title-section" id="mdEventsTitle">أحداث المباراة</div>
-            <div class="card glass-box" id="mdEventsTimeline" style="margin-bottom:15px; border-radius:12px;"><div class="modern-timeline" id="mdTimelineList"></div></div>
+
+            <!-- التبويبات المتفرعة للمباراة المنتهية -->
+            <div class="match-tabs" id="mdTabs" style="display:none; margin: 15px 0;">
+                <button class="match-tab-btn active" id="btnMdEvents" onclick="switchMatchTab('md', 'events')"><i class="fa-solid fa-clock-rotate-left"></i> الأحداث</button>
+                <button class="match-tab-btn" id="btnMdStats" onclick="switchMatchTab('md', 'stats')"><i class="fa-solid fa-chart-pie"></i> الإحصائيات</button>
+            </div>
+
+            <div id="md-content-events">
+                <div class="card glass-box" id="mdEventsTimeline" style="margin-bottom:15px; border-radius:12px;">
+                    <div class="modern-timeline" id="mdTimelineList"></div>
+                </div>
+            </div>
+
+            <!-- محتوى الإحصائيات الجديد في تفاصيل المباراة -->
+            <div id="md-content-stats" style="display:none;">
+                <div class="card glass-box" id="mdStats" style="margin-bottom:15px; border-radius:12px;">
+                    <!-- الاستحواذ -->
+                    <div style="font-size: 13px; color: #fff; text-align: center; margin-bottom: 8px; font-weight:900;">الاستحواذ</div>
+                    <div style="display: flex; justify-content: space-between; font-size: 16px; font-weight: 900; margin-bottom: 8px;"><span id="mdPos1Txt" style="color: var(--primary);">50%</span><span id="mdPos2Txt" style="color: var(--accent);">50%</span></div>
+                    <div style="display: flex; height: 8px; border-radius: 4px; overflow: hidden; margin-bottom: 20px; background: rgba(255,255,255,0.1);"><div id="mdPos1Bar" style="width: 50%; background: var(--primary);"></div><div id="mdPos2Bar" style="width: 50%; background: var(--accent);"></div></div>
+                    
+                    <!-- باقي الإحصائيات بشكل صفوف -->
+                    <div class="stat-list-row">
+                        <div class="stat-item-val right" id="mdShots1Txt">0</div>
+                        <div class="stat-item-title" style="color:#facc15;">التسديدات</div>
+                        <div class="stat-item-val left" id="mdShots2Txt">0</div>
+                    </div>
+                    <div class="stat-list-row">
+                        <div class="stat-item-val right" id="mdCorn1Txt">0</div>
+                        <div class="stat-item-title" style="color:#fff;">الركنيات</div>
+                        <div class="stat-item-val left" id="mdCorn2Txt">0</div>
+                    </div>
+                    <div class="stat-list-row">
+                        <div class="stat-item-val right" id="mdFouls1Txt">0</div>
+                        <div class="stat-item-title" style="color:#ef4444;">الفاولات</div>
+                        <div class="stat-item-val left" id="mdFouls2Txt">0</div>
+                    </div>
+                </div>
+            </div>
+
             <div id="mdMotm" class="team-clickable" style="margin-top:15px; text-align:center; font-size:14px; color:#facc15; font-weight:bold;"></div>
-            <div class="export-btn" style="display:flex; gap:10px; margin-top:20px; border:none; padding:0; background:transparent;"><button id="mdSquadBtn" style="flex:1; padding:12px; background:rgba(0,0,0,0.6); color:var(--primary); border:1px solid var(--primary); border-radius:12px; font-weight:bold; font-size:14px; cursor:pointer; font-family:'Cairo'; display:none;"><i class="fa-solid fa-users"></i> التشكيلة</button><button onclick="shareAsImage('mdContentArea')" style="flex:1; padding:12px; background:var(--primary); color:#fff; border:none; border-radius:12px; font-weight:bold; font-size:14px; cursor:pointer; font-family:'Cairo';"><i class="fa-solid fa-camera"></i> حفظ بوستر</button></div>
+            
+            <div class="export-btn" style="display:flex; gap:10px; margin-top:20px; border:none; padding:0; background:transparent;">
+                <button id="mdSquadBtn" style="flex:1; padding:12px; background:rgba(0,0,0,0.6); color:var(--primary); border:1px solid var(--primary); border-radius:12px; font-weight:bold; font-size:14px; cursor:pointer; font-family:'Cairo'; display:none;"><i class="fa-solid fa-users"></i> التشكيلة</button>
+                <button onclick="shareAsImage('mdContentArea')" style="flex:1; padding:12px; background:var(--primary); color:#fff; border:none; border-radius:12px; font-weight:bold; font-size:14px; cursor:pointer; font-family:'Cairo';"><i class="fa-solid fa-camera"></i> حفظ بوستر</button>
+            </div>
         </div>
     </div>
 
@@ -364,7 +488,6 @@
             if(t === 'blue') { root.style.setProperty('--primary', '#3b82f6'); root.style.setProperty('--accent', '#4ade80'); } else if(t === 'gold') { root.style.setProperty('--primary', '#d4af37'); root.style.setProperty('--accent', '#facc15'); } else if(t === 'green') { root.style.setProperty('--primary', '#10b981'); root.style.setProperty('--accent', '#34d399'); } else if(t === 'crimson') { root.style.setProperty('--primary', '#e11d48'); root.style.setProperty('--accent', '#fb7185'); } else if(t === 'purple') { root.style.setProperty('--primary', '#8b5cf6'); root.style.setProperty('--accent', '#c084fc'); } else if(t === 'orange') { root.style.setProperty('--primary', '#f97316'); root.style.setProperty('--accent', '#fbbf24'); } else if(t === 'neon') { root.style.setProperty('--primary', '#39ff14'); root.style.setProperty('--accent', '#0ff'); root.style.setProperty('--bg', '#050505'); root.style.setProperty('--card', '#111'); } if(t !== 'neon') { root.style.setProperty('--bg', '#0e1318'); root.style.setProperty('--card', '#1a222b'); }
 
             let liveCard = document.getElementById('liveMatchCard');
-            // تم تخفيف الفلتر (Gradient) الخاص بالكارد الرئيسي حتى تبين الخلفية بوضوح تام
             if(liveCard) { 
                 if(s.active_liveBg) { 
                     liveCard.style.backgroundImage = `linear-gradient(to bottom, rgba(0, 0, 0, 0.2), rgba(0, 0, 0, 0.7)), url('${s.active_liveBg}')`; 
@@ -382,7 +505,6 @@
         function formatEventsToTimeline(eventsStr) {
             if(!eventsStr || eventsStr.trim() === '') return '<div style="text-align:center; color:var(--muted); padding:10px;">لا توجد أحداث مسجلة</div>';
             let lines = eventsStr.split('\n'); let html = '<div class="modern-timeline">';
-            
             const eventLabels = { '⚽': 'هدف', '🅰️': 'أسيست', '🟨': 'بطاقة صفراء', '🟥': 'بطاقة حمراء', '🔃': 'تبديل' };
 
             lines.forEach((line) => {
@@ -455,7 +577,24 @@
                 if(d.referee4) { document.getElementById('lRef4Wrap').style.display = 'flex'; document.getElementById('lRef4Txt').innerHTML = getRefHtml(d.referee4); } else { document.getElementById('lRef4Wrap').style.display = 'none'; }
             } else { document.getElementById('lReferees').style.display = 'none'; }
 
-            if(d.stats && (d.stats.possession1 !== undefined || d.stats.shots1 !== undefined)) { document.getElementById('lStats').style.display = 'block'; document.getElementById('pos1Txt').innerText = (d.stats.possession1 || 50) + '%'; document.getElementById('pos2Txt').innerText = (d.stats.possession2 || 50) + '%'; document.getElementById('pos1Bar').style.width = (d.stats.possession1 || 50) + '%'; document.getElementById('pos2Bar').style.width = (d.stats.possession2 || 50) + '%'; document.getElementById('shots1Txt').innerText = d.stats.shots1 || 0; document.getElementById('shots2Txt').innerText = d.stats.shots2 || 0; document.getElementById('corn1Txt').innerText = d.stats.corners1 || 0; document.getElementById('corn2Txt').innerText = d.stats.corners2 || 0; document.getElementById('fouls1Txt').innerText = d.stats.fouls1 || 0; document.getElementById('fouls2Txt').innerText = d.stats.fouls2 || 0; } else { document.getElementById('lStats').style.display = 'none'; }
+            if(d.stats && (d.stats.possession1 !== undefined || d.stats.shots1 !== undefined)) { 
+                document.getElementById('lTabs').style.display = 'flex'; 
+                
+                document.getElementById('pos1Txt').innerText = (d.stats.possession1 || 50) + '%'; 
+                document.getElementById('pos2Txt').innerText = (d.stats.possession2 || 50) + '%'; 
+                document.getElementById('pos1Bar').style.width = (d.stats.possession1 || 50) + '%'; 
+                document.getElementById('pos2Bar').style.width = (d.stats.possession2 || 50) + '%'; 
+                document.getElementById('shots1Txt').innerText = d.stats.shots1 || 0; 
+                document.getElementById('shots2Txt').innerText = d.stats.shots2 || 0; 
+                document.getElementById('corn1Txt').innerText = d.stats.corners1 || 0; 
+                document.getElementById('corn2Txt').innerText = d.stats.corners2 || 0; 
+                document.getElementById('fouls1Txt').innerText = d.stats.fouls1 || 0; 
+                document.getElementById('fouls2Txt').innerText = d.stats.fouls2 || 0; 
+            } else { 
+                document.getElementById('lTabs').style.display = 'none';
+                switchMatchTab('live', 'events');
+            }
+            
             document.getElementById('lTeam1Container').onclick = function() { if(d.team1) openTeam(d.team1); }; document.getElementById('lTeam2Container').onclick = function() { if(d.team2) openTeam(d.team2); };
             let btnSq = document.getElementById('liveSquadBtn'); if(btnSq) { if((liveSquad1 && Object.keys(liveSquad1).length > 0) || (liveSquad2 && Object.keys(liveSquad2).length > 0)) { btnSq.style.display = 'block'; btnSq.onclick = function() { openSquads(d.team1, d.team2, liveSquad1, liveSquad2); }; } else { btnSq.style.display = 'none'; } }
             clearInterval(timerInterval); if(d.timer && d.timer.isRunning) { timerInterval = setInterval(() => { let elapsedSecs = Math.floor((Date.now() - (d.timer.startTime || Date.now())) / 1000); let totalSecs = (d.timer.savedSeconds || 0) + elapsedSecs; let m = Math.floor(totalSecs / 60); let s = totalSecs % 60; document.getElementById('lTimer').innerText = `${m}:${s < 10 ? '0'+s : s}`; }, 1000); } else if (d.timer && !d.timer.isRunning) { let totalSecs = d.timer.savedSeconds || 0; let m = Math.floor(totalSecs / 60); let s = totalSecs % 60; document.getElementById('lTimer').innerText = `${m}:${s < 10 ? '0'+s : s}`; } else { document.getElementById('lTimer').innerText = `00:00`; }
@@ -514,7 +653,7 @@
 
         window.openMatchDetails = function(key) {
             let m = savedMatchesGlobal[key]; if(!m) return; let info = []; if(m.groupInfo && m.groupInfo !== "أدوار إقصائية") info.push(`مجموعة ${m.groupInfo}`); if(m.round) info.push(m.round);
-            document.getElementById('mdRound').innerText = info.length > 0 ? info.join(' - ') : 'نتيجة مباراة'; document.getElementById('mdT1Name').innerText = m.team1 || '--'; document.getElementById('mdT2Name').innerText = m.team2 || '--'; document.getElementById('mdLogo1').innerHTML = teamsDataGlobal[m.team1]?.logo ? `<img src="${teamsDataGlobal[m.team1].logo}">` : `<i class="fa-solid fa-shield"></i>`; document.getElementById('mdLogo2').innerHTML = teamsDataGlobal[m.team2]?.logo ? `<img src="${teamsDataGlobal[m.team2].logo}">` : `<i class="fa-solid fa-shield"></i>`; document.getElementById('mdScore').innerText = `${parseInt(m.score1) || 0} - ${parseInt(m.score2) || 0}`; document.getElementById('mdScore').style.fontSize = '36px'; document.getElementById('mdEventsTitle').style.display = 'block'; 
+            document.getElementById('mdRound').innerText = info.length > 0 ? info.join(' - ') : 'نتيجة مباراة'; document.getElementById('mdT1Name').innerText = m.team1 || '--'; document.getElementById('mdT2Name').innerText = m.team2 || '--'; document.getElementById('mdLogo1').innerHTML = teamsDataGlobal[m.team1]?.logo ? `<img src="${teamsDataGlobal[m.team1].logo}">` : `<i class="fa-solid fa-shield"></i>`; document.getElementById('mdLogo2').innerHTML = teamsDataGlobal[m.team2]?.logo ? `<img src="${teamsDataGlobal[m.team2].logo}">` : `<i class="fa-solid fa-shield"></i>`; document.getElementById('mdScore').innerText = `${parseInt(m.score1) || 0} - ${parseInt(m.score2) || 0}`; document.getElementById('mdScore').style.fontSize = '36px'; 
             
             document.getElementById('mdTimelineList').innerHTML = formatEventsToTimeline(m.events);
             
@@ -528,7 +667,24 @@
                 if(m.referee4) { document.getElementById('mdRef4Wrap').style.display = 'flex'; document.getElementById('mdRef4Txt').innerHTML = getRefHtml(m.referee4); } else { document.getElementById('mdRef4Wrap').style.display = 'none'; }
             } else { document.getElementById('mdReferees').style.display = 'none'; }
 
-            if(m.stats && (m.stats.possession1 !== undefined || m.stats.shots1 !== undefined)) { document.getElementById('mdStats').style.display = 'block'; document.getElementById('mdPos1Txt').innerText = (m.stats.possession1 || 50) + '%'; document.getElementById('mdPos2Txt').innerText = (m.stats.possession2 || 50) + '%'; document.getElementById('mdPos1Bar').style.width = (m.stats.possession1 || 50) + '%'; document.getElementById('mdPos2Bar').style.width = (m.stats.possession2 || 50) + '%'; document.getElementById('mdShots1Txt').innerText = m.stats.shots1 || 0; document.getElementById('mdShots2Txt').innerText = m.stats.shots2 || 0; document.getElementById('mdCorn1Txt').innerText = m.stats.corners1 || 0; document.getElementById('mdCorn2Txt').innerText = m.stats.corners2 || 0; document.getElementById('mdFouls1Txt').innerText = m.stats.fouls1 || 0; document.getElementById('mdFouls2Txt').innerText = m.stats.fouls2 || 0; } else { document.getElementById('mdStats').style.display = 'none'; }
+            if(m.stats && (m.stats.possession1 !== undefined || m.stats.shots1 !== undefined)) { 
+                document.getElementById('mdTabs').style.display = 'flex';
+
+                document.getElementById('mdPos1Txt').innerText = (m.stats.possession1 || 50) + '%'; 
+                document.getElementById('mdPos2Txt').innerText = (m.stats.possession2 || 50) + '%'; 
+                document.getElementById('mdPos1Bar').style.width = (m.stats.possession1 || 50) + '%'; 
+                document.getElementById('mdPos2Bar').style.width = (m.stats.possession2 || 50) + '%'; 
+                document.getElementById('mdShots1Txt').innerText = m.stats.shots1 || 0; 
+                document.getElementById('mdShots2Txt').innerText = m.stats.shots2 || 0; 
+                document.getElementById('mdCorn1Txt').innerText = m.stats.corners1 || 0; 
+                document.getElementById('mdCorn2Txt').innerText = m.stats.corners2 || 0; 
+                document.getElementById('mdFouls1Txt').innerText = m.stats.fouls1 || 0; 
+                document.getElementById('mdFouls2Txt').innerText = m.stats.fouls2 || 0; 
+            } else { 
+                document.getElementById('mdTabs').style.display = 'none';
+            }
+            switchMatchTab('md', 'events');
+            
             document.getElementById('mdTeam1Container').onclick = function() { openTeam(m.team1); }; document.getElementById('mdTeam2Container').onclick = function() { openTeam(m.team2); };
             let btnSq = document.getElementById('mdSquadBtn'); if(btnSq) { if((m.squad1 && Object.keys(m.squad1).length > 0) || (m.squad2 && Object.keys(m.squad2).length > 0)) { btnSq.style.display = 'block'; btnSq.onclick = function() { openSquads(m.team1, m.team2, m.squad1, m.squad2); }; } else { btnSq.style.display = 'none'; } }
             document.getElementById('matchDetailsModal').style.display = 'block';
@@ -536,7 +692,7 @@
 
         window.openScheduledMatch = function(key) {
             let m = scheduleGlobal[key]; if(!m) return; let info = []; if(m.group) info.push(`مجموعة ${m.group}`); if(m.round) info.push(m.round);
-            document.getElementById('mdRound').innerText = info.length > 0 ? info.join(' - ') : 'مباراة قادمة'; document.getElementById('mdT1Name').innerText = m.team1 || '--'; document.getElementById('mdT2Name').innerText = m.team2 || '--'; document.getElementById('mdLogo1').innerHTML = teamsDataGlobal[m.team1]?.logo ? `<img src="${teamsDataGlobal[m.team1].logo}">` : `<i class="fa-solid fa-shield"></i>`; document.getElementById('mdLogo2').innerHTML = teamsDataGlobal[m.team2]?.logo ? `<img src="${teamsDataGlobal[m.team2].logo}">` : `<i class="fa-solid fa-shield"></i>`; document.getElementById('mdScore').innerText = `VS`; document.getElementById('mdScore').style.fontSize = '24px'; document.getElementById('mdEventsTitle').style.display = 'none'; document.getElementById('mdStats').style.display = 'none'; document.getElementById('mdTimelineList').innerHTML = `<div style="text-align:center; padding: 20px;"><i class="fa-regular fa-clock" style="font-size:30px; color:var(--primary); margin-bottom:15px; display:block;"></i><strong style="font-size:14px; color:var(--text);">المباراة لم تبدأ بعد</strong><br><br><span style="color:var(--muted); font-size:12px;">موعد المباراة: ${m.time} | ${m.date}</span><br><span style="color:var(--muted); font-size:12px;"><i class="fa-solid fa-location-dot"></i> الملعب: ${m.stadium || 'لم يحدد'}</span></div>`; document.getElementById('mdMotm').innerHTML = '';
+            document.getElementById('mdRound').innerText = info.length > 0 ? info.join(' - ') : 'مباراة قادمة'; document.getElementById('mdT1Name').innerText = m.team1 || '--'; document.getElementById('mdT2Name').innerText = m.team2 || '--'; document.getElementById('mdLogo1').innerHTML = teamsDataGlobal[m.team1]?.logo ? `<img src="${teamsDataGlobal[m.team1].logo}">` : `<i class="fa-solid fa-shield"></i>`; document.getElementById('mdLogo2').innerHTML = teamsDataGlobal[m.team2]?.logo ? `<img src="${teamsDataGlobal[m.team2].logo}">` : `<i class="fa-solid fa-shield"></i>`; document.getElementById('mdScore').innerText = `VS`; document.getElementById('mdScore').style.fontSize = '24px'; document.getElementById('mdTabs').style.display = 'none'; document.getElementById('md-content-stats').style.display = 'none'; document.getElementById('mdTimelineList').innerHTML = `<div style="text-align:center; padding: 20px;"><i class="fa-regular fa-clock" style="font-size:30px; color:var(--primary); margin-bottom:15px; display:block;"></i><strong style="font-size:14px; color:var(--text);">المباراة لم تبدأ بعد</strong><br><br><span style="color:var(--muted); font-size:12px;">موعد المباراة: ${m.time} | ${m.date}</span><br><span style="color:var(--muted); font-size:12px;"><i class="fa-solid fa-location-dot"></i> الملعب: ${m.stadium || 'لم يحدد'}</span></div>`; document.getElementById('mdMotm').innerHTML = ''; switchMatchTab('md', 'events');
             
             if(m.referee1 || m.referee2 || m.referee3 || m.referee4) { 
                 document.getElementById('mdReferees').style.display = 'flex'; 
@@ -552,7 +708,7 @@
 
         window.openGroupMatchup = function(key) {
             let m = groupMatchupsGlobal[key]; if(!m) return; let info = []; if(m.group) info.push(`مجموعة ${m.group}`); if(m.round) info.push(m.round);
-            document.getElementById('mdRound').innerText = info.length > 0 ? info.join(' - ') : 'مواجهة قادمة'; document.getElementById('mdT1Name').innerText = m.team1 || '--'; document.getElementById('mdT2Name').innerText = m.team2 || '--'; document.getElementById('mdLogo1').innerHTML = teamsDataGlobal[m.team1]?.logo ? `<img src="${teamsDataGlobal[m.team1].logo}">` : `<i class="fa-solid fa-shield"></i>`; document.getElementById('mdLogo2').innerHTML = teamsDataGlobal[m.team2]?.logo ? `<img src="${teamsDataGlobal[m.team2].logo}">` : `<i class="fa-solid fa-shield"></i>`; document.getElementById('mdScore').innerText = `VS`; document.getElementById('mdScore').style.fontSize = '24px'; document.getElementById('mdEventsTitle').style.display = 'none'; document.getElementById('mdStats').style.display = 'none'; document.getElementById('mdTimelineList').innerHTML = `<div style="text-align:center; padding: 20px;"><i class="fa-regular fa-calendar-xmark" style="font-size:30px; color:#f59e0b; margin-bottom:15px; display:block;"></i><strong style="font-size:14px; color:var(--text);">بانتظار التحديد</strong><br><br><span style="color:var(--muted); font-size:12px;">لم يتم تحديد وقت أو تاريخ لهذه المواجهة حتى الآن.</span></div>`; document.getElementById('mdMotm').innerHTML = ''; document.getElementById('mdReferees').style.display = 'none';
+            document.getElementById('mdRound').innerText = info.length > 0 ? info.join(' - ') : 'مواجهة قادمة'; document.getElementById('mdT1Name').innerText = m.team1 || '--'; document.getElementById('mdT2Name').innerText = m.team2 || '--'; document.getElementById('mdLogo1').innerHTML = teamsDataGlobal[m.team1]?.logo ? `<img src="${teamsDataGlobal[m.team1].logo}">` : `<i class="fa-solid fa-shield"></i>`; document.getElementById('mdLogo2').innerHTML = teamsDataGlobal[m.team2]?.logo ? `<img src="${teamsDataGlobal[m.team2].logo}">` : `<i class="fa-solid fa-shield"></i>`; document.getElementById('mdScore').innerText = `VS`; document.getElementById('mdScore').style.fontSize = '24px'; document.getElementById('mdTabs').style.display = 'none'; document.getElementById('md-content-stats').style.display = 'none'; document.getElementById('mdTimelineList').innerHTML = `<div style="text-align:center; padding: 20px;"><i class="fa-regular fa-calendar-xmark" style="font-size:30px; color:#f59e0b; margin-bottom:15px; display:block;"></i><strong style="font-size:14px; color:var(--text);">بانتظار التحديد</strong><br><br><span style="color:var(--muted); font-size:12px;">لم يتم تحديد وقت أو تاريخ لهذه المواجهة حتى الآن.</span></div>`; document.getElementById('mdMotm').innerHTML = ''; document.getElementById('mdReferees').style.display = 'none'; switchMatchTab('md', 'events');
             document.getElementById('mdTeam1Container').onclick = function() { openTeam(m.team1); }; document.getElementById('mdTeam2Container').onclick = function() { openTeam(m.team2); };
             let btnSq = document.getElementById('mdSquadBtn'); if(btnSq) btnSq.style.display = 'none'; document.getElementById('matchDetailsModal').style.display = 'block';
         }
