@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
@@ -56,7 +55,7 @@
         
         .glass-box { background: rgba(0,0,0,0.5); backdrop-filter: blur(4px); border-top: 1px solid rgba(255,255,255,0.1); padding: 15px; }
         
-        /* الأحداث (Timeline) */
+        /* الأحداث (Timeline) مع التحديثات الجديدة */
         .events-container { padding: 20px 15px; position: relative; }
         .modern-timeline { position: relative; max-width: 100%; margin: 0 auto; }
         .modern-timeline::after { content: ''; position: absolute; width: 2px; background-color: var(--border); top: 0; bottom: 0; left: 25px; margin-left: -1px; z-index: 1; }
@@ -70,9 +69,17 @@
         .timeline-event:hover .timeline-event-body { background-color: rgba(255,255,255,0.05); border-color: rgba(255,255,255,0.1); }
         .timeline-event-body::before { content: " "; height: 0; position: absolute; top: 18px; width: 0; z-index: 1; left: -10px; border: medium solid transparent; border-width: 10px; border-right-color: var(--border); }
         .timeline-event-body::after { content: " "; height: 0; position: absolute; top: 18px; width: 0; z-index: 1; left: -9px; border: medium solid transparent; border-width: 10px; border-right-color: rgb(26, 31, 38); }
-        .event-main-line { display: flex; align-items: center; gap: 8px; margin-bottom: 2px; }
+        .event-main-line { display: flex; align-items: center; gap: 8px; margin-bottom: 4px; flex-wrap: wrap; }
         .event-player-name { font-size: 13px; font-weight: 800; color: var(--text); font-family: 'Cairo'; }
         .event-detail-text { font-size: 11px; color: var(--muted); font-weight: 400; font-family: 'Cairo'; }
+        
+        .event-type-label { font-size: 10px; padding: 2px 6px; border-radius: 6px; margin-left: 6px; font-weight: 800; display: inline-block; font-family: 'Cairo'; letter-spacing: 0.5px;}
+        .label-⚽ { background: rgba(74,222,128,0.15); color: #4ade80; border: 1px solid #4ade80; }
+        .label-🅰️ { background: rgba(139,92,246,0.15); color: #8b5cf6; border: 1px solid #8b5cf6; }
+        .label-🟨 { background: rgba(250,204,21,0.15); color: #facc15; border: 1px solid #facc15; }
+        .label-🟥 { background: rgba(239,68,68,0.15); color: #ef4444; border: 1px solid #ef4444; }
+        .label-🔃 { background: rgba(59,130,246,0.15); color: #3b82f6; border: 1px solid #3b82f6; }
+        
         .badge-⚽ { color: #4ade80; text-shadow: 0 0 5px rgba(74,222,128,0.5); }
         .badge-🅰️ { color: #8b5cf6; text-shadow: 0 0 5px rgba(139,92,246,0.5); }
         .badge-🟨 { color: #facc15; text-shadow: 0 0 5px rgba(250,204,21,0.5); }
@@ -136,10 +143,10 @@
         .modern-referees span { color: #fff; display: flex; align-items: center; gap: 8px; font-weight: 700; text-shadow:0 1px 2px #000;}
         .modern-referees span span { color: var(--primary); font-weight: 800; font-size: 13px; display:flex; align-items:center; gap:5px;}
 
-        /* الملعب المتجاوب */
+        /* الملعب المتجاوب المُحدث */
         .pitch-container {
             width: 100%; max-width: 480px; margin: 0 auto;
-            aspect-ratio: 9 / 13; 
+            aspect-ratio: 9 / 15; /* تم زيادة الطول ليكون الملعب أكبر ويمنع التداخل */
             height: auto; 
             background-color: #03200a; 
             background-image: repeating-linear-gradient(0deg, transparent, transparent 10%, rgba(0,0,0,0.1) 10%, rgba(0,0,0,0.1) 20%), radial-gradient(circle at center, rgba(255,255,255,0.05) 0%, transparent 100%);
@@ -151,16 +158,16 @@
         .p-pen-bottom { position: absolute; bottom: 0; left: 50%; width: 45%; height: 12%; border: 1px solid rgba(255,255,255,0.2); border-bottom:none; transform: translateX(-50%); }
         
         .pitch-player { position: absolute; display: flex; flex-direction: column; align-items: center; transform: translate(-50%, -50%); 
-            width: 14.5%; max-width: 65px; min-width: 48px; z-index: 10; cursor:pointer; transition:0.2s;} 
+            width: 12%; max-width: 55px; min-width: 40px; z-index: 10; cursor:pointer; transition:0.2s;} /* تم تصغير العرض لمنع التداخل الجانبي */
         .pitch-player:hover { z-index:20; transform: translate(-50%, -50%) scale(1.15);}
         .pitch-player-img-wrapper { position: relative; width: 100%; aspect-ratio: 1/1; border-radius: 50%; border: 2px solid #fff; background: #1a1c21; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 8px rgba(0,0,0,0.6); margin-bottom:3px; overflow: hidden; } 
         .pitch-player-img-wrapper img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; }
         .pitch-player-img-wrapper i { font-size:16px; color:var(--muted); }
-        .pitch-player-pos { position: absolute; top: 0%; left: 0%; transform: translate(-30%, -30%); font-size: 7px; font-weight: 900; background: #3b82f6; color: #fff; padding: 2px 4px; border-radius: 4px; border: 1px solid rgba(255,255,255,0.2); z-index: 2; }
-        .pitch-player-rating { position: absolute; bottom: 0%; right: 0%; transform: translate(30%, 30%); font-size: 8px; font-weight: 900; padding: 2px 4px; border-radius: 4px; border: 1px solid rgba(255,255,255,0.2); color: #fff; z-index: 2;}
-        .pitch-player-info { background: rgba(0,0,0,0.8); border: 1px solid rgba(255,255,255,0.1); border-radius: 6px; padding: 2px 1px; text-align: center; width: 110%; margin-left:-5%;}
+        .pitch-player-pos { position: absolute; top: 0%; left: 0%; transform: translate(-20%, -20%); font-size: 7px; font-weight: 900; background: #3b82f6; color: #fff; padding: 2px 4px; border-radius: 4px; border: 1px solid rgba(255,255,255,0.2); z-index: 3; }
+        .pitch-player-rating { position: absolute; bottom: 0%; right: 0%; transform: translate(20%, 20%); font-size: 8px; font-weight: 900; padding: 2px 4px; border-radius: 4px; border: 1px solid rgba(255,255,255,0.2); color: #fff; z-index: 3;}
+        .pitch-player-info { background: rgba(0,0,0,0.85); border: 1px solid rgba(255,255,255,0.15); border-radius: 6px; padding: 3px 2px; text-align: center; width: 130%; margin-left:-15%; z-index:5; margin-top: -2px;}
         .pitch-player-name { font-size: 7.5px; font-weight: bold; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-family:'Cairo'; }
-        .pitch-player-team { font-size: 7px; color: #aaa; white-space: nowrap; font-family:'Cairo'; margin-top:2px; display:none;}
+        .pitch-player-team { font-size: 6px; color: #b3b3b3; white-space: nowrap; font-family:'Cairo'; margin-top:1px; display:block; overflow: hidden; text-overflow: ellipsis;} /* تم التفعيل لتظهر أسماء الفرق */
 
         .export-horizontal-mode { display: grid !important; grid-template-columns: repeat(2, 1fr) !important; gap: 20px !important; padding: 40px !important; background: var(--bg) !important; border: none !important; width: 1000px !important; max-width: none !important; }
         .export-horizontal-mode .title-section { color: var(--text) !important; font-size: 20px !important; justify-content: center !important;}
@@ -356,13 +363,6 @@
 
             let liveCard = document.getElementById('liveMatchCard');
             if(liveCard) { if(s.active_liveBg) { liveCard.style.backgroundImage = `linear-gradient(to bottom, rgba(14, 19, 24, 0.85), rgba(14, 19, 24, 0.98)), url('${s.active_liveBg}')`; } else { liveCard.style.backgroundImage = `linear-gradient(to bottom, rgba(14, 19, 24, 0.85), rgba(14, 19, 24, 0.98)), url('https://images.unsplash.com/photo-1521731978332-9e9e714b7a3a?q=80&w=1000')`; } }
-
-            let adWrapper = document.getElementById('adLinkWrapper'); let adTextDisplay = document.getElementById('adTextDisplay'); let adArea = document.getElementById('adArea'); let adOverlay = document.getElementById('adOverlay'); let adIcon = document.getElementById('adIcon');
-         if(adWrapper) {
-                if(s.adLink && s.adLink.trim() !== '') { adWrapper.href = s.adLink; adWrapper.style.pointerEvents = 'auto'; } else { adWrapper.href = '#'; adWrapper.style.pointerEvents = 'none'; }
-                if(s.active_adBg) { adArea.style.backgroundImage = `url('${s.active_adBg}')`; adArea.style.border = 'none'; adOverlay.style.display = 'none'; adIcon.style.display = 'none'; if(s.adText && s.adText.trim() !== '') { adTextDisplay.style.display = 'block'; adTextDisplay.innerText = s.adText; } else { adTextDisplay.style.display = 'none'; }
-                } else { adArea.style.backgroundImage = 'none'; adArea.style.border = '1px dashed var(--border)'; adOverlay.style.display = 'none'; adIcon.style.display = 'block'; adIcon.style.color = 'var(--primary)'; adTextDisplay.style.display = 'block'; adTextDisplay.innerText = s.adText || 'مساحة إعلانية لبطولة دوائر خانقين'; }
-            }
         });
 
         db.ref(`tournaments/${dbPath}/round_stars`).on('value', snap => { let data = snap.val(); let hasAny = false; if(data?.player_of_week) { document.getElementById('potwImgDisplay').src = data.player_of_week; document.getElementById('potwContainer').style.display = 'block'; hasAny = true; } else { document.getElementById('potwContainer').style.display = 'none'; } if(data?.team_of_week) { document.getElementById('totwImgDisplay').src = data.team_of_week; document.getElementById('totwContainer').style.display = 'block'; hasAny = true; } else { document.getElementById('totwContainer').style.display = 'none'; } document.getElementById('roundStarsContainer').style.display = hasAny ? 'flex' : 'none'; });
@@ -370,11 +370,14 @@
         function getRefHtml(name) { if(!name || name === '--') return '--'; let photo = refereesDataGlobal[name]?.photo; let imgHtml = photo ? `<img src="${photo}" style="width:24px;height:24px;border-radius:50%;object-fit:cover;border:1px solid var(--primary);">` : `<i class="fa-solid fa-user" style="color:var(--primary); font-size:14px;"></i>`; return `${imgHtml} <span>${name}</span>`; }
         function getPlayerImageHtml(pName, tName, fallbackColorClass) { let pPhoto = teamsDataGlobal[tName]?.players?.[pName]?.photo || ''; if(pPhoto) return `<img src="${pPhoto}" style="width:30px;height:30px;border-radius:50%;object-fit:cover;border:1px solid var(--primary); margin-left:8px;">`; return `<div style="width:30px;height:30px;border-radius:50%;background:rgba(255,255,255,0.05);display:inline-flex;align-items:center;justify-content:center;margin-left:8px;border:1px solid var(--primary);font-size:12px;color:${fallbackColorClass};"><i class="fa-solid fa-user"></i></div>`; }
 
-        /* دالة تنسيق الأحداث (Timeline) المحدثة */
+        /* دالة تنسيق الأحداث (Timeline) المحدثة بالنصوص والعلامات الواضحة */
         function formatEventsToTimeline(eventsStr) {
             if(!eventsStr || eventsStr.trim() === '') return '<div style="text-align:center; color:var(--muted); padding:10px;">لا توجد أحداث مسجلة</div>';
             let lines = eventsStr.split('\n'); let html = '<div class="modern-timeline">';
             
+            // قواميس تحويل الرموز التعبيرية إلى نصوص
+            const eventLabels = { '⚽': 'هدف', '🅰️': 'أسيست', '🟨': 'بطاقة صفراء', '🟥': 'بطاقة حمراء', '🔃': 'تبديل' };
+
             lines.forEach((line) => {
                 if(!line.trim()) return;
                 let iconMatch = line.match(/^(⚽|🅰️|🟨|🟥|🔃)\s*(.*)/);
@@ -390,20 +393,23 @@
                 for (const team in teamsDataGlobal) {
                     if (teamsDataGlobal[team].players && teamsDataGlobal[team].players[playerName]) {
                         let pData = teamsDataGlobal[team].players[playerName];
-                        if (pData.photo) { playerPhotoHtml = `<img src="${pData.photo}" style="width:100%; height:100%; object-fit:cover;">`; playerFound = true; break; }
+                        if (pData.photo) { playerPhotoHtml = `<img src="${pData.photo}" style="width:100%; height:100%; object-fit:cover; border-radius:50%;">`; playerFound = true; break; }
                     }
                 }
                 
                 if (!playerFound) {
                     let iconClass = 'fa-user'; if (emojiIcon === '⚽') iconClass = 'fa-futbol'; if (emojiIcon === '🟨' || emojiIcon === '🟥') iconClass = 'fa-square'; if (emojiIcon === '🔃') iconClass = 'fa-exchange-alt';
-                    playerPhotoHtml = `<i class="fa-solid ${iconClass}" style="opacity:0.3; font-size:16px;"></i>`;
+                    playerPhotoHtml = `<i class="fa-solid ${iconClass}" style="opacity:0.6; font-size:18px;"></i>`;
                 }
 
                 let bodyClass = ''; let detailClass = '';
                 if (eventDetail.includes('عكسي') || eventDetail.toUpperCase().includes('OG')) { bodyClass = 'OG-goal'; detailClass = 'OG-text'; } 
                 else if (eventDetail.includes('جزاء') || eventDetail.toUpperCase().includes('(P)')) { bodyClass = 'P-goal'; detailClass = 'P-text'; }
 
-                html += `<div class="timeline-event"><div class="timeline-badge-wrapper"><div class="timeline-badge badge-${emojiIcon}">${playerPhotoHtml}</div>${minute ? `<div class="timeline-minute">${minute}</div>` : ''}</div><div class="timeline-event-body ${bodyClass}"><div class="event-main-line"><span class="event-player-name">${playerName}</span></div>${eventDetail ? `<div class="event-detail-text ${detailClass}">${eventDetail}</div>` : ''}</div></div>`;
+                // إنشاء الشارة النصية للحدث
+                let labelHtml = emojiIcon ? `<span class="event-type-label label-${emojiIcon}">${eventLabels[emojiIcon]}</span>` : '';
+
+                html += `<div class="timeline-event"><div class="timeline-badge-wrapper"><div class="timeline-badge badge-${emojiIcon}">${playerPhotoHtml}</div>${minute ? `<div class="timeline-minute">${minute}</div>` : ''}</div><div class="timeline-event-body ${bodyClass}"><div class="event-main-line">${labelHtml}<span class="event-player-name">${playerName}</span></div>${eventDetail ? `<div class="event-detail-text ${detailClass}">${eventDetail}</div>` : ''}</div></div>`;
             });
             html += '</div>'; return html;
         }
@@ -615,16 +621,17 @@
                     cam: {top:'35%', left:'50%'}, lw: {top:'22%', left:'25%'}, rw: {top:'22%', left:'75%'}, st: {top:'15%', left:'50%'} 
                 };
 
+                // تم زيادة المسافات بين خطوط الملعب لتقليل التداخل
                 const vsTopLayout = { 
-                    gk: {top:'7%', left:'50%'}, cb: {top:'16%', left:'50%'}, lb: {top:'18%', left:'82%'}, rb: {top:'18%', left:'18%'}, 
-                    cdm: {top:'24%', left:'50%'}, cm: {top:'32%', left:'50%'}, lm: {top:'32%', left:'82%'}, rm: {top:'32%', left:'18%'}, 
-                    cam: {top:'38%', left:'50%'}, lw: {top:'42%', left:'75%'}, rw: {top:'42%', left:'25%'}, st: {top:'45%', left:'50%'} 
+                    gk: {top:'6%', left:'50%'}, cb: {top:'15%', left:'50%'}, lb: {top:'18%', left:'82%'}, rb: {top:'18%', left:'18%'}, 
+                    cdm: {top:'25%', left:'50%'}, cm: {top:'32%', left:'50%'}, lm: {top:'32%', left:'82%'}, rm: {top:'32%', left:'18%'}, 
+                    cam: {top:'39%', left:'50%'}, lw: {top:'43%', left:'75%'}, rw: {top:'43%', left:'25%'}, st: {top:'46%', left:'50%'} 
                 };
 
                 const vsBottomLayout = { 
-                    gk: {top:'93%', left:'50%'}, cb: {top:'84%', left:'50%'}, lb: {top:'82%', left:'18%'}, rb: {top:'82%', left:'82%'}, 
-                    cdm: {top:'76%', left:'50%'}, cm: {top:'68%', left:'50%'}, lm: {top:'68%', left:'18%'}, rm: {top:'68%', left:'82%'}, 
-                    cam: {top:'62%', left:'50%'}, lw: {top:'58%', left:'25%'}, rw: {top:'58%', left:'75%'}, st: {top:'55%', left:'50%'} 
+                    gk: {top:'94%', left:'50%'}, cb: {top:'85%', left:'50%'}, lb: {top:'82%', left:'18%'}, rb: {top:'82%', left:'82%'}, 
+                    cdm: {top:'75%', left:'50%'}, cm: {top:'68%', left:'50%'}, lm: {top:'68%', left:'18%'}, rm: {top:'68%', left:'82%'}, 
+                    cam: {top:'61%', left:'50%'}, lw: {top:'57%', left:'25%'}, rw: {top:'57%', left:'75%'}, st: {top:'54%', left:'50%'} 
                 };
 
                 const renderPitch = (sq, containerId, layout, teamName) => {
