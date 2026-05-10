@@ -1,4 +1,5 @@
 
+
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
@@ -14,10 +15,18 @@
     <script>
       window.OneSignalDeferred = window.OneSignalDeferred || [];
       OneSignalDeferred.push(function(OneSignal) {
-        OneSignal.init({ appId: "d29380b0-23f9-4f35-b262-4a9a3102cf56", path: "/kdc/", serviceWorkerParam: { scope: "/kdc/" }, serviceWorkerPath: "OneSignalSDKWorker.js" });
-      });
-      function activateNotifications() { window.OneSignalDeferred.push(function(OneSignal) { OneSignal.Slidedown.promptPush({ force: true }); }); }
-    </script>
+        OneSignal.init({ 
+    appId: "d29380b0-23f9-4f35-b262-4a9a3102cf56", 
+    serviceWorker: {
+        path: "/kdc/OneSignalSDKWorker.js",
+        scope: "/kdc/"
+    }
+});
+function activateNotifications() { 
+    window.OneSignalDeferred.push(function(OneSignal) { 
+        OneSignal.Notifications.requestPermission(); 
+    }); 
+}
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
