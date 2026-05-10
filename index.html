@@ -450,47 +450,51 @@
         if (!firebase.apps.length) { firebase.initializeApp(firebaseConfig); } const db = firebase.database(); 
         
         // --- نظام إشعارات فايربيس المطور لـ GitHub ---
+// --- نظام إشعارات فايربيس المطور لـ GitHub ---
 const messaging = firebase.messaging();
 
-// 1. تسجيل الويركر بمجرد فتح الموقع لتعريف فايربيس على مسار المجلد الفرعي
-if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('./firebase-messaging-sw.js', { scope: './' })
-    .then(function(registration) {
-        // السطر السحري: إجبار فايربيس على استخدام هذا المسار بدل المسار الرئيسي
-        messaging.useServiceWorker(registration);
-        
-        // استقبال الإشعارات والموقع مفتوح أمام المستخدم
-        messaging.onMessage((payload) => {
-            alert(`📢 ${payload.notification.title}\n${payload.notification.body}`);
-        });
-    }).catch(function(err) {
-        console.log('فشل تسجيل الويركر:', err);
-    });
-}
+// استقبال الإشعارات والموقع مفتوح
+messaging.onMessage((payload) => {
+    alert(`📢 ${payload.notification.title}\n${payload.notification.body}`);
+});
 
-// 2. دالة طلب الإذن عند الضغط على الجرس
 async function activateNotifications() {
+    if (!('serviceWorker' in navigator)) {
+        alert("المتصفح لا يدعم الإشعارات.");
+        return;
+    }
+
     try {
         const permission = await Notification.requestPermission();
-        if (permission === 'granted') {
-            // استخراج التوكن
-            const token = await messaging.getToken({ 
-                vapidKey: "BEqZP6_3EYWOhK7Q7Tmu6PJhV6WJhts4s9n1ZnRhlXNhAWa47E6_SWxFSqvHoG8l8XjUqmAfpzWulXRLPc2nPg8"
-            });
-
-            if (token) {
-                await db.ref('fcm_tokens/' + token.substring(0, 20)).set({
-                    token: token,
-                    lastUpdated: Date.now()
-                });
-                alert("تم التفعيل بنجاح! 🔔 الإشعارات ستصلك الآن على GitHub.");
-            }
-        } else {
+        if (permission !== 'granted') {
             alert("لقد قمت برفض الإشعارات ❌ يرجى تفعيلها من إعدادات المتصفح.");
+            return;
+        }
+
+        // تسجيل ملف الويركر
+        const registration = await navigator.serviceWorker.register('./firebase-messaging-sw.js');
+        
+        // إجبار فايربيس على استخدام هذا الويركر (لحل مشكلة مسارات GitHub)
+        messaging.useServiceWorker(registration);
+
+        // استخراج التوكن (بالمفتاح الصحيح هسة)
+        const token = await messaging.getToken({ 
+            vapidKey: "BEqZPS_3EYWDNK7Q7Tmu6PJhV6WJhts4s9n1ZnRhlXNhAWa47E6_SWxFSqvHoG8l8XjUqmAfpzWulXRLPc2nPg8"
+        });
+
+        if (token) {
+            await db.ref('fcm_tokens/' + token.substring(0, 20)).set({
+                token: token,
+                lastUpdated: Date.now()
+            });
+            alert("تم التفعيل بنجاح! 🔔 الإشعارات ستصلك الآن.");
+        } else {
+            alert("لم يتم إرجاع أي توكن.");
         }
     } catch (err) {
-        console.error("خطأ في جلب التوكن:", err);
-        alert("حدث خطأ تقني، تأكد من اتصالك بالإنترنت.");
+        console.error("FCM Error:", err);
+        // هسة إذا صار خطأ راح يكتبلك السبب الحقيقي بدل كلمة "تأكد من الإنترنت"
+        alert("حدث خطأ تقني:\n" + err.message); 
     }
 }
         // -------------------------------------
