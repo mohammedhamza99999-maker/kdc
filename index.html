@@ -956,49 +956,44 @@ async function activateNotifications() {
 
       
     let deferredPrompt; const installBtn = document.getElementById('installBtn'); window.addEventListener('beforeinstallprompt', (e) => { e.preventDefault(); deferredPrompt = e; installBtn.style.display = 'block'; }); installBtn.addEventListener('click', async () => { if (deferredPrompt) { deferredPrompt.prompt(); const { outcome } = await deferredPrompt.userChoice; if (outcome === 'accepted') { installBtn.style.display = 'none'; } deferredPrompt = null; } });
+// دالة إظهار الشاشة بالقوة
+function showMyModal() {
+    const modal = document.getElementById('forceSubscribeModal');
+    if (modal) {
+        modal.setAttribute('style', 'display:flex !important; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.98); z-index:9999999; justify-content:center; align-items:center; flex-direction:column; padding:20px; text-align:center; backdrop-filter: blur(10px);');
+    }
+}
+
+// فحص الحالة أول ما يفتح الموقع
+window.addEventListener('DOMContentLoaded', () => {
+    // إذا الشخص مو مسوي "سماح"، نطلعله الشاشة فوراً
+    if (Notification.permission !== 'granted') {
+        showMyModal();
+    }
+});
+
+// دالة الاشتراك اللي تفتح القفل
 async function activateNotifications() {
-            if (!('serviceWorker' in navigator)) {
-                alert("متصفحك لا يدعم الإشعارات.");
-                return;
+    try {
+        const permission = await Notification.requestPermission();
+        if (permission === 'granted') {
+            const reg = await navigator.serviceWorker.register('./firebase-messaging-sw.js');
+            const token = await messaging.getToken({ 
+                vapidKey: "BEqZPS_3EYWDNK7Q7Tmu6PJhV6WJhts4s9n1ZnRhlXNhAWa47E6_SWxFSqvHoG8l8XjUqmAfpzWulXRLPc2nPg8",
+                serviceWorkerRegistration: reg 
+            });
+            if (token) {
+                await db.ref('fcm_tokens/' + token.substring(0, 20)).set({token: token, lastUpdated: Date.now()});
+                // إخفاء الشاشة بعد النجاح
+                document.getElementById('forceSubscribeModal').style.display = 'none';
+                alert("تم التفعيل! استمتع بالمشاهدة ✅");
             }
-
-            try {
-                const permission = await Notification.requestPermission();
-                
-                if (permission === 'granted') {
-                    const registration = await navigator.serviceWorker.register('./firebase-messaging-sw.js', { scope: './' });
-                    
-                    const token = await messaging.getToken({ 
-                        vapidKey: "BEqZPS_3EYWDNK7Q7Tmu6PJhV6WJhts4s9n1ZnRhlXNhAWa47E6_SWxFSqvHoG8l8XjUqmAfpzWulXRLPc2nPg8",
-                        serviceWorkerRegistration: registration 
-                    });
-
-                    if (token) {
-                        await db.ref('fcm_tokens/' + token.substring(0, 20)).set({
-                            token: token,
-                            lastUpdated: Date.now()
-                        });
-                        
-                        document.getElementById('forceSubscribeModal').style.display = 'none';
-                        alert("تم فتح الموقع بنجاح ✅ أهلاً بك في البطولة!");
-                    }
-                } else {
-                    alert("لا يمكنك الدخول للموقع بدون الاشتراك! ❌ يرجى السماح بالإشعارات من إعدادات المتصفح (علامة القفل).");
-                }
-            } catch (err) {
-                console.error("FCM Error:", err);
-                alert("حدث خطأ تقني، حاول مرة أخرى.");
-            }
+        } else {
+            alert("لا يمكنك الدخول بدون الاشتراك! ❌ يرجى تغيير الإعدادات من علامة القفل");
+            showMyModal(); // نرجع نطلع الشاشة إذا رفض
         }
-
-        window.addEventListener('load', () => {
-            if (Notification.permission !== 'granted') {
-                setTimeout(() => {
-                    document.getElementById('forceSubscribeModal').style.display = 'flex';
-                }, 500); 
-            }
-        });
-        // 👆 نهاية الكود الثاني
+    } catch (e) { showMyModal(); }
+}نهاية الكود الثاني
         
     </script>
 </body>
