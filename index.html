@@ -449,49 +449,49 @@
         const firebaseConfig = { apiKey: "AIzaSyC05TqAcGRExjLwBqwwFLrjGA-t3jI0UdQ", authDomain: "kdcc-85139.firebaseapp.com", databaseURL: "https://kdcc-85139-default-rtdb.firebaseio.com", projectId: "kdcc-85139", storageBucket: "kdcc-85139.firebasestorage.app", messagingSenderId: "743548860238", appId: "1:743548860238:web:66b66fe49cf32da352101f" }; 
         if (!firebase.apps.length) { firebase.initializeApp(firebaseConfig); } const db = firebase.database(); 
         
-        const messaging = firebase.messaging();
+        // --- نظام إشعارات فايربيس المطور لـ GitHub ---
+const messaging = firebase.messaging();
 
-// تفعيل الإشعارات وتوليد التوكن مع تحديد مسار الويركر لـ GitHub
-// دالة تفعيل الإشعارات - تُستدعى عند الضغط على الجرس فقط
-// دالة مطورة لضمان التسجيل وجلب التوكن على GitHub
-function activateNotifications() {
-    if (!('serviceWorker' in navigator)) {
-        alert("متصفحك لا يدعم نظام الإشعارات.");
-        return;
-    }
-
-    // 1. تسجيل الويركر يدوياً لضمان عدم وجود تعارض
+// 1. تسجيل الويركر بمجرد فتح الموقع لتعريف فايربيس على مسار المجلد الفرعي
+if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('./firebase-messaging-sw.js', { scope: './' })
     .then(function(registration) {
-        console.log('تم تسجيل الويركر بنجاح');
+        // السطر السحري: إجبار فايربيس على استخدام هذا المسار بدل المسار الرئيسي
+        messaging.useServiceWorker(registration);
         
-        // 2. طلب إذن المتصفح بشكل صريح
-        return Notification.requestPermission().then((permission) => {
-            if (permission === 'granted') {
-                // 3. جلب التوكن باستخدام الـ VAPID Key والويركر المسجل حالياً
-                return messaging.getToken({ 
-                    vapidKey: "BEqZP6_3EYWOhK7Q7Tmu6PJhV6WJhts4s9n1ZnRhlXNhAWa47E6_SWxFSqvHoG8l8XjUqmAfpzWulXRLPc2nPg8",
-                    serviceWorkerRegistration: registration 
-                });
-            } else {
-                throw new Error('Permission denied');
-            }
+        // استقبال الإشعارات والموقع مفتوح أمام المستخدم
+        messaging.onMessage((payload) => {
+            alert(`📢 ${payload.notification.title}\n${payload.notification.body}`);
         });
-    })
-    .then((token) => {
-        if (token) {
-            // 4. حفظ التوكن فوراً في قاعدة البيانات
-            db.ref('fcm_tokens/' + token.substring(0, 20)).set({
-                token: token,
-                lastUpdated: Date.now()
-            });
-            alert("تم تفعيل الإشعارات بنجاح! 🔔 ستصلك التنبيهات الآن.");
-        }
-    })
-    .catch((err) => {
-        console.error('حدث خطأ:', err);
-        alert("يرجى إلغاء حظر الإشعارات من إعدادات المتصفح (علامة القفل بجانب الرابط) ثم المحاولة مجدداً ❌");
+    }).catch(function(err) {
+        console.log('فشل تسجيل الويركر:', err);
     });
+}
+
+// 2. دالة طلب الإذن عند الضغط على الجرس
+async function activateNotifications() {
+    try {
+        const permission = await Notification.requestPermission();
+        if (permission === 'granted') {
+            // استخراج التوكن
+            const token = await messaging.getToken({ 
+                vapidKey: "BEqZP6_3EYWOhK7Q7Tmu6PJhV6WJhts4s9n1ZnRhlXNhAWa47E6_SWxFSqvHoG8l8XjUqmAfpzWulXRLPc2nPg8"
+            });
+
+            if (token) {
+                await db.ref('fcm_tokens/' + token.substring(0, 20)).set({
+                    token: token,
+                    lastUpdated: Date.now()
+                });
+                alert("تم التفعيل بنجاح! 🔔 الإشعارات ستصلك الآن على GitHub.");
+            }
+        } else {
+            alert("لقد قمت برفض الإشعارات ❌ يرجى تفعيلها من إعدادات المتصفح.");
+        }
+    } catch (err) {
+        console.error("خطأ في جلب التوكن:", err);
+        alert("حدث خطأ تقني، تأكد من اتصالك بالإنترنت.");
+    }
 }
         // -------------------------------------
 
