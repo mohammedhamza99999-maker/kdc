@@ -515,13 +515,49 @@
             }; renderGallery(d.liveBg, 'liveBgGallery', 'liveBg'); renderGallery(d.adBg, 'adBgGallery', 'adBg');
         });
 
-        async function sendManualPush(title, message) {
-            if(typeof testModeActive !== 'undefined' && testModeActive) { alert(`[تجربة]\n${title}\n${message}`); return; }
-            fetch("https://onesignal.com/api/v1/notifications", {
-                method: "POST", headers: { "Content-Type": "application/json; charset=utf-8", "Authorization": "Basic os_v2_app_2kjybmbd7fhtlmtcjkndcawpk2q2dhluw3nejgn2ikraoxloiswnu24d3tpemqewfnuhqn24ndjjgt2ou7zwke3p4y7to33rqnj6zaa" },
-                body: JSON.stringify({ app_id: "d29380b0-23f9-4f35-b262-4a9a3102cf56", included_segments: ["Subscribed Users"], headings: { "en": title, "ar": title }, contents: { "en": message, "ar": message } })
-            }).then(r => { if(r.ok) alert("تم الإرسال 🚀"); else alert("حدث خطأ"); }).catch(e => console.error(e));
-        }
+async function sendManualPush(title, message) {
+    if(typeof testModeActive !== 'undefined' && testModeActive) { 
+        alert(`[تجربة]\n${title}\n${message}`); 
+        return; 
+    }
+
+    // اترك هذا المفتاح كما هو إذا كان هذا هو الـ Server Key الذي حصلت عليه
+    const serverKey = "BEqZPS_3EYW0hK7Q7Tmu6PJhV6Wjhts4s9n1ZnRhiXNhAWa47E6_SWxFSqvHoG8I8XjUqmAFpvWuiXRLPc2nPg8";
+
+    // 1. جلب كل التوكنات (المشتركين) من قاعدة البيانات
+    const tokensSnap = await db.ref('fcm_tokens').once('value');
+    const tokens = tokensSnap.val();
+
+    if(!tokens) {
+        alert("لا يوجد مشتركين حالياً في نظام الإشعارات.");
+        return;
+    }
+
+    // 2. إرسال الطلب لفايربيس لإيصال الإشعار لكل المشتركين
+    let sendCount = 0;
+    for(let id in tokens) {
+        fetch('https://fcm.googleapis.com/fcm/send', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': 'key=' + serverKey
+            },
+            body: JSON.stringify({
+                to: tokens[id].token,
+                notification: {
+                    title: title,
+                    body: message,
+                    icon: "https://mohammedhamza99999-maker.github.io/kdc/logo.png",
+                    click_action: "https://mohammedhamza99999-maker.github.io/kdc/"
+                }
+            })
+        });
+        sendCount++;
+    }
+    
+    console.log(`تم إرسال طلب لـ ${sendCount} مشترك`);
+    alert("تم إرسال الإشعارات بنجاح عبر نظام Firebase 🚀");
+}
 
         async function saveRoundStars() { let pFile = document.getElementById('potwImg').files[0]; let tFile = document.getElementById('totwImg').files[0]; let updates = {}; if(pFile) updates.player_of_week = await compressImage(pFile); if(tFile) updates.team_of_week = await compressImage(tFile); if(Object.keys(updates).length > 0) { db.ref(`tournaments/${dbPath}/round_stars`).update(updates).then(()=>{ document.getElementById('potwImg').value = ''; document.getElementById('totwImg').value = ''; alert("تم الحفظ!"); }); } else { alert("اختر صورة!"); } }
         function editReferee(rName) { document.getElementById('newRefName').value = rName; document.getElementById('newRefName').focus(); alert(`تم تحديد الحكم "${rName}".`); }
