@@ -216,12 +216,7 @@
     </script>
 </head>
 <body>
-<div id="forceSubscribeModal" style="display:none !important; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.98); z-index:9999999; justify-content:center; align-items:center; flex-direction:column; padding:20px; text-align:center; backdrop-filter: blur(10px);">
-    <i class="fa-solid fa-lock" style="font-size:50px; color:#ef4444; margin-bottom:15px;"></i>
-    <h2 style="color:#fff; margin:0 0 10px; font-family:'Cairo';">الموقع مغلق مؤقتاً 🔒</h2>
-    <p style="color:#ccc; font-size:14px; margin-bottom:30px; font-family:'Cairo';">يجب تفعيل الإشعارات لمتابعة نتائج مباريات بطولة دوائر خانقين.</p>
-    <button onclick="activateNotifications();" style="background:#3b82f6; color:#fff; border:none; padding:15px 30px; border-radius:25px; font-size:16px; font-weight:bold; cursor:pointer; width:100%; max-width:300px; font-family:'Cairo';">🔔 اشترك الآن للدخول</button>
-</div>
+    
     <audio id="crowdSound" src="https://assets.mixkit.co/active_storage/sfx/2000/2000-preview.mp3" preload="auto"></audio>
     <div id="osNotification" class="os-notification">...</div>
     
@@ -956,44 +951,6 @@ async function activateNotifications() {
 
       
     let deferredPrompt; const installBtn = document.getElementById('installBtn'); window.addEventListener('beforeinstallprompt', (e) => { e.preventDefault(); deferredPrompt = e; installBtn.style.display = 'block'; }); installBtn.addEventListener('click', async () => { if (deferredPrompt) { deferredPrompt.prompt(); const { outcome } = await deferredPrompt.userChoice; if (outcome === 'accepted') { installBtn.style.display = 'none'; } deferredPrompt = null; } });
-// دالة إظهار الشاشة بالقوة
-function showMyModal() {
-    const modal = document.getElementById('forceSubscribeModal');
-    if (modal) {
-        modal.setAttribute('style', 'display:flex !important; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.98); z-index:9999999; justify-content:center; align-items:center; flex-direction:column; padding:20px; text-align:center; backdrop-filter: blur(10px);');
-    }
-}
-
-// فحص الحالة أول ما يفتح الموقع
-window.addEventListener('DOMContentLoaded', () => {
-    // إذا الشخص مو مسوي "سماح"، نطلعله الشاشة فوراً
-    if (Notification.permission !== 'granted') {
-        showMyModal();
-    }
-});
-
-// دالة الاشتراك اللي تفتح القفل
-async function activateNotifications() {
-    try {
-        const permission = await Notification.requestPermission();
-        if (permission === 'granted') {
-            const reg = await navigator.serviceWorker.register('./firebase-messaging-sw.js');
-            const token = await messaging.getToken({ 
-                vapidKey: "BEqZPS_3EYWDNK7Q7Tmu6PJhV6WJhts4s9n1ZnRhlXNhAWa47E6_SWxFSqvHoG8l8XjUqmAfpzWulXRLPc2nPg8",
-                serviceWorkerRegistration: reg 
-            });
-            if (token) {
-                await db.ref('fcm_tokens/' + token.substring(0, 20)).set({token: token, lastUpdated: Date.now()});
-                // إخفاء الشاشة بعد النجاح
-                document.getElementById('forceSubscribeModal').style.display = 'none';
-                alert("تم التفعيل! استمتع بالمشاهدة ✅");
-            }
-        } else {
-            alert("لا يمكنك الدخول بدون الاشتراك! ❌ يرجى تغيير الإعدادات من علامة القفل");
-            showMyModal(); // نرجع نطلع الشاشة إذا رفض
-        }
-    } catch (e) { showMyModal(); }
-}نهاية الكود الثاني
 
     </script>
 </body>
