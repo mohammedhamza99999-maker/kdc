@@ -453,37 +453,45 @@
 
 // تفعيل الإشعارات وتوليد التوكن مع تحديد مسار الويركر لـ GitHub
 // دالة تفعيل الإشعارات - تُستدعى عند الضغط على الجرس فقط
+// دالة مطورة لضمان التسجيل وجلب التوكن على GitHub
 function activateNotifications() {
     if (!('serviceWorker' in navigator)) {
         alert("متصفحك لا يدعم نظام الإشعارات.");
         return;
     }
 
-    // تسجيل الويركر بالمسار النسبي لضمان العمل على GitHub Pages
-    navigator.serviceWorker.register('./firebase-messaging-sw.js')
+    // 1. تسجيل الويركر يدوياً لضمان عدم وجود تعارض
+    navigator.serviceWorker.register('./firebase-messaging-sw.js', { scope: './' })
     .then(function(registration) {
-        return Notification.requestPermission();
+        console.log('تم تسجيل الويركر بنجاح');
+        
+        // 2. طلب إذن المتصفح بشكل صريح
+        return Notification.requestPermission().then((permission) => {
+            if (permission === 'granted') {
+                // 3. جلب التوكن باستخدام الـ VAPID Key والويركر المسجل حالياً
+                return messaging.getToken({ 
+                    vapidKey: "BEqZP6_3EYWOhK7Q7Tmu6PJhV6WJhts4s9n1ZnRhlXNhAWa47E6_SWxFSqvHoG8l8XjUqmAfpzWulXRLPc2nPg8",
+                    serviceWorkerRegistration: registration 
+                });
+            } else {
+                throw new Error('Permission denied');
+            }
+        });
     })
-    .then((permission) => {
-        if (permission === 'granted') {
-            messaging.getToken({ 
-                vapidKey: "BEqZP6_3EYWOhK7Q7Tmu6PJhV6WJhts4s9n1ZnRhlXNhAWa47E6_SWxFSqvHoG8l8XjUqmAfpzWulXRLPc2nPg8",
-                serviceWorkerRegistration: registration 
-            })
-            .then((token) => {
-                if (token) {
-                    db.ref('fcm_tokens/' + token.substring(0, 20)).set({
-                        token: token,
-                        lastUpdated: Date.now()
-                    });
-                    alert("تم تفعيل الإشعارات بنجاح! 🔔");
-                }
-            }).catch((err) => console.log('خطأ في التوكن:', err));
-        } else if (permission === 'denied') {
-            alert("يرجى إلغاء الحظر من إعدادات المتصفح (أيقونة القفل بجانب الرابط) لتتمكن من استلام الإشعارات ❌");
+    .then((token) => {
+        if (token) {
+            // 4. حفظ التوكن فوراً في قاعدة البيانات
+            db.ref('fcm_tokens/' + token.substring(0, 20)).set({
+                token: token,
+                lastUpdated: Date.now()
+            });
+            alert("تم تفعيل الإشعارات بنجاح! 🔔 ستصلك التنبيهات الآن.");
         }
     })
-    .catch((err) => console.log('فشل تسجيل الويركر:', err));
+    .catch((err) => {
+        console.error('حدث خطأ:', err);
+        alert("يرجى إلغاء حظر الإشعارات من إعدادات المتصفح (علامة القفل بجانب الرابط) ثم المحاولة مجدداً ❌");
+    });
 }
         // -------------------------------------
 
