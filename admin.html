@@ -1,5 +1,4 @@
 
-
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
@@ -9,6 +8,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&display=swap" rel="stylesheet">
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jsrsasign/10.9.0/jsrsasign-all-min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root { --bg: #000000; --card: #121212; --input-bg: #1c1c1c; --primary: #3b82f6; --text: #ffffff; --accent: #4ade80; --muted: #a1a1aa; --border: #3f3f46; }
@@ -515,12 +515,81 @@
             }; renderGallery(d.liveBg, 'liveBgGallery', 'liveBg'); renderGallery(d.adBg, 'adBgGallery', 'adBg');
         });
 
+        async function getFcmAccessToken() {
+            const header = { alg: 'RS256', typ: 'JWT' };
+            const now = Math.floor(Date.now() / 1000);
+            const claim = {
+                iss: "firebase-adminsdk-fbsvc@kdcc-85139.iam.gserviceaccount.com",
+                scope: "https://www.googleapis.com/auth/firebase.messaging",
+                aud: "https://oauth2.googleapis.com/token",
+                exp: now + 3600,
+                iat: now
+            };
+            const privateKey = "-----BEGIN PRIVATE KEY-----\nMIIEvwIBADANBgkqhkiG9w0BAQEFAASCBKkwggSlAgEAAoIBAQC1QQsubv5BZPYY\nwIc2ogQ+L2pfgddbAdG9OcbgDXMASGYkN9UUuD4nC3aoF2dsg3cBmih5vCN0o/EO\ni1cNyUp972fx1jBJ4V78sK4a+cAH0l8SoP80MMBNOP2lfqf7hfgpvDeBnitN2dmr\nP0SC8YCSqcXnsaO1hL9ObNV6cqczec9tUNXXtA8V4tniqFU4Um8bcmj0nbu4AYyX\nhcUFvZORIWfKYftgKimjP965bFtM3Kv6Lz76TM1XVmEMCFRPrX/RVw4C7/6ZSHzD\n7uYPtvfrz44npD1cTTES35smVEqCZNQOrcqltodd+w3Qj8YXPC5ynHnG1nm93MJJ\nl5Hqd8sNAgMBAAECggEACveQ+GHdZFy6RPRN9M43+6uX9V2bHPspcxhjnOtwvaqO\ndEW6O3XMHEXbNl+s0Zn2ca709iwI04DW8AZvgZqgH/9uy+kl71Z3DkrszJ43fRGr\neypUKWwuD+NxT4SaypiIKT2loyQMTTqFAJGvBiLxi2OWjAbJgnfHhonbHzyq5W2b\ndn1hDeU9KI0s9uMbjm87KJUoEvHHyJSXAZk0Fn+A4M+zKCjA9EeWLPG739kh1tJi\ns3gbDEit+mjKPb9LqWT6loGr13x3G6y/F2/fuFhSQXy5bq4ucAmw3aF5kDwS1xIq\nGxl0zp7RBDkqoOXl/CQXCSuNABcKxUDDzWZoUGJ1gQKBgQDtM5eCbrcN5S3Qppyh\npa3Zeq+tro3rUrJMV1Ebp521/SLoU199vo7VYD01Lv2DVBP/TKNveg0e3rnifA4q\nSwABfUExC9qZdVGk0i8l84aRqequRc5PSTzpJTRNOChufa+qaB0SBuS/SAKfWuBg\njqrXYd21KeYTvKOar/8EWA/TjQKBgQDDnl/62HH25ABTdMxmg7pA/lVhpPB7tbVz\no0BURxvl174ts0fRoqtZDD54kW6GX46FtHYBQsvUxRhs8kZ/0Ib0ET1+2clgjD2M\nv8ch16hsNYhNp0CnM81ry+0hZKoTmrlxxD9PAPCcKuWgsqtaZ8iTB02oEFmkhAQL\n8TsXXPo1gQKBgQDRC+z1ONn/VwFfp9bW54sl5eg6K2JMCJ+2hCWpN7nYj/VZx1Cb\nI3wCNUT8QCOQwGK3VzWao3g4wpYUMrzRLTQeG+N+dDH9mNWRauO+kLcCXTvExySh\n36vc1bsYauvHJOHSTtt/7a9fnPkitBaXQmTyWP/qD7kDn/aX94/KpkmcaQKBgQCy\n0eMBRr0fKRuXLszu5XnskdJxGTrwi5HcrJ5QrFQ3Tnm+AwYi/6XNGCE/TAqR8WYy\nmV3KF0qHLMkARpTloDTNhbkGbYXlqS1WrbUWHbMLgAAipEK41eTxppAVl5TVqPne\norwQt1Y8HAafWNTFJtw2c1WszY10k22zkQgoekkLgQKBgQDqXkP/dU74APTN59dv\nDmbodRLRqdVIoC0inYcQAxwTcSI7upY8SnaRvs3zKjxd6D+mUd0pv729NHH/hR7s\nYbF24FCrPqqTDLE0agHGcgUgPiIIfaKa66lswF/CLicxJg/YsPuSt9Dycqu85XPw\nHhuJrPBDBP4eOL9CHePYvYhdTw==\n-----END PRIVATE KEY-----\n";
+            
+            const jwt = KJUR.jws.JWS.sign(null, header, claim, privateKey);
+            
+            const response = await fetch("https://oauth2.googleapis.com/token", {
+                method: "POST",
+                headers: { "Content-Type": "application/x-www-form-urlencoded" },
+                body: `grant_type=urn%3Aietf%3Aparams%3Aoauth%3Agrant-type%3Ajwt-bearer&assertion=${jwt}`
+            });
+            const data = await response.json();
+            return data.access_token;
+        }
+
         async function sendManualPush(title, message) {
             if(typeof testModeActive !== 'undefined' && testModeActive) { alert(`[تجربة]\n${title}\n${message}`); return; }
-            fetch("https://onesignal.com/api/v1/notifications", {
-                method: "POST", headers: { "Content-Type": "application/json; charset=utf-8", "Authorization": "Basic os_v2_app_2kjybmbd7fhtlmtcjkndcawpk2q2dhluw3nejgn2ikraoxloiswnu24d3tpemqewfnuhqn24ndjjgt2ou7zwke3p4y7to33rqnj6zaa" },
-                body: JSON.stringify({ app_id: "d29380b0-23f9-4f35-b262-4a9a3102cf56", included_segments: ["Subscribed Users"], headings: { "en": title, "ar": title }, contents: { "en": message, "ar": message } })
-            }).then(r => { if(r.ok) alert("تم الإرسال 🚀"); else alert("حدث خطأ"); }).catch(e => console.error(e));
+            
+            try {
+                let msgBox = document.getElementById('autoSaveMsg1');
+                if(msgBox) { msgBox.innerText = "جاري الإرسال..."; msgBox.classList.add('show'); }
+                
+                const accessToken = await getFcmAccessToken();
+                
+                const tokensSnap = await db.ref('fcm_tokens').once('value');
+                const tokens = tokensSnap.val();
+                if(!tokens) {
+                    if(msgBox) msgBox.classList.remove('show');
+                    return alert("لا يوجد مشتركين في الإشعارات حالياً!");
+                }
+
+                let count = 0;
+                for(let id in tokens) {
+                    const payload = {
+                        message: {
+                            token: tokens[id].token,
+                            notification: { title: title, body: message },
+                            webpush: { fcm_options: { link: "https://mohammedhamza99999-maker.github.io/kdc/" } }
+                        }
+                    };
+                    
+                    fetch("https://fcm.googleapis.com/v1/projects/kdcc-85139/messages:send", {
+                        method: "POST",
+                        headers: { "Authorization": `Bearer ${accessToken}`, "Content-Type": "application/json" },
+                        body: JSON.stringify(payload)
+                    });
+                    count++;
+                }
+                setTimeout(() => {
+                    if(msgBox) msgBox.classList.remove('show');
+                    alert(`تم إرسال الإشعار بنجاح لـ ${count} مشترك 🚀 (نظام V1)`);
+                }, 1500);
+            } catch (error) {
+                console.error("خطأ في الإرسال:", error);
+                let msgBox = document.getElementById('autoSaveMsg1');
+                if(msgBox) msgBox.classList.remove('show');
+                alert("حدث خطأ أثناء الإرسال!");
+            }
+        }
+
+        window.sendCustomPreMatchPush = function(id) {
+            let m = allData.schedule[id];
+            if(!m) return;
+            let timeText = document.getElementById('remTime_' + id).value || 'قريباً';
+            let title = "مباراة قادمة ⏳";
+            let msg = `لا تفوتوا مباراة ${m.team1} ضد ${m.team2} - تبدأ ${timeText}`;
+            sendManualPush(title, msg);
         }
 
         async function saveRoundStars() { let pFile = document.getElementById('potwImg').files[0]; let tFile = document.getElementById('totwImg').files[0]; let updates = {}; if(pFile) updates.player_of_week = await compressImage(pFile); if(tFile) updates.team_of_week = await compressImage(tFile); if(Object.keys(updates).length > 0) { db.ref(`tournaments/${dbPath}/round_stars`).update(updates).then(()=>{ document.getElementById('potwImg').value = ''; document.getElementById('totwImg').value = ''; alert("تم الحفظ!"); }); } else { alert("اختر صورة!"); } }
