@@ -459,26 +459,53 @@
         const firebaseConfig = { apiKey: "AIzaSyC05TqAcGRExjLwBqwwFLrjGA-t3jI0UdQ", authDomain: "kdcc-85139.firebaseapp.com", databaseURL: "https://kdcc-85139-default-rtdb.firebaseio.com", projectId: "kdcc-85139", storageBucket: "kdcc-85139.firebasestorage.app", messagingSenderId: "743548860238", appId: "1:743548860238:web:66b66fe49cf32da352101f" }; 
         if (!firebase.apps.length) { firebase.initializeApp(firebaseConfig); } const db = firebase.database(); 
         
-        // --- كود الإشعارات الذي كان مفقوداً ---
         const messaging = firebase.messaging();
-        function setupNotifications() {
-            messaging.requestPermission()
-            .then(() => messaging.getToken())
-            .then((token) => {
-                if (token) {
-                    console.log('تم استخراج Token بنجاح');
-                    db.ref('fcm_tokens/' + token.substring(0, 20)).set({
-                        token: token,
-                        lastUpdated: Date.now()
-                    });
-                }
-            }).catch((err) => console.log('خطأ في الإشعارات: ', err));
-        }
 
-        messaging.onMessage((payload) => {
-            console.log('إشعار جديد:', payload);
-            triggerNotification(payload.notification.title, payload.notification.body);
+// تفعيل الإشعارات وتوليد التوكن مع تحديد مسار الويركر لـ GitHub
+function activateNotifications() {
+    if ('serviceWorker' in navigator) {
+        // تسجيل الويركر بالمسار الحالي إجبارياً
+        navigator.serviceWorker.register('./firebase-messaging-sw.js')
+        .then(function(registration) {
+            
+            // طلب الإذن من المتصفح
+            Notification.requestPermission().then((permission) => {
+                if (permission === 'granted') {
+                    
+                    // استخراج التوكن باستخدام المفتاح والويركر المسجل
+                    messaging.getToken({ 
+                        vapidKey: "BEqZP6_3EYWOhK7Q7Tmu6PJhV6WJhts4s9n1ZnRhlXNhAWa47E6_SWxFSqvHoG8l8XjUqmAfpzWulXRLPc2nPg8",
+                        serviceWorkerRegistration: registration 
+                    })
+                    .then((token) => {
+                        if (token) {
+                            db.ref('fcm_tokens/' + token.substring(0, 20)).set({
+                                token: token,
+                                lastUpdated: Date.now()
+                            });
+                            alert("تم تفعيل الإشعارات بنجاح! 🔔 مبروك!");
+                        }
+                    }).catch((err) => {
+                        console.log('حدث خطأ في جلب التوكن:', err);
+                    });
+                } else if (permission === 'denied') {
+                    alert("لقد قمت بحظر الإشعارات سابقاً ❌. يرجى تفعيلها من إعدادات المتصفح.");
+                }
+            });
+            
+        }).catch(function(err) {
+            console.log('فشل العثور على ملف الويركر:', err);
         });
+    } else {
+        alert("متصفحك لا يدعم نظام الإشعارات.");
+    }
+}
+
+// استلام الإشعارات والموقع مفتوح
+messaging.onMessage((payload) => {
+    console.log('إشعار جديد:', payload);
+    alert(`📢 ${payload.notification.title}\n${payload.notification.body}`);
+});
         // -------------------------------------
 
         const urlParams = new URLSearchParams(window.location.search); let dbPath = urlParams.get('db') || localStorage.getItem('audienceDbPath') || "Khanaqin_Tournament_Official"; if (urlParams.get('db')) { localStorage.setItem('audienceDbPath', dbPath); }
