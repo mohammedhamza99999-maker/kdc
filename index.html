@@ -454,12 +454,27 @@
         
         // --- نظام إشعارات فايربيس المطور لـ GitHub ---
 // --- نظام إشعارات فايربيس المطور لـ GitHub ---
-const messaging = firebase.messaging();
+// متغير الإشعارات (محمي من الانهيار في الآيفون)
+let messaging = null;
 
-// استقبال الإشعارات والموقع مفتوح
-messaging.onMessage((payload) => {
-    alert(`📢 ${payload.notification.title}\n${payload.notification.body}`);
-});
+try {
+    // نفحص المتصفح أولاً: هل يدعم الإشعارات؟
+    if (typeof firebase.messaging.isSupported === 'function') {
+        firebase.messaging.isSupported().then((supported) => {
+            if (supported) {
+                // إذا يدعم (أندرويد أو حاسبة)، نشغل الإشعارات
+                messaging = firebase.messaging();
+                messaging.onMessage((payload) => {
+                    alert(`📢 ${payload.notification.title}\n${payload.notification.body}`);
+                });
+            } else {
+                console.log("هذا الجهاز لا يدعم إشعارات فايربيس (آيفون)");
+            }
+        }).catch((e) => console.log("تخطي الإشعارات:", e));
+    }
+} catch (error) {
+    console.log("تم حماية الموقع من التوقف في هذا المتصفح.");
+}
 
         // -------------------------------------
 
