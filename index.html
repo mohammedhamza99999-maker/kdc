@@ -11,7 +11,17 @@
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-messaging.js"></script>
-  
+
+    <script>
+      // دالة تفعيل الإشعارات الجديدة لفايربيس
+      function activateNotifications() { 
+          if (typeof setupNotifications === "function") {
+              setupNotifications();
+              alert("يرجى الضغط على 'Allow' أو 'سماح' لتصلك نتائج المباريات ✅");
+          }
+      }
+    </script>
+    
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
@@ -217,9 +227,6 @@
 </head>
 <body>
     <audio id="crowdSound" src="https://assets.mixkit.co/active_storage/sfx/2000/2000-preview.mp3" preload="auto"></audio>
-    <div id="osNotification" class="os-notification">...</div>
-    
-    <audio id="crowdSound" src="https://assets.mixkit.co/active_storage/sfx/2000/2000-preview.mp3" preload="auto"></audio>
     <div id="osNotification" class="os-notification"><div style="font-size:24px; color:var(--primary);"><i class="fa-solid fa-futbol"></i></div><div><strong id="notifTitle" style="font-size:14px; font-family:'Cairo';">تحديث</strong><div id="notifText" style="font-size:12px; color:var(--muted); margin-top:3px;"></div></div></div>
     <div id="imageViewerModal" class="image-viewer"><button class="close-btn" onclick="closeImageViewer()"><i class="fa-solid fa-xmark"></i></button><img id="fullSizeImg" src=""></div>
 
@@ -342,7 +349,7 @@
         </div>
 
         <div class="footer">
-            <div style="margin-bottom:10px; font-weight:bold; font-size:13px; color:var(--text);">بطولة دوائر خانقين • 2026</div><div style="font-weight:bold; color:var(--primary); font-size:12px;"><i class="fa-solid fa-code"></i>  محمد حمزة</div>
+            <div style="margin-bottom:10px; font-weight:bold; font-size:13px; color:var(--text);">بطولة دوائر خانقين • 2026</div><div style="font-weight:bold; color:var(--primary); font-size:12px;"><i class="fa-solid fa-code"></i> مؤسسة محمد حمزة</div>
             <div class="footer-social"><a href="https://www.facebook.com/share/1AnD5a4oY1/" target="_blank"><i class="fab fa-facebook"></i></a><a href="https://www.instagram.com/moe_hz9" target="_blank"><i class="fab fa-instagram"></i></a><a href="https://wa.me/9647717007839" target="_blank"><i class="fab fa-whatsapp"></i></a></div>
             <div style="margin-top:20px;"><button onclick="changeAudienceDB()" style="background:transparent; border:1px solid var(--border); color:var(--muted); padding:5px 15px; border-radius:20px; font-size:11px; font-family:'Cairo'; cursor:pointer;"><i class="fa-solid fa-database"></i> تبديل بيانات البطولة</button></div>
         </div>
@@ -452,22 +459,26 @@
         const firebaseConfig = { apiKey: "AIzaSyC05TqAcGRExjLwBqwwFLrjGA-t3jI0UdQ", authDomain: "kdcc-85139.firebaseapp.com", databaseURL: "https://kdcc-85139-default-rtdb.firebaseio.com", projectId: "kdcc-85139", storageBucket: "kdcc-85139.firebasestorage.app", messagingSenderId: "743548860238", appId: "1:743548860238:web:66b66fe49cf32da352101f" }; 
         if (!firebase.apps.length) { firebase.initializeApp(firebaseConfig); } const db = firebase.database(); 
         
-   // تعريف متغير الإشعارات بشكل آمن
-var messaging = null;
+        // --- كود الإشعارات الذي كان مفقوداً ---
+        const messaging = firebase.messaging();
+        function setupNotifications() {
+            messaging.requestPermission()
+            .then(() => messaging.getToken())
+            .then((token) => {
+                if (token) {
+                    console.log('تم استخراج Token بنجاح');
+                    db.ref('fcm_tokens/' + token.substring(0, 20)).set({
+                        token: token,
+                        lastUpdated: Date.now()
+                    });
+                }
+            }).catch((err) => console.log('خطأ في الإشعارات: ', err));
+        }
 
-try {
-    // نحاول تشغيل الإشعارات مباشرة
-    messaging = firebase.messaging();
-    
-    // استقبال الاشعارات والموقع مفتوح
-    messaging.onMessage((payload) => {
-        alert(`📢 ${payload.notification.title}\n${payload.notification.body}`);
-    });
-} catch (error) {
-    // إذا المتصفح (مثل الآيفون) ما يدعمها وطلع خطأ، نعبر الخطأ بصمت والموقع يكمل تحميل!
-    console.warn("الإشعارات غير مدعومة في هذا المتصفح، تم تخطي الخطأ وحماية الموقع.");
-}
-
+        messaging.onMessage((payload) => {
+            console.log('إشعار جديد:', payload);
+            triggerNotification(payload.notification.title, payload.notification.body);
+        });
         // -------------------------------------
 
         const urlParams = new URLSearchParams(window.location.search); let dbPath = urlParams.get('db') || localStorage.getItem('audienceDbPath') || "Khanaqin_Tournament_Official"; if (urlParams.get('db')) { localStorage.setItem('audienceDbPath', dbPath); }
@@ -916,46 +927,7 @@ try {
             });
         })();
 
-      
-    let deferredPrompt; const installBtn = document.getElementById('installBtn'); window.addEventListener('beforeinstallprompt', (e) => { e.preventDefault(); deferredPrompt = e; installBtn.style.display = 'block'; }); installBtn.addEventListener('click', async () => { if (deferredPrompt) { deferredPrompt.prompt(); const { outcome } = await deferredPrompt.userChoice; if (outcome === 'accepted') { installBtn.style.display = 'none'; } deferredPrompt = null; } });
-// دالة الاشتراك الاختياري (تعمل فقط عند الضغط على زر الجرس)
-async function activateNotifications() {
-    if (!('serviceWorker' in navigator)) {
-        alert("متصفحك لا يدعم الإشعارات.");
-        return;
-    }
-
-    try {
-        // نطلب الإذن من المستخدم
-        const permission = await Notification.requestPermission();
-        
-        if (permission === 'granted') {
-            // تسجيل الويركر
-            const reg = await navigator.serviceWorker.register('./firebase-messaging-sw.js', { scope: './' });
-            messaging.useServiceWorker(reg);
-            
-            // جلب التوكن
-            const token = await messaging.getToken({ 
-                vapidKey: "BEqZPS_3EYWDNK7Q7Tmu6PJhV6WJhts4s9n1ZnRhlXNhAWa47E6_SWxFSqvHoG8l8XjUqmAfpzWulXRLPc2nPg8",
-                serviceWorkerRegistration: reg 
-            });
-
-            if (token) {
-                // حفظ التوكن في قاعدة البيانات
-                await db.ref('fcm_tokens/' + token.substring(0, 20)).set({
-                    token: token,
-                    lastUpdated: Date.now()
-                });
-                alert("تم تفعيل الإشعارات بنجاح! ✅ ستصلك نتائج البطولة لحظة بلحظة.");
-            }
-        } else {
-            alert("تم رفض تفعيل الإشعارات. ❌ يمكنك تفعيلها لاحقاً من علامة القفل بجانب الرابط.");
-        }
-    } catch (err) {
-        console.error("FCM Error:", err);
-        alert("حدث خطأ تقني أثناء محاولة التفعيل، يرجى تحديث الصفحة والمحاولة مرة أخرى.");
-    }
-}}
+        let deferredPrompt; const installBtn = document.getElementById('installBtn'); window.addEventListener('beforeinstallprompt', (e) => { e.preventDefault(); deferredPrompt = e; installBtn.style.display = 'block'; }); installBtn.addEventListener('click', async () => { if (deferredPrompt) { deferredPrompt.prompt(); const { outcome } = await deferredPrompt.userChoice; if (outcome === 'accepted') { installBtn.style.display = 'none'; } deferredPrompt = null; } });
     </script>
 </body>
 </html>
