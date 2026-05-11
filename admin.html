@@ -2,7 +2,6 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-    
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>إدارة البطولات - محمد حمزة</title>
@@ -102,6 +101,12 @@
                         </div>
                     </div>
                     <hr style="border-color:var(--border); margin: 15px 0;">
+                    
+                    <div style="margin-bottom: 15px; background: rgba(59, 130, 246, 0.1); border: 1px solid rgba(59, 130, 246, 0.3); padding: 10px; border-radius: 8px;">
+                        <label style="color:var(--primary); font-size: 13px;"><i class="fa-solid fa-tag"></i> شريط النص المخصص (للبطاقة المباشرة):</label>
+                        <input type="text" id="mCustomLabel" placeholder="مثال: ديربي خانقين، يوم التأهل... (اتركه فارغاً للإخفاء)" oninput="autoSaveMatchDetails()" style="margin-bottom: 0; border-color: rgba(59, 130, 246, 0.5);">
+                    </div>
+
                     <div class="flex-row">
                         <div style="flex:1.5;">
                             <label>الدور/الجولة:</label>
@@ -643,6 +648,8 @@
             document.getElementById('mEvents').value = live.events || ''; document.getElementById('mStatus').value = live.status || 'لم تبدأ'; 
             document.getElementById('mRound').value = live.round || ''; document.getElementById('mLeg').value = live.leg || ''; document.getElementById('mGroup').value = live.groupInfo || '';
             document.getElementById('mRef1').value = live.referee1 || ''; document.getElementById('mRef2').value = live.referee2 || ''; document.getElementById('mRef3').value = live.referee3 || ''; document.getElementById('mRef4').value = live.referee4 || ''; 
+            if(document.getElementById('mCustomLabel')) document.getElementById('mCustomLabel').value = live.customLabel || ''; // <-- تحميل النص المخصص الجديد
+            
             const stats = live.stats || {posSec1: 0, posSec2: 0, possession1: 50, possession2: 50, shots1: 0, shots2: 0, corners1: 0, corners2: 0, fouls1: 0, fouls2: 0};
             posSec1 = stats.posSec1 || 0; posSec2 = stats.posSec2 || 0;
             document.getElementById('posValue1').innerText = stats.possession1 + '%'; document.getElementById('posValue2').innerText = stats.possession2 + '%';
@@ -666,8 +673,8 @@
         db.ref('analytics/visits').on('value', snap => { document.getElementById('visitCount').innerText = snap.numChildren(); });
 
         let autoSaveTimeout;
-        function autoSaveMatchDetails() { clearTimeout(autoSaveTimeout); autoSaveTimeout = setTimeout(() => { isInternalUpdate = true; db.ref(`tournaments/${dbPath}/live_match`).update({ round: document.getElementById('mRound').value, leg: document.getElementById('mLeg').value, groupInfo: document.getElementById('mGroup').value, status: document.getElementById('mStatus').value, team1: document.getElementById('t1Name').value, team2: document.getElementById('t2Name').value, referee1: document.getElementById('mRef1').value, referee2: document.getElementById('mRef2').value, referee3: document.getElementById('mRef3').value, referee4: document.getElementById('mRef4').value }).then(() => { const ind = document.getElementById('autoSaveMsg1'); ind.classList.add('show'); setTimeout(() => ind.classList.remove('show'), 2000); isInternalUpdate = false; }); }, 500); }
-        function clearLiveMatch() { if(confirm("إفراغ المباشر بالكامل؟")) { isInternalUpdate = true; db.ref(`tournaments/${dbPath}/live_match`).set({ team1:'', team2:'', score1:0, score2:0, events:'', status:'لم تبدأ', round: '', leg: '', groupInfo: '', referee1:'', referee2:'', referee3:'', referee4:'', squad1:{}, squad2:{}, timer:{isRunning:false, savedSeconds:0, startTime:0}, stats: {posSec1:0, posSec2:0, possession1: 50, possession2: 50, shots1: 0, shots2: 0, corners1: 0, corners2: 0, fouls1: 0, fouls2: 0}}).then(() => { alert("تم الإفراغ!"); location.reload(); }); } }
+        function autoSaveMatchDetails() { clearTimeout(autoSaveTimeout); autoSaveTimeout = setTimeout(() => { isInternalUpdate = true; db.ref(`tournaments/${dbPath}/live_match`).update({ round: document.getElementById('mRound').value, leg: document.getElementById('mLeg').value, groupInfo: document.getElementById('mGroup').value, status: document.getElementById('mStatus').value, team1: document.getElementById('t1Name').value, team2: document.getElementById('t2Name').value, referee1: document.getElementById('mRef1').value, referee2: document.getElementById('mRef2').value, referee3: document.getElementById('mRef3').value, referee4: document.getElementById('mRef4').value, customLabel: document.getElementById('mCustomLabel') ? document.getElementById('mCustomLabel').value : '' }).then(() => { const ind = document.getElementById('autoSaveMsg1'); ind.classList.add('show'); setTimeout(() => ind.classList.remove('show'), 2000); isInternalUpdate = false; }); }, 500); }
+        function clearLiveMatch() { if(confirm("إفراغ المباشر بالكامل؟")) { isInternalUpdate = true; db.ref(`tournaments/${dbPath}/live_match`).set({ team1:'', team2:'', score1:0, score2:0, events:'', status:'لم تبدأ', customLabel:'', round: '', leg: '', groupInfo: '', referee1:'', referee2:'', referee3:'', referee4:'', squad1:{}, squad2:{}, timer:{isRunning:false, savedSeconds:0, startTime:0}, stats: {posSec1:0, posSec2:0, possession1: 50, possession2: 50, shots1: 0, shots2: 0, corners1: 0, corners2: 0, fouls1: 0, fouls2: 0}}).then(() => { alert("تم الإفراغ!"); location.reload(); }); } }
 
         function setPossession(teamNum) { posActiveTeam = teamNum; document.getElementById('btnPos1').className = 'pos-btn ' + (teamNum===1 ? 'active-1' : ''); document.getElementById('btnPos2').className = 'pos-btn ' + (teamNum===2 ? 'active-2' : ''); document.getElementById('btnPos0').className = 'pos-btn ' + (teamNum===0 ? 'active-0' : ''); let totPos = posSec1 + posSec2; let pct1 = totPos===0 ? 50 : Math.round((posSec1 / totPos) * 100); let pct2 = 100 - pct1; db.ref(`tournaments/${dbPath}/live_match/stats`).update({posSec1: posSec1, posSec2: posSec2, possession1: pct1, possession2: pct2}); }
         function updateStat(id, change) { let el = document.getElementById(id); let val = parseInt(el.value) || 0; if(val + change >= 0) { el.value = val + change; autoSaveMatchStats(); } }
@@ -751,10 +758,10 @@
             }
 
             await db.ref(`tournaments/${dbPath}/saved_matches`).push(archiveData);
-            await db.ref(`tournaments/${dbPath}/live_match`).set({ team1:'', team2:'', score1:0, score2:0, events:'', status:'لم تبدأ', round: '', leg: '', groupInfo: '', referee1:'', referee2:'', referee3:'', referee4:'', squad1:{}, squad2:{}, timer:{isRunning:false, savedSeconds:0, startTime:0}, stats: {posSec1:0, posSec2:0, possession1: 50, possession2: 50, shots1: 0, shots2: 0, corners1: 0, corners2: 0, fouls1: 0, fouls2: 0}}); 
+            await db.ref(`tournaments/${dbPath}/live_match`).set({ team1:'', team2:'', score1:0, score2:0, events:'', status:'لم تبدأ', customLabel:'', round: '', leg: '', groupInfo: '', referee1:'', referee2:'', referee3:'', referee4:'', squad1:{}, squad2:{}, timer:{isRunning:false, savedSeconds:0, startTime:0}, stats: {posSec1:0, posSec2:0, possession1: 50, possession2: 50, shots1: 0, shots2: 0, corners1: 0, corners2: 0, fouls1: 0, fouls2: 0}}); 
             
             let endMsg = `انتهت مباراة ${t1} و ${t2} بنتيجة ${s1} - ${s2}.`; if(motmName) endMsg += ` نجم المباراة: ${motmName} 🌟.`; sendManualPush("انتهاء المباراة! 🏁", endMsg);
-            document.getElementById('t1Name').value=''; document.getElementById('t2Name').value=''; document.getElementById('mRound').value=''; document.getElementById('mLeg').value=''; document.getElementById('mGroup').value=''; document.getElementById('mStatus').value='لم تبدأ'; document.getElementById('tMinutes').value=0; document.getElementById('mRef1').value=''; document.getElementById('mRef2').value=''; document.getElementById('mRef3').value=''; document.getElementById('mRef4').value=''; posSec1=0; posSec2=0; posActiveTeam=0; setPossession(0); alert("تم الإنهاء والحفظ!"); 
+            document.getElementById('t1Name').value=''; document.getElementById('t2Name').value=''; document.getElementById('mRound').value=''; document.getElementById('mLeg').value=''; document.getElementById('mGroup').value=''; document.getElementById('mStatus').value='لم تبدأ'; document.getElementById('mCustomLabel').value=''; document.getElementById('tMinutes').value=0; document.getElementById('mRef1').value=''; document.getElementById('mRef2').value=''; document.getElementById('mRef3').value=''; document.getElementById('mRef4').value=''; posSec1=0; posSec2=0; posActiveTeam=0; setPossession(0); alert("تم الإنهاء والحفظ!"); 
         }
 
         function compressImage(file) { return new Promise((resolve) => { const reader = new FileReader(); reader.readAsDataURL(file); reader.onload = (e) => { const img = new Image(); img.src = e.target.result; img.onload = () => { const canvas = document.createElement('canvas'); let w = img.width; let h = img.height; const max_w = 400; const max_h = 400; if (w > h) { if (w > max_w) { h = Math.round(h * max_w / w); w = max_w; } } else { if (h > max_h) { w = Math.round(w * max_h / h); h = max_h; } } canvas.width = w; canvas.height = h; const ctx = canvas.getContext('2d'); ctx.drawImage(img, 0, 0, w, h); resolve(canvas.toDataURL('image/webp', 0.5)); }; }; }); }
