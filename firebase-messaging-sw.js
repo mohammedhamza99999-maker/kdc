@@ -11,13 +11,13 @@ firebase.initializeApp({
 
 const messaging = firebase.messaging();
 
-// هذا الكود المسؤول عن إظهار الإشعار والموقع مغلق أو في الخلفية
+// هذا الكود المسؤول عن استلام الإشعار والموقع مغلق
 messaging.onBackgroundMessage(function(payload) {
     console.log('تم استلام إشعار في الخلفية: ', payload);
     const notificationTitle = payload.notification.title;
     const notificationOptions = {
         body: payload.notification.body,
-        icon: '/logo.png' // يمكنك وضع رابط شعار البطولة هنا
+        icon: '/logo.png' // يمكنك تغيير هذا لاسم صورة شعار البطولة إذا كانت موجودة
     };
 
     self.registration.showNotification(notificationTitle, notificationOptions);
