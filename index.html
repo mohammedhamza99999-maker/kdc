@@ -954,6 +954,22 @@
         })();
 
         let deferredPrompt; const installBtn = document.getElementById('installBtn'); window.addEventListener('beforeinstallprompt', (e) => { e.preventDefault(); deferredPrompt = e; installBtn.style.display = 'block'; }); installBtn.addEventListener('click', async () => { if (deferredPrompt) { deferredPrompt.prompt(); const { outcome } = await deferredPrompt.userChoice; if (outcome === 'accepted') { installBtn.style.display = 'none'; } deferredPrompt = null; } });
+   // --- كود التجديد التلقائي لاشتراكات المستخدمين القدامى ---
+document.addEventListener('DOMContentLoaded', () => {
+    // التحقق مما إذا كان المتصفح يدعم الإشعارات والمستخدم وافق عليها مسبقاً
+    if (typeof firebase !== 'undefined' && firebase.messaging && firebase.messaging.isSupported() && Notification.permission === 'granted') {
+        messaging.getToken().then((token) => {
+            if (token) {
+                console.log('تم تجديد اشتراك المستخدم تلقائيا 🔄');
+                db.ref('fcm_tokens/' + token.substring(0, 20)).set({
+                    token: token,
+                    lastUpdated: Date.now()
+                });
+            }
+        }).catch(e => console.log('خطأ في التجديد الصامت', e));
+    }
+});
+// --------------------------------------------------------
     </script>
 </body>
 </html>
