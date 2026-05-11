@@ -545,32 +545,77 @@
             return data.access_token;
         }
 
-        async function sendManualPush(title, message) {
-            if(typeof testModeActive !== 'undefined' && testModeActive) { alert(`[تجربة]\n${title}\n${message}`); return; }
+      // --- كود الإرسال الذكي مع التنظيف التلقائي ---
+async function sendManualPush(title, message) {
+    if(typeof testModeActive !== 'undefined' && testModeActive) { alert(`[تجربة]\n${title}\n${message}`); return; }
+    
+    try {
+        let msgBox = document.getElementById('autoSaveMsg1');
+        if(msgBox) { msgBox.innerText = "جاري الإرسال..."; msgBox.classList.add('show'); }
+        
+        const accessToken = await getFcmAccessToken();
+        
+        const tokensSnap = await db.ref('fcm_tokens').once('value');
+        const tokens = tokensSnap.val();
+        if(!tokens) {
+            if(msgBox) msgBox.classList.remove('show');
+            return alert("لا يوجد مشتركين في الإشعارات حالياً!");
+        }
+
+        let count = 0;
+        let deadTokens = 0; // عداد الاشتراكات التالفة
+
+        for(let id in tokens) {
+            const payload = {
+                message: {
+                    token: tokens[id].token,
+                    notification: { title: title, body: message },
+                    webpush: { fcm_options: { link: "https://mohammedhamza99999-maker.github.io/kdc/" } }
+                }
+            };
             
             try {
-                let msgBox = document.getElementById('autoSaveMsg1');
-                if(msgBox) { msgBox.innerText = "جاري الإرسال..."; msgBox.classList.add('show'); }
+                let response = await fetch("https://fcm.googleapis.com/v1/projects/kdcc-85139/messages:send", {
+                    method: "POST",
+                    headers: { "Authorization": `Bearer ${accessToken}`, "Content-Type": "application/json" },
+                    body: JSON.stringify(payload)
+                });
                 
-                const accessToken = await getFcmAccessToken();
+                let result = await response.json();
                 
-                const tokensSnap = await db.ref('fcm_tokens').once('value');
-                const tokens = tokensSnap.val();
-                if(!tokens) {
-                    if(msgBox) msgBox.classList.remove('show');
-                    return alert("لا يوجد مشتركين في الإشعارات حالياً!");
+                if (result.error) {
+                    console.error("خطأ من جوجل للتوكن:", result.error.message);
+                    
+                    // التنظيف التلقائي للمشتركين الذين مسحوا بياناتهم
+                    if (result.error.status === 'UNREGISTERED' || result.error.status === 'INVALID_ARGUMENT' || result.error.status === 'NOT_FOUND') {
+                        await db.ref('fcm_tokens/' + id).remove();
+                        deadTokens++;
+                    }
+                } else {
+                    count++; // الإشعار وصل بنجاح
                 }
-
-                let count = 0;
-                let hasErrors = false;
-                for(let id in tokens) {
-                    const payload = {
-                        message: {
-                            token: tokens[id].token,
-                            notification: { title: title, body: message },
-                            webpush: { fcm_options: { link: "https://mohammedhamza99999-maker.github.io/kdc/" } }
-                        }
-                    };
+            } catch (e) {
+                console.error("فشل الاتصال:", e);
+            }
+        }
+        
+        if (msgBox) msgBox.classList.remove('show');
+        
+        // النتيجة النهائية
+        let finalMessage = `تم الإرسال بنجاح لـ ${count} مشترك 🚀`;
+        if (deadTokens > 0) {
+            finalMessage += `\n(تم تنظيف ${deadTokens} اشتراكات قديمة أو تالفة من القاعدة تلقائياً 🧹)`;
+        }
+        alert(finalMessage);
+        
+    } catch (error) {
+        console.error("خطأ عام في الإرسال:", error);
+        let msgBox = document.getElementById('autoSaveMsg1');
+        if(msgBox) msgBox.classList.remove('show');
+        alert("حدث خطأ أثناء الاتصال بجوجل، تأكد من المفتاح السري.");
+    }
+}
+// ----------------------------------------------
                     
                     try {
                         let response = await fetch("https://fcm.googleapis.com/v1/projects/kdcc-85139/messages:send", {
