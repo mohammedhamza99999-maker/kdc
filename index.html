@@ -459,8 +459,7 @@
         const firebaseConfig = { apiKey: "AIzaSyC05TqAcGRExjLwBqwwFLrjGA-t3jI0UdQ", authDomain: "kdcc-85139.firebaseapp.com", databaseURL: "https://kdcc-85139-default-rtdb.firebaseio.com", projectId: "kdcc-85139", storageBucket: "kdcc-85139.firebasestorage.app", messagingSenderId: "743548860238", appId: "1:743548860238:web:66b66fe49cf32da352101f" }; 
         if (!firebase.apps.length) { firebase.initializeApp(firebaseConfig); } const db = firebase.database(); 
         
-        // --- كود الإشعارات الحديث والمتوافق مع جميع الأجهزة ---
-        let messaging = null;
+      let messaging = null;
 
         if (typeof firebase !== 'undefined' && firebase.messaging && firebase.messaging.isSupported()) {
             messaging = firebase.messaging();
@@ -479,7 +478,13 @@
 
             Notification.requestPermission().then((permission) => {
                 if (permission === 'granted') {
-                    messaging.getToken().then((token) => {
+                    // إجبار المتصفح وفايربيس على قراءة الملف من المجلد الحالي (GitHub Pages Fix)
+                    navigator.serviceWorker.register('./firebase-messaging-sw.js')
+                    .then((registration) => {
+                        messaging.useServiceWorker(registration);
+                        return messaging.getToken();
+                    })
+                    .then((token) => {
                         if (token) {
                             console.log('تم استخراج Token بنجاح');
                             db.ref('fcm_tokens/' + token.substring(0, 20)).set({
@@ -499,9 +504,15 @@
             });
         };
 
+        // التجديد التلقائي متوافق مع GitHub Pages
         document.addEventListener('DOMContentLoaded', () => {
             if (messaging && Notification.permission === 'granted') {
-                messaging.getToken().then((token) => {
+                navigator.serviceWorker.register('./firebase-messaging-sw.js')
+                .then((registration) => {
+                    messaging.useServiceWorker(registration);
+                    return messaging.getToken();
+                })
+                .then((token) => {
                     if (token) {
                         db.ref('fcm_tokens/' + token.substring(0, 20)).set({
                             token: token,
