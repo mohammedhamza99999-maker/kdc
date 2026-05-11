@@ -447,10 +447,11 @@
     <script>
         const firebaseConfig = { apiKey: "AIzaSyC05TqAcGRExjLwBqwwFLrjGA-t3jI0UdQ", authDomain: "kdcc-85139.firebaseapp.com", databaseURL: "https://kdcc-85139-default-rtdb.firebaseio.com" };
         firebase.initializeApp(firebaseConfig); const db = firebase.database(); 
+        
         let dbPath = "Khanaqin_Tournament_Official";
         try {
             dbPath = localStorage.getItem('activeDbPath') || "Khanaqin_Tournament_Official";
-        } catch(e) { console.log("Local Storage restricted"); }
+        } catch(e) { console.log("Local storage restricted"); }
 
         let testModeActive = false; let allData = {}; let adminClockInterval; let isInternalUpdate = false;
         let posActiveTeam = 0; let posSec1 = 0; let posSec2 = 0;
@@ -489,10 +490,7 @@
             </div>`; 
         }
         
-        function updateVisualName() { 
-            try { localStorage.setItem('visualName', document.getElementById('tourneyName').value); } catch(e){} 
-            alert("تم التغيير!"); 
-        }
+        function updateVisualName() { try { localStorage.setItem('visualName', document.getElementById('tourneyName').value); } catch(e){} alert("تم التغيير!"); }
         try { if(localStorage.getItem('visualName')) document.getElementById('tourneyName').value = localStorage.getItem('visualName'); } catch(e){}
 
         function updateAppSettings() { const tm = document.getElementById('testModeSelect').value === 'true'; db.ref(`tournaments/${dbPath}/settings`).update({ testMode: tm }); }
@@ -545,77 +543,33 @@
             return data.access_token;
         }
 
-      // --- كود الإرسال الذكي مع التنظيف التلقائي ---
-async function sendManualPush(title, message) {
-    if(typeof testModeActive !== 'undefined' && testModeActive) { alert(`[تجربة]\n${title}\n${message}`); return; }
-    
-    try {
-        let msgBox = document.getElementById('autoSaveMsg1');
-        if(msgBox) { msgBox.innerText = "جاري الإرسال..."; msgBox.classList.add('show'); }
-        
-        const accessToken = await getFcmAccessToken();
-        
-        const tokensSnap = await db.ref('fcm_tokens').once('value');
-        const tokens = tokensSnap.val();
-        if(!tokens) {
-            if(msgBox) msgBox.classList.remove('show');
-            return alert("لا يوجد مشتركين في الإشعارات حالياً!");
-        }
-
-        let count = 0;
-        let deadTokens = 0; // عداد الاشتراكات التالفة
-
-        for(let id in tokens) {
-            const payload = {
-                message: {
-                    token: tokens[id].token,
-                    notification: { title: title, body: message },
-                    webpush: { fcm_options: { link: "https://mohammedhamza99999-maker.github.io/kdc/" } }
-                }
-            };
+        async function sendManualPush(title, message) {
+            if(typeof testModeActive !== 'undefined' && testModeActive) { alert(`[تجربة]\n${title}\n${message}`); return; }
             
             try {
-                let response = await fetch("https://fcm.googleapis.com/v1/projects/kdcc-85139/messages:send", {
-                    method: "POST",
-                    headers: { "Authorization": `Bearer ${accessToken}`, "Content-Type": "application/json" },
-                    body: JSON.stringify(payload)
-                });
+                let msgBox = document.getElementById('autoSaveMsg1');
+                if(msgBox) { msgBox.innerText = "جاري الإرسال..."; msgBox.classList.add('show'); }
                 
-                let result = await response.json();
+                const accessToken = await getFcmAccessToken();
                 
-                if (result.error) {
-                    console.error("خطأ من جوجل للتوكن:", result.error.message);
-                    
-                    // التنظيف التلقائي للمشتركين الذين مسحوا بياناتهم
-                    if (result.error.status === 'UNREGISTERED' || result.error.status === 'INVALID_ARGUMENT' || result.error.status === 'NOT_FOUND') {
-                        await db.ref('fcm_tokens/' + id).remove();
-                        deadTokens++;
-                    }
-                } else {
-                    count++; // الإشعار وصل بنجاح
+                const tokensSnap = await db.ref('fcm_tokens').once('value');
+                const tokens = tokensSnap.val();
+                if(!tokens) {
+                    if(msgBox) msgBox.classList.remove('show');
+                    return alert("لا يوجد مشتركين في الإشعارات حالياً!");
                 }
-            } catch (e) {
-                console.error("فشل الاتصال:", e);
-            }
-        }
-        
-        if (msgBox) msgBox.classList.remove('show');
-        
-        // النتيجة النهائية
-        let finalMessage = `تم الإرسال بنجاح لـ ${count} مشترك 🚀`;
-        if (deadTokens > 0) {
-            finalMessage += `\n(تم تنظيف ${deadTokens} اشتراكات قديمة أو تالفة من القاعدة تلقائياً 🧹)`;
-        }
-        alert(finalMessage);
-        
-    } catch (error) {
-        console.error("خطأ عام في الإرسال:", error);
-        let msgBox = document.getElementById('autoSaveMsg1');
-        if(msgBox) msgBox.classList.remove('show');
-        alert("حدث خطأ أثناء الاتصال بجوجل، تأكد من المفتاح السري.");
-    }
-}
-// ----------------------------------------------
+
+                let count = 0;
+                let deadTokens = 0;
+
+                for(let id in tokens) {
+                    const payload = {
+                        message: {
+                            token: tokens[id].token,
+                            notification: { title: title, body: message },
+                            webpush: { fcm_options: { link: "https://mohammedhamza99999-maker.github.io/kdc/" } }
+                        }
+                    };
                     
                     try {
                         let response = await fetch("https://fcm.googleapis.com/v1/projects/kdcc-85139/messages:send", {
@@ -627,26 +581,32 @@ async function sendManualPush(title, message) {
                         let result = await response.json();
                         
                         if (result.error) {
-                            console.error("خطأ من جوجل:", result.error.message);
-                            hasErrors = true;
+                            console.error("خطأ من جوجل للتوكن:", result.error.message);
+                            if (result.error.status === 'UNREGISTERED' || result.error.status === 'INVALID_ARGUMENT' || result.error.status === 'NOT_FOUND') {
+                                await db.ref('fcm_tokens/' + id).remove();
+                                deadTokens++;
+                            }
                         } else {
                             count++;
                         }
                     } catch (e) {
                         console.error("فشل الاتصال:", e);
-                        hasErrors = true;
                     }
                 }
                 
                 if (msgBox) msgBox.classList.remove('show');
-                if (count > 0) alert(`تم إرسال الإشعار بنجاح لـ ${count} مشترك`);
-                if (hasErrors) alert("فشل الإرسال لبعض المستخدمين (راجع الـ Console لمعرفة السبب).");
+                
+                let finalMessage = `تم الإرسال بنجاح لـ ${count} مشترك 🚀`;
+                if (deadTokens > 0) {
+                    finalMessage += `\n(تم تنظيف ${deadTokens} اشتراكات قديمة أو تالفة من القاعدة تلقائياً 🧹)`;
+                }
+                alert(finalMessage);
                 
             } catch (error) {
-                console.error("خطأ في الإرسال:", error);
+                console.error("خطأ عام في الإرسال:", error);
                 let msgBox = document.getElementById('autoSaveMsg1');
                 if(msgBox) msgBox.classList.remove('show');
-                alert("حدث خطأ أثناء الإرسال!");
+                alert("حدث خطأ أثناء الاتصال بجوجل، تأكد من المفتاح السري.");
             }
         }
 
@@ -671,9 +631,9 @@ async function sendManualPush(title, message) {
         function updateEditStatPlayers() { const tName = document.getElementById('editStatTeam').value; let pOpts = '<option value="">اختر اللاعب...</option>'; if(tName && allData.teams && allData.teams[tName] && allData.teams[tName].players) { for(let p in allData.teams[tName].players) pOpts += `<option value="${p}">${p}</option>`; } document.getElementById('editStatPlayer').innerHTML = pOpts; clearSinglePlayerStats(); }
         function loadSinglePlayerStats() { const tName = document.getElementById('editStatTeam').value; const pName = document.getElementById('editStatPlayer').value; if(!tName || !pName) return clearSinglePlayerStats(); const p = allData.teams[tName].players[pName]; document.getElementById('esGoals').value = p.goals || 0; document.getElementById('esAssists').value = p.assists || 0; document.getElementById('esMotm').value = p.motm || 0; document.getElementById('esYellow').value = p.yellow || 0; document.getElementById('esRed').value = p.red || 0; document.getElementById('esMatches').value = p.matches || 0; }
         function clearSinglePlayerStats() { document.getElementById('esGoals').value = 0; document.getElementById('esAssists').value = 0; document.getElementById('esMotm').value = 0; document.getElementById('esYellow').value = 0; document.getElementById('esRed').value = 0; document.getElementById('esMatches').value = 0; }
-        function saveSinglePlayerStats() { const tName = document.getElementById('editStatTeam').value; const pName = document.getElementById('editStatPlayer').value; if(!tName || !pName) return alert("الرجاء اختيار الفريق واللاعب أولاً"); const updates = { goals: parseInt(document.getElementById('esGoals').value) || 0, assists: parseInt(document.getElementById('esAssists').value) || 0, motm: parseInt(document.getElementById('esMotm').value) || 0, yellow: parseInt(document.getElementById('esYellow').value) || 0, red: parseInt(document.getElementById('esRed').value) || 0, matches: parseInt(document.getElementById('esMatches').value) || 0 }; db.ref(`tournaments/${dbPath}/teams/${tName}/players/${pName}`).update(updates).then(() => { alert("تم تحديث إحصائيات اللاعب بنجاح!"); }).catch(e => alert("حدث خطأ أثناء الحفظ")); }
+        function saveSinglePlayerStats() { const tName = document.getElementById('editStatTeam').value; const pName = document.getElementById('editStatPlayer').value; if(!tName || !pName) return alert("الرجاء اختيار الفريق واللاعب أولاً"); const updates = { goals: parseInt(document.getElementById('esGoals').value) || 0, assists: parseInt(document.getElementById('esAssists').value) || 0, motm: parseInt(document.getElementById('esMotm').value) || 0, yellow: parseInt(document.getElementById('esYellow').value) || 0, red: parseInt(document.getElementById('esRed').value) || 0, matches: parseInt(document.getElementById('esMatches').value) || 0 }; db.ref(`tournaments/${dbPath}/teams/${tName}/players/${pName}`).update(updates).then(() => { alert("تم تحديث إحصائيات اللاعب بنجاح! 🚀"); }).catch(e => alert("حدث خطأ أثناء الحفظ")); }
 
-        window.deleteItem = function(path) { if(confirm('تأكيد: هل أنت متأكد من الحذف نهائياً؟')) { db.ref(`tournaments/${dbPath}/${path}`).remove().then(() => { alert("تم الحذف!"); if(typeof renderFullAdminPreviews === "function") renderFullAdminPreviews(); }).catch(err => alert("خطأ: " + err.message)); } };
+        window.deleteItem = function(path) { if(confirm('تأكيد: هل أنت متأكد من الحذف نهائياً؟')) { db.ref(`tournaments/${dbPath}/${path}`).remove().then(() => { alert("تم الحذف! 🗑️"); if(typeof renderFullAdminPreviews === "function") renderFullAdminPreviews(); }).catch(err => alert("خطأ: " + err.message)); } };
 
         db.ref('tournaments/' + dbPath).on('value', snap => {
             if(isInternalUpdate) return;
@@ -792,7 +752,7 @@ async function sendManualPush(title, message) {
             await db.ref(`tournaments/${dbPath}/saved_matches`).push(archiveData);
             await db.ref(`tournaments/${dbPath}/live_match`).set({ team1:'', team2:'', score1:0, score2:0, events:'', status:'لم تبدأ', round: '', leg: '', groupInfo: '', referee1:'', referee2:'', referee3:'', referee4:'', squad1:{}, squad2:{}, timer:{isRunning:false, savedSeconds:0, startTime:0}, stats: {posSec1:0, posSec2:0, possession1: 50, possession2: 50, shots1: 0, shots2: 0, corners1: 0, corners2: 0, fouls1: 0, fouls2: 0}}); 
             
-            let endMsg = `انتهت مباراة ${t1} و ${t2} بنتيجة ${s1} - ${s2}.`; if(motmName) endMsg += ` نجم المباراة: ${motmName}.`; sendManualPush("انتهاء المباراة! 🏁", endMsg);
+            let endMsg = `انتهت مباراة ${t1} و ${t2} بنتيجة ${s1} - ${s2}.`; if(motmName) endMsg += ` نجم المباراة: ${motmName} 🌟.`; sendManualPush("انتهاء المباراة! 🏁", endMsg);
             document.getElementById('t1Name').value=''; document.getElementById('t2Name').value=''; document.getElementById('mRound').value=''; document.getElementById('mLeg').value=''; document.getElementById('mGroup').value=''; document.getElementById('mStatus').value='لم تبدأ'; document.getElementById('tMinutes').value=0; document.getElementById('mRef1').value=''; document.getElementById('mRef2').value=''; document.getElementById('mRef3').value=''; document.getElementById('mRef4').value=''; posSec1=0; posSec2=0; posActiveTeam=0; setPossession(0); alert("تم الإنهاء والحفظ!"); 
         }
 
@@ -874,13 +834,7 @@ async function sendManualPush(title, message) {
             const sPreview = document.getElementById('schedulePreview'); sPreview.innerHTML = ''; 
             if(allData.schedule) { 
                 let scheduledArr = []; for(let id in allData.schedule) { scheduledArr.push({ id: id, ...allData.schedule[id] }); }
-                scheduledArr.sort((a, b) => { 
-                    let dA = (a.date || '2099-01-01').replace(/-/g, '/');
-                    let dB = (b.date || '2099-01-01').replace(/-/g, '/');
-                    let dateA = new Date(dA + ' ' + (a.time || '00:00')); 
-                    let dateB = new Date(dB + ' ' + (b.time || '00:00')); 
-                    return dateA - dateB; 
-                });
+                scheduledArr.sort((a, b) => { let dateA = new Date((a.date || '2099-01-01') + 'T' + (a.time || '00:00')); let dateB = new Date((b.date || '2099-01-01') + 'T' + (b.time || '00:00')); return dateA - dateB; });
                 scheduledArr.forEach(m => { 
                     let id = m.id; let info = []; if (m.group) info.push(`مجموعة ${m.group}`); if (m.round) info.push(m.round); if (m.leg) info.push(m.leg); let extraInfo = info.length > 0 ? `<br><span style="font-size:10px; color:var(--accent)">${info.join(' | ')}</span>` : ''; 
                     sPreview.innerHTML += `<div class="preview-item"><div class="preview-item-header"><div><b>${m.team1} - ${m.team2}</b>${extraInfo}<br><span style="font-size:10px; color:var(--muted)">${m.date} | ${m.time}</span></div><div><button class="edit-btn" onclick="openEditScheduledMatch('${id}')"><i class="fa-solid fa-pen"></i></button><button class="del-btn" onclick="deleteItem('schedule/${id}')"><i class="fa-solid fa-xmark"></i></button></div></div><div style="display:flex; gap: 5px; margin-top: 5px;"><button class="edit-btn" style="flex:1; color:var(--accent); border-color:var(--accent);" onclick="loadScheduledToLive('${id}')"><i class="fa-solid fa-play"></i> بدء المباراة</button></div><div style="display:flex; gap: 5px; margin-top: 5px; background:#1c1c1c; padding:5px; border-radius:5px; border:1px solid #3f3f46;"><input type="text" id="remTime_${id}" placeholder="مثال: 15 دقيقة / نصف ساعة" style="flex:2; margin:0; font-size:11px; height:35px;"><button class="edit-btn" style="flex:1; color:#facc15; border-color:#facc15; height:35px; margin:0; margin-right:5px;" onclick="sendCustomPreMatchPush('${id}')"><i class="fa-solid fa-bell"></i> تنبيه للجمهور</button></div></div>`; 
@@ -947,7 +901,7 @@ async function sendManualPush(title, message) {
                 let html = `<label style="color:var(--muted); font-size:11px;">فريق: ${tName}</label>`;
                 let opts = '<option value="">-- اختر --</option>';
                 if(allData.teams?.[tName]?.players) { for(let p in allData.teams[tName].players) opts += `<option value="${p}">${p}</option>`; }
-                ['gk', 'cb', 'lb', 'rb', 'cdm', 'cm', 'cam', 'lm', 'rm', 'lw', 'rw', 'st'].forEach(pos => { html += `<div class="flex-row" style="margin-bottom:4px;"><select id="${prefix}_pos" style="flex:2; font-size:11px; margin:0;">${opts}</select><input type="number" id="${prefix}_r_${pos}" style="flex:1; font-size:11px; margin:0; padding:4px;" placeholder="تقييم" step="0.1" max="10" min="0"></div>`; });
+                ['gk', 'cb', 'lb', 'rb', 'cdm', 'cm', 'cam', 'lm', 'rm', 'lw', 'rw', 'st'].forEach(pos => { html += `<div class="flex-row" style="margin-bottom:4px;"><select id="${prefix}_${pos}" style="flex:2; font-size:11px; margin:0;">${opts}</select><input type="number" id="${prefix}_r_${pos}" style="flex:1; font-size:11px; margin:0; padding:4px;" placeholder="تقييم" step="0.1" max="10" min="0"></div>`; });
                 document.getElementById(containerId).innerHTML = html;
                 setTimeout(() => { ['gk', 'cb', 'lb', 'rb', 'cdm', 'cm', 'cam', 'lm', 'rm', 'lw', 'rw', 'st'].forEach(pos => { let el = document.getElementById(`${prefix}_${pos}`); let rEl = document.getElementById(`${prefix}_r_${pos}`); if(savedSq && savedSq[pos]) { let pData = savedSq[pos]; if(typeof pData === 'object') { el.value = pData.name || ''; rEl.value = pData.rating || ''; } else { el.value = pData; rEl.value = ''; } } }); }, 50);
             };
