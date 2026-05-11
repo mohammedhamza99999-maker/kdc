@@ -13,11 +13,9 @@
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-messaging.js"></script>
 
     <script>
-      // دالة تفعيل الإشعارات الجديدة لفايربيس
       function activateNotifications() { 
           if (typeof setupNotifications === "function") {
               setupNotifications();
-              alert("يرجى الضغط على 'Allow' أو 'سماح' لتصلك نتائج المباريات ✅");
           }
       }
     </script>
@@ -459,9 +457,20 @@
         const firebaseConfig = { apiKey: "AIzaSyC05TqAcGRExjLwBqwwFLrjGA-t3jI0UdQ", authDomain: "kdcc-85139.firebaseapp.com", databaseURL: "https://kdcc-85139-default-rtdb.firebaseio.com", projectId: "kdcc-85139", storageBucket: "kdcc-85139.firebasestorage.app", messagingSenderId: "743548860238", appId: "1:743548860238:web:66b66fe49cf32da352101f" }; 
         if (!firebase.apps.length) { firebase.initializeApp(firebaseConfig); } const db = firebase.database(); 
         
-        // --- كود الإشعارات الذي كان مفقوداً ---
-        const messaging = firebase.messaging();
+        let messaging = null;
+        if (firebase.messaging && firebase.messaging.isSupported && firebase.messaging.isSupported()) {
+            messaging = firebase.messaging();
+            messaging.onMessage((payload) => {
+                console.log('إشعار جديد:', payload);
+                triggerNotification(payload.notification.title, payload.notification.body);
+            });
+        }
+
         function setupNotifications() {
+            if (!messaging) {
+                alert("الإشعارات غير مدعومة مباشرة في متصفحك الحالي. لتفعيلها على الآيفون، قم بـ 'إضافة الموقع للشاشة الرئيسية' (Add to Home Screen) وافتحه من هناك.");
+                return;
+            }
             messaging.requestPermission()
             .then(() => messaging.getToken())
             .then((token) => {
@@ -475,15 +484,26 @@
             }).catch((err) => console.log('خطأ في الإشعارات: ', err));
         }
 
-        messaging.onMessage((payload) => {
-            console.log('إشعار جديد:', payload);
-            triggerNotification(payload.notification.title, payload.notification.body);
-        });
-        // -------------------------------------
+        let dbPath = "Khanaqin_Tournament_Official";
+        try {
+            const urlParams = new URLSearchParams(window.location.search); 
+            dbPath = urlParams.get('db') || localStorage.getItem('audienceDbPath') || "Khanaqin_Tournament_Official"; 
+            if (urlParams.get('db')) { localStorage.setItem('audienceDbPath', dbPath); }
+        } catch(e) { console.log("Local storage restricted."); }
 
-        const urlParams = new URLSearchParams(window.location.search); let dbPath = urlParams.get('db') || localStorage.getItem('audienceDbPath') || "Khanaqin_Tournament_Official"; if (urlParams.get('db')) { localStorage.setItem('audienceDbPath', dbPath); }
-        window.changeAudienceDB = function() { let newDb = prompt("أدخل معرف البطولة:", dbPath); if(newDb && newDb.trim() !== "") { let cleanDb = newDb.trim().replace(/\s+/g, '_'); localStorage.setItem('audienceDbPath', cleanDb); window.location.href = window.location.pathname + "?db=" + cleanDb; } };
-        let visualName = localStorage.getItem('visualName') || "بطولة دوائر خانقين"; document.getElementById('displayTourneyName').innerText = visualName;
+        window.changeAudienceDB = function() { 
+            let newDb = prompt("أدخل معرف البطولة:", dbPath); 
+            if(newDb && newDb.trim() !== "") { 
+                let cleanDb = newDb.trim().replace(/\s+/g, '_'); 
+                try { localStorage.setItem('audienceDbPath', cleanDb); } catch(e){} 
+                window.location.href = window.location.pathname + "?db=" + cleanDb; 
+            } 
+        };
+
+        let visualName = "بطولة دوائر خانقين";
+        try { visualName = localStorage.getItem('visualName') || "بطولة دوائر خانقين"; } catch(e){}
+        document.getElementById('displayTourneyName').innerText = visualName;
+
         window.openImageViewer = function(src) { if(!src) return; document.getElementById('fullSizeImg').src = src; document.getElementById('imageViewerModal').style.display = 'flex'; try{ history.pushState({ modal: 'imageViewerModal' }, "", "#image"); }catch(e){} }; window.closeImageViewer = function() { document.getElementById('imageViewerModal').style.display = 'none'; };
         function shareAsImage(elementId) { const card = document.getElementById(elementId); card.classList.add('premium-poster'); const actions = card.querySelectorAll('.export-btn, .share-actions, .btn-enter-match, .close-btn, .squad-btn'); actions.forEach(a => { if(a) a.style.display = 'none'; }); triggerNotification('معالجة', 'جاري إنشاء بوستر احترافي 📸'); html2canvas(card, { backgroundColor: '#0a0e12', useCORS: true, scale: 2 }).then(canvas => { const link = document.createElement('a'); link.download = `Poster.png`; link.href = canvas.toDataURL('image/png'); link.click(); card.classList.remove('premium-poster'); actions.forEach(a => { if(a) a.style.display = ''; }); }).catch(e => { card.classList.remove('premium-poster'); actions.forEach(a => { if(a) a.style.display = ''; }); }); }
         window.shareAsStatsImage = function(elementId) { const card = document.getElementById(elementId); card.classList.add('premium-poster'); card.classList.add('stats-export-mode'); const actions = card.querySelectorAll('.export-btn, .share-actions, .btn-enter-match, .close-btn, button'); actions.forEach(a => { if(a) a.style.display = 'none'; }); triggerNotification('معالجة', 'جاري إنشاء بوستر 📸'); html2canvas(card, { backgroundColor: '#0a0e12', useCORS: true, scale: 2 }).then(canvas => { const link = document.createElement('a'); link.download = `Stats.png`; link.href = canvas.toDataURL('image/png'); link.click(); card.classList.remove('premium-poster'); card.classList.remove('stats-export-mode'); actions.forEach(a => { if(a) a.style.display = ''; }); }).catch(e => { card.classList.remove('premium-poster'); card.classList.remove('stats-export-mode'); actions.forEach(a => { if(a) a.style.display = ''; }); }); }
@@ -613,7 +633,7 @@
             const tCards = document.getElementById('cardsList'); tCards.innerHTML = ''; allPlayers.filter(p => p.yellow > 0 || p.red > 0).sort((a,b) => (b.red||0) - (a.red||0) || (b.yellow||0) - (a.yellow||0)).forEach(p => { tCards.innerHTML += `<tr class="clickable-player" onclick="openPlayerProfile('${p.name}','${p.team}')"><td style="text-align:right; padding-right:15px; display:flex; align-items:center; font-weight:bold;">${getPlayerImageHtml(p.name, p.team, '#ef4444')} <div>${p.name}<br><span style="font-size:10px; color:var(--muted); font-weight:normal;">${p.team}</span></div></td><td style="font-size:14px; color:#facc15;">${p.yellow||0}</td><td style="font-size:14px; color:#ef4444;">${p.red||0}</td></tr>`; });
         });
 
-        function formatMatchDate(d) { if(!d) return ""; const matchDate = new Date(d); const today = new Date(); const tomorrow = new Date(today); tomorrow.setDate(tomorrow.getDate() + 1); if(matchDate.toDateString() === today.toDateString()) return "اليوم"; if(matchDate.toDateString() === tomorrow.toDateString()) return "غداً"; return d; }
+        function formatMatchDate(d) { if(!d) return ""; const matchDate = new Date(d.replace(/-/g, '/')); const today = new Date(); const tomorrow = new Date(today); tomorrow.setDate(tomorrow.getDate() + 1); if(matchDate.toDateString() === today.toDateString()) return "اليوم"; if(matchDate.toDateString() === tomorrow.toDateString()) return "غداً"; return d; }
 
         let timerInterval; let initialLoad = true; let lastS1 = -1, lastS2 = -1; let liveSquad1 = {}, liveSquad2 = {};
         db.ref(`tournaments/${dbPath}/live_match`).on('value', snap => {
@@ -684,7 +704,13 @@
             scheduleGlobal = snap.val() || {}; const list = document.getElementById('scheduleList'); list.innerHTML = ''; 
             if(scheduleGlobal && Object.keys(scheduleGlobal).length > 0) { 
                 let scheduledArr = []; for(let id in scheduleGlobal) { scheduledArr.push({ id: id, ...scheduleGlobal[id] }); }
-                scheduledArr.sort((a, b) => { let dateA = new Date((a.date || '2099-01-01') + 'T' + (a.time || '00:00')); let dateB = new Date((b.date || '2099-01-01') + 'T' + (b.time || '00:00')); return dateA - dateB; });
+                scheduledArr.sort((a, b) => { 
+                    let dA = (a.date || '2099-01-01').replace(/-/g, '/');
+                    let dB = (b.date || '2099-01-01').replace(/-/g, '/');
+                    let dateA = new Date(dA + ' ' + (a.time || '00:00')); 
+                    let dateB = new Date(dB + ' ' + (b.time || '00:00')); 
+                    return dateA - dateB; 
+                });
                 scheduledArr.forEach(m => { 
                     let id = m.id; let badgeInfo = ''; let info = []; if(m.group) info.push(`مجموعة ${m.group}`); if(m.round) info.push(m.round); if(m.leg) info.push(m.leg);
                     if (info.length > 0) { badgeInfo = `<div style="font-size:11px; color:var(--primary); margin-bottom:12px; text-align:center; font-weight:bold; background: rgba(255,255,255,0.05); padding: 6px; border-radius: 6px; border:1px solid var(--primary);"><i class="fa-solid fa-layer-group"></i> ${info.join(' - ')}</div>`; } else { badgeInfo = `<div style="font-size:11px; color:var(--primary); margin-bottom:12px; text-align:center; font-weight:bold; background: rgba(255,255,255,0.05); padding: 6px; border-radius: 6px; border:1px solid var(--primary);">مباراة مجدولة</div>`; }
