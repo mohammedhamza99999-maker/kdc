@@ -452,28 +452,20 @@
         const firebaseConfig = { apiKey: "AIzaSyC05TqAcGRExjLwBqwwFLrjGA-t3jI0UdQ", authDomain: "kdcc-85139.firebaseapp.com", databaseURL: "https://kdcc-85139-default-rtdb.firebaseio.com", projectId: "kdcc-85139", storageBucket: "kdcc-85139.firebasestorage.app", messagingSenderId: "743548860238", appId: "1:743548860238:web:66b66fe49cf32da352101f" }; 
         if (!firebase.apps.length) { firebase.initializeApp(firebaseConfig); } const db = firebase.database(); 
         
-        // --- نظام إشعارات فايربيس المطور لـ GitHub ---
-// --- نظام إشعارات فايربيس المطور لـ GitHub ---
-// متغير الإشعارات (محمي من الانهيار في الآيفون)
-let messaging = null;
+   // تعريف متغير الإشعارات بشكل آمن
+var messaging = null;
 
 try {
-    // نفحص المتصفح أولاً: هل يدعم الإشعارات؟
-    if (typeof firebase.messaging.isSupported === 'function') {
-        firebase.messaging.isSupported().then((supported) => {
-            if (supported) {
-                // إذا يدعم (أندرويد أو حاسبة)، نشغل الإشعارات
-                messaging = firebase.messaging();
-                messaging.onMessage((payload) => {
-                    alert(`📢 ${payload.notification.title}\n${payload.notification.body}`);
-                });
-            } else {
-                console.log("هذا الجهاز لا يدعم إشعارات فايربيس (آيفون)");
-            }
-        }).catch((e) => console.log("تخطي الإشعارات:", e));
-    }
+    // نحاول تشغيل الإشعارات مباشرة
+    messaging = firebase.messaging();
+    
+    // استقبال الاشعارات والموقع مفتوح
+    messaging.onMessage((payload) => {
+        alert(`📢 ${payload.notification.title}\n${payload.notification.body}`);
+    });
 } catch (error) {
-    console.log("تم حماية الموقع من التوقف في هذا المتصفح.");
+    // إذا المتصفح (مثل الآيفون) ما يدعمها وطلع خطأ، نعبر الخطأ بصمت والموقع يكمل تحميل!
+    console.warn("الإشعارات غير مدعومة في هذا المتصفح، تم تخطي الخطأ وحماية الموقع.");
 }
 
         // -------------------------------------
