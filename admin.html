@@ -447,12 +447,16 @@
     <script>
         const firebaseConfig = { apiKey: "AIzaSyC05TqAcGRExjLwBqwwFLrjGA-t3jI0UdQ", authDomain: "kdcc-85139.firebaseapp.com", databaseURL: "https://kdcc-85139-default-rtdb.firebaseio.com" };
         firebase.initializeApp(firebaseConfig); const db = firebase.database(); 
-        let dbPath = localStorage.getItem('activeDbPath') || "Khanaqin_Tournament_Official";
+        let dbPath = "Khanaqin_Tournament_Official";
+        try {
+            dbPath = localStorage.getItem('activeDbPath') || "Khanaqin_Tournament_Official";
+        } catch(e) { console.log("Local Storage restricted"); }
+
         let testModeActive = false; let allData = {}; let adminClockInterval; let isInternalUpdate = false;
         let posActiveTeam = 0; let posSec1 = 0; let posSec2 = 0;
 
         document.addEventListener("DOMContentLoaded", () => { if(document.getElementById('tourneyDbPath')) document.getElementById('tourneyDbPath').value = dbPath; });
-        function changeTournamentPath() { const p = document.getElementById('tourneyDbPath').value.trim().replace(/\s+/g, '_'); if(p) { localStorage.setItem('activeDbPath', p); alert(`تم التبديل!`); location.reload(); } }
+        function changeTournamentPath() { const p = document.getElementById('tourneyDbPath').value.trim().replace(/\s+/g, '_'); if(p) { try { localStorage.setItem('activeDbPath', p); } catch(e){} alert(`تم التبديل!`); location.reload(); } }
         function openTab(tabId, btn) { document.querySelectorAll('.tab-content').forEach(t=>t.classList.remove('active')); document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active')); document.getElementById(tabId).classList.add('active'); btn.classList.add('active'); }
         
         const grid = document.getElementById('playersGridInputs'); grid.innerHTML = ''; 
@@ -485,8 +489,11 @@
             </div>`; 
         }
         
-        function updateVisualName() { localStorage.setItem('visualName', document.getElementById('tourneyName').value); alert("تم التغيير!"); }
-        if(localStorage.getItem('visualName')) document.getElementById('tourneyName').value = localStorage.getItem('visualName');
+        function updateVisualName() { 
+            try { localStorage.setItem('visualName', document.getElementById('tourneyName').value); } catch(e){} 
+            alert("تم التغيير!"); 
+        }
+        try { if(localStorage.getItem('visualName')) document.getElementById('tourneyName').value = localStorage.getItem('visualName'); } catch(e){}
 
         function updateAppSettings() { const tm = document.getElementById('testModeSelect').value === 'true'; db.ref(`tournaments/${dbPath}/settings`).update({ testMode: tm }); }
         function saveTourneySystem() { const sys = document.getElementById('tourneySystemType').value; db.ref(`tournaments/${dbPath}/settings`).update({ systemType: sys }).then(() => alert("تم حفظ النظام!")); }
@@ -525,7 +532,7 @@
                 exp: now + 3600,
                 iat: now
             };
-            const privateKey = "-----BEGIN PRIVATE KEY-----\nMIIEvwIBADANBgkqhkiG9w0BAQEFAASCBKkwggSlAgEAAoIBAQC1QQsubv5BZPYY\nwIc2ogQ+L2pfgddbAdG9OcbgDXMASGYkN9UUuD4nC3aoF2dsg3cBmih5vCN0o/EO\ni1cNyUp972fx1jBJ4V78sK4a+cAH0l8SoP80MMBNOP2lfqf7hfgpvDeBnitN2dmr\nP0SC8YCSqcXnsaO1hL9ObNV6cqczec9tUNXXtA8V4tniqFU4Um8bcmj0nbu4AYyX\nhcUFvZORIWfKYftgKimjP965bFtM3Kv6Lz76TM1XVmEMCFRPrX/RVw4C7/6ZSHzD\n7uYPtvfrz44npD1cTTES35smVEqCZNQOrcqltodd+w3Qj8YXPC5ynHnG1nm93MJJ\nl5Hqd8sNAgMBAAECggEACveQ+GHdZFy6RPRN9M43+6uX9V2bHPspcxhjnOtwvaqO\ndEW6O3XMHEXbNl+s0Zn2ca709iwI04DW8AZvgZqgH/9uy+kl71Z3DkrszJ43fRGr\neypUKWwuD+NxT4SaypiIKT2loyQMTTqFAJGvBiLxi2OWjAbJgnfHhonbHzyq5W2b\ndn1hDeU9KI0s9uMbjm87KJUoEvHHyJSXAZk0Fn+A4M+zKCjA9EeWLPG739kh1tJi\ns3gbDEit+mjKPb9LqWT6loGr13x3G6y/F2/fuFhSQXy5bq4ucAmw3aF5kDwS1xIq\nGxl0zp7RBDkqoOXl/CQXCSuNABcKxUDDzWZoUGJ1gQKBgQDtM5eCbrcN5S3Qppyh\npa3Zeq+tro3rUrJMV1Ebp521/SLoU199vo7VYD01Lv2DVBP/TKNveg0e3rnifA4q\nSwABfUExC9qZdVGk0i8l84aRqequRc5PSTzpJTRNOChufa+qaB0SBuS/SAKfWuBg\njqrXYd21KeYTvKOar/8EWA/TjQKBgQDDnl/62HH25ABTdMxmg7pA/lVhpPB7tbVz\no0BURxvl174ts0fRoqtZDD54kW6GX46FtHYBQsvUxRhs8kZ/0Ib0ET1+2clgjD2M\nv8ch16hsNYhNp0CnM81ry+0hZKoTmrlxxD9PAPCcKuWgsqtaZ8iTB02oEFmkhAQL\n8TsXXPo1gQKBgQDRC+z1ONn/VwFfp9bW54sl5eg6K2JMCJ+2hCWpN7nYj/VZx1Cb\nI3wCNUT8QCOQwGK3VzWao3g4wpYUMrzRLTQeG+N+dDH9mNWRauO+kLcCXTvExySh\n36vc1bsYauvHJOHSTtt/7a9fnPkitBaXQmTyWP/qD7kDn/aX94/KpkmcaQKBgQCy\n0eMBRr0fKRuXLszu5XnskdJxGTrwi5HcrJ5QrFQ3Tnm+AwYi/6XNGCE/TAqR8WYy\nmV3KF0qHLMkARpTloDTNhbkGbYXlqS1WrbUWHbMLgAAipEK41eTxppAVl5TVqPne\norwQt1Y8HAafWNTFJtw2c1WszY10k22zkQgoekkLgQKBgQDqXkP/dU74APTN59dv\nDmbodRLRqdVIoC0inYcQAxwTcSI7upY8SnaRvs3zKjxd6D+mUd0pv729NHH/hR7s\nYbF24FCrPqqTDLE0agHGcgUgPiIIfaKa66lswF/CLicxJg/YsPuSt9Dycqu85XPw\nHhuJrPBDBP4eOL9CHePYvYhdTw==\n-----END PRIVATE KEY-----\n";
+            const privateKey = "-----BEGIN PRIVATE KEY-----\nMIIEvwIBADANBgkqhkiG9w0BAQEFAASCBKkwggSlAgEAAoIBAQDAgKiGy8mX656h\nAA02+Hm6y30q2TwSPgpXbZ2ce9VHDp0jicMEsg3WxR+nkuVAyfXQwhjLTWQZxMih\nTLQD5krRtYmDXyXlkSUFJBJw5BYEJR7w72w3U+scn8iv0Uoz1uS0acLxvLCEeCgT\nznjWPukYxP+SmU5goImaC1lge164mnICSs0v/pvnB8Z8LSnd8GGjfqfPU/37cb1h\nvvyk5GKiJYalvj97wkGHaNK7XEXM5Myb1huwQym4QjyRCy64u/8aM9moHDzkdhWQ\nSk5KQ4nMSMfPpnq+YhaIusjbGm78NessrAfy0thRWLuK4ycZV2J6xRoNjTmOpLA3\n3PAP0nzVAgMBAAECggEAEMQj6XmeWUkAS+2BOSRzFb3bbPv2q3AT3oGBlLuEW+f9\n77Zz8djAM9B/bUzyAq6UZlZBapOXAFePUd0oYJ6SLamuDG8hEdmOa+A0aviyojHJ\nfBqeRkNc2uVfyVBlMhapXL1JaVyR0zfT5cW56I8aJjoiOFZ56RiSY4RRiIG2QkWq\nnb0Opg3bgrXHWz2d/LbQa2LtpePeOc6loMlMeBXzmCpT19HKdkCISLIJpnvc9H6I\n5TBFtd5AJHc0RlGNKHwevSRDuXTJAHj7JiLMjfcF0RpEjvn2T/dcJ/XiV6D6zV/E\nuu+6PBY0CuKxnOol9304E4c5ZahxoB7HDqRcBWQYAQKBgQDttNCi5MvYP2Wicm7l\nK8dvWrZZCfITUTMlb85fNYW4bqTKQ95uNz6O3hv2sYQ7DwKlushzodllijIk9ozA\n4naq4xQXEcFlZMGE7A7Dray/2JJQYy9/yF29Al2P3cm3FEPZwvl5ZnUIUpva/b8K\nvvYMX5cgPM3dendBMgMt5XYEVQKBgQDPUUJa80VZ9t6BR2mJqMub5T8FuDfut00m\naXd3KUvXrFSajzBDuKEvSZPLsJ2VZlxCVt1yreYtizMKnlvULnobSi9ULkgTAJpj\n1PD4jEhm60b8ew/yzTgCuh5UjIE53RECZs59g45sYXaH8lT0/dkDjMT8pW4f9JXh\nPDvy4g8WgQKBgQDdHbySOmiQgPCm+vHDRkUfhW9oRgMkCv2bznRXRm9cT7gE2rs3\nJTaRKXUzto99bIoW5jf+sEiM1s+saJgn+MFQVyliCEcxbVdCsV9OkOjIEMqR8qHF\nqPnhjyi/Yh14q2YuU9tDHZayJj4KqM2kTlyMyALJnyYU5w213LLuZ6uvfQKBgQCo\nnRhwzGbdUrGJR8GIWqau9naZekjTeHXhBepKGmY61UhCJK9GhQVjZl40TkL8XbIv\nqmKVgOYyqIIs4rshCWP6ig2QU8v+2IC5LVmHbOD+A+FKO/Sur0Ycwa8laNk5bJkG\n8QKEhtjxQRucWfXLBCLahkU4jnvQtaao98pyMnW/AQKBgQCy3zOG6vuIspviq38s\nLyGzmjk+peZX1C4B5aM+Xq/QIxotNqorVwoEuF9LWB3m4esg4o+4dSNY8ULz+7cU\nVHP8zxUA9WO4t/azGnJnS3ZAgAnchKRJrBG61PxmoS1I0inE1q6aNZAKzzWFz5ar\n3kOPb8HxFDXPWLJgdHdRLmN6oQ==\n-----END PRIVATE KEY-----\n";
             
             const jwt = KJUR.jws.JWS.sign(null, header, claim, privateKey);
             
@@ -555,6 +562,7 @@
                 }
 
                 let count = 0;
+                let hasErrors = false;
                 for(let id in tokens) {
                     const payload = {
                         message: {
@@ -564,17 +572,31 @@
                         }
                     };
                     
-                    fetch("https://fcm.googleapis.com/v1/projects/kdcc-85139/messages:send", {
-                        method: "POST",
-                        headers: { "Authorization": `Bearer ${accessToken}`, "Content-Type": "application/json" },
-                        body: JSON.stringify(payload)
-                    });
-                    count++;
+                    try {
+                        let response = await fetch("https://fcm.googleapis.com/v1/projects/kdcc-85139/messages:send", {
+                            method: "POST",
+                            headers: { "Authorization": `Bearer ${accessToken}`, "Content-Type": "application/json" },
+                            body: JSON.stringify(payload)
+                        });
+                        
+                        let result = await response.json();
+                        
+                        if (result.error) {
+                            console.error("خطأ من جوجل:", result.error.message);
+                            hasErrors = true;
+                        } else {
+                            count++;
+                        }
+                    } catch (e) {
+                        console.error("فشل الاتصال:", e);
+                        hasErrors = true;
+                    }
                 }
-                setTimeout(() => {
-                    if(msgBox) msgBox.classList.remove('show');
-                    alert(`تم إرسال الإشعار بنجاح لـ ${count} مشترك 🚀 (نظام V1)`);
-                }, 1500);
+                
+                if (msgBox) msgBox.classList.remove('show');
+                if (count > 0) alert(`تم إرسال الإشعار بنجاح لـ ${count} مشترك`);
+                if (hasErrors) alert("فشل الإرسال لبعض المستخدمين (راجع الـ Console لمعرفة السبب).");
+                
             } catch (error) {
                 console.error("خطأ في الإرسال:", error);
                 let msgBox = document.getElementById('autoSaveMsg1');
@@ -604,9 +626,9 @@
         function updateEditStatPlayers() { const tName = document.getElementById('editStatTeam').value; let pOpts = '<option value="">اختر اللاعب...</option>'; if(tName && allData.teams && allData.teams[tName] && allData.teams[tName].players) { for(let p in allData.teams[tName].players) pOpts += `<option value="${p}">${p}</option>`; } document.getElementById('editStatPlayer').innerHTML = pOpts; clearSinglePlayerStats(); }
         function loadSinglePlayerStats() { const tName = document.getElementById('editStatTeam').value; const pName = document.getElementById('editStatPlayer').value; if(!tName || !pName) return clearSinglePlayerStats(); const p = allData.teams[tName].players[pName]; document.getElementById('esGoals').value = p.goals || 0; document.getElementById('esAssists').value = p.assists || 0; document.getElementById('esMotm').value = p.motm || 0; document.getElementById('esYellow').value = p.yellow || 0; document.getElementById('esRed').value = p.red || 0; document.getElementById('esMatches').value = p.matches || 0; }
         function clearSinglePlayerStats() { document.getElementById('esGoals').value = 0; document.getElementById('esAssists').value = 0; document.getElementById('esMotm').value = 0; document.getElementById('esYellow').value = 0; document.getElementById('esRed').value = 0; document.getElementById('esMatches').value = 0; }
-        function saveSinglePlayerStats() { const tName = document.getElementById('editStatTeam').value; const pName = document.getElementById('editStatPlayer').value; if(!tName || !pName) return alert("الرجاء اختيار الفريق واللاعب أولاً"); const updates = { goals: parseInt(document.getElementById('esGoals').value) || 0, assists: parseInt(document.getElementById('esAssists').value) || 0, motm: parseInt(document.getElementById('esMotm').value) || 0, yellow: parseInt(document.getElementById('esYellow').value) || 0, red: parseInt(document.getElementById('esRed').value) || 0, matches: parseInt(document.getElementById('esMatches').value) || 0 }; db.ref(`tournaments/${dbPath}/teams/${tName}/players/${pName}`).update(updates).then(() => { alert("تم تحديث إحصائيات اللاعب بنجاح! 🚀"); }).catch(e => alert("حدث خطأ أثناء الحفظ")); }
+        function saveSinglePlayerStats() { const tName = document.getElementById('editStatTeam').value; const pName = document.getElementById('editStatPlayer').value; if(!tName || !pName) return alert("الرجاء اختيار الفريق واللاعب أولاً"); const updates = { goals: parseInt(document.getElementById('esGoals').value) || 0, assists: parseInt(document.getElementById('esAssists').value) || 0, motm: parseInt(document.getElementById('esMotm').value) || 0, yellow: parseInt(document.getElementById('esYellow').value) || 0, red: parseInt(document.getElementById('esRed').value) || 0, matches: parseInt(document.getElementById('esMatches').value) || 0 }; db.ref(`tournaments/${dbPath}/teams/${tName}/players/${pName}`).update(updates).then(() => { alert("تم تحديث إحصائيات اللاعب بنجاح!"); }).catch(e => alert("حدث خطأ أثناء الحفظ")); }
 
-        window.deleteItem = function(path) { if(confirm('تأكيد: هل أنت متأكد من الحذف نهائياً؟')) { db.ref(`tournaments/${dbPath}/${path}`).remove().then(() => { alert("تم الحذف! 🗑️"); if(typeof renderFullAdminPreviews === "function") renderFullAdminPreviews(); }).catch(err => alert("خطأ: " + err.message)); } };
+        window.deleteItem = function(path) { if(confirm('تأكيد: هل أنت متأكد من الحذف نهائياً؟')) { db.ref(`tournaments/${dbPath}/${path}`).remove().then(() => { alert("تم الحذف!"); if(typeof renderFullAdminPreviews === "function") renderFullAdminPreviews(); }).catch(err => alert("خطأ: " + err.message)); } };
 
         db.ref('tournaments/' + dbPath).on('value', snap => {
             if(isInternalUpdate) return;
@@ -725,7 +747,7 @@
             await db.ref(`tournaments/${dbPath}/saved_matches`).push(archiveData);
             await db.ref(`tournaments/${dbPath}/live_match`).set({ team1:'', team2:'', score1:0, score2:0, events:'', status:'لم تبدأ', round: '', leg: '', groupInfo: '', referee1:'', referee2:'', referee3:'', referee4:'', squad1:{}, squad2:{}, timer:{isRunning:false, savedSeconds:0, startTime:0}, stats: {posSec1:0, posSec2:0, possession1: 50, possession2: 50, shots1: 0, shots2: 0, corners1: 0, corners2: 0, fouls1: 0, fouls2: 0}}); 
             
-            let endMsg = `انتهت مباراة ${t1} و ${t2} بنتيجة ${s1} - ${s2}.`; if(motmName) endMsg += ` نجم المباراة: ${motmName} 🌟.`; sendManualPush("انتهاء المباراة! 🏁", endMsg);
+            let endMsg = `انتهت مباراة ${t1} و ${t2} بنتيجة ${s1} - ${s2}.`; if(motmName) endMsg += ` نجم المباراة: ${motmName}.`; sendManualPush("انتهاء المباراة! 🏁", endMsg);
             document.getElementById('t1Name').value=''; document.getElementById('t2Name').value=''; document.getElementById('mRound').value=''; document.getElementById('mLeg').value=''; document.getElementById('mGroup').value=''; document.getElementById('mStatus').value='لم تبدأ'; document.getElementById('tMinutes').value=0; document.getElementById('mRef1').value=''; document.getElementById('mRef2').value=''; document.getElementById('mRef3').value=''; document.getElementById('mRef4').value=''; posSec1=0; posSec2=0; posActiveTeam=0; setPossession(0); alert("تم الإنهاء والحفظ!"); 
         }
 
@@ -807,7 +829,13 @@
             const sPreview = document.getElementById('schedulePreview'); sPreview.innerHTML = ''; 
             if(allData.schedule) { 
                 let scheduledArr = []; for(let id in allData.schedule) { scheduledArr.push({ id: id, ...allData.schedule[id] }); }
-                scheduledArr.sort((a, b) => { let dateA = new Date((a.date || '2099-01-01') + 'T' + (a.time || '00:00')); let dateB = new Date((b.date || '2099-01-01') + 'T' + (b.time || '00:00')); return dateA - dateB; });
+                scheduledArr.sort((a, b) => { 
+                    let dA = (a.date || '2099-01-01').replace(/-/g, '/');
+                    let dB = (b.date || '2099-01-01').replace(/-/g, '/');
+                    let dateA = new Date(dA + ' ' + (a.time || '00:00')); 
+                    let dateB = new Date(dB + ' ' + (b.time || '00:00')); 
+                    return dateA - dateB; 
+                });
                 scheduledArr.forEach(m => { 
                     let id = m.id; let info = []; if (m.group) info.push(`مجموعة ${m.group}`); if (m.round) info.push(m.round); if (m.leg) info.push(m.leg); let extraInfo = info.length > 0 ? `<br><span style="font-size:10px; color:var(--accent)">${info.join(' | ')}</span>` : ''; 
                     sPreview.innerHTML += `<div class="preview-item"><div class="preview-item-header"><div><b>${m.team1} - ${m.team2}</b>${extraInfo}<br><span style="font-size:10px; color:var(--muted)">${m.date} | ${m.time}</span></div><div><button class="edit-btn" onclick="openEditScheduledMatch('${id}')"><i class="fa-solid fa-pen"></i></button><button class="del-btn" onclick="deleteItem('schedule/${id}')"><i class="fa-solid fa-xmark"></i></button></div></div><div style="display:flex; gap: 5px; margin-top: 5px;"><button class="edit-btn" style="flex:1; color:var(--accent); border-color:var(--accent);" onclick="loadScheduledToLive('${id}')"><i class="fa-solid fa-play"></i> بدء المباراة</button></div><div style="display:flex; gap: 5px; margin-top: 5px; background:#1c1c1c; padding:5px; border-radius:5px; border:1px solid #3f3f46;"><input type="text" id="remTime_${id}" placeholder="مثال: 15 دقيقة / نصف ساعة" style="flex:2; margin:0; font-size:11px; height:35px;"><button class="edit-btn" style="flex:1; color:#facc15; border-color:#facc15; height:35px; margin:0; margin-right:5px;" onclick="sendCustomPreMatchPush('${id}')"><i class="fa-solid fa-bell"></i> تنبيه للجمهور</button></div></div>`; 
@@ -874,7 +902,7 @@
                 let html = `<label style="color:var(--muted); font-size:11px;">فريق: ${tName}</label>`;
                 let opts = '<option value="">-- اختر --</option>';
                 if(allData.teams?.[tName]?.players) { for(let p in allData.teams[tName].players) opts += `<option value="${p}">${p}</option>`; }
-                ['gk', 'cb', 'lb', 'rb', 'cdm', 'cm', 'cam', 'lm', 'rm', 'lw', 'rw', 'st'].forEach(pos => { html += `<div class="flex-row" style="margin-bottom:4px;"><select id="${prefix}_${pos}" style="flex:2; font-size:11px; margin:0;">${opts}</select><input type="number" id="${prefix}_r_${pos}" style="flex:1; font-size:11px; margin:0; padding:4px;" placeholder="تقييم" step="0.1" max="10" min="0"></div>`; });
+                ['gk', 'cb', 'lb', 'rb', 'cdm', 'cm', 'cam', 'lm', 'rm', 'lw', 'rw', 'st'].forEach(pos => { html += `<div class="flex-row" style="margin-bottom:4px;"><select id="${prefix}_pos" style="flex:2; font-size:11px; margin:0;">${opts}</select><input type="number" id="${prefix}_r_${pos}" style="flex:1; font-size:11px; margin:0; padding:4px;" placeholder="تقييم" step="0.1" max="10" min="0"></div>`; });
                 document.getElementById(containerId).innerHTML = html;
                 setTimeout(() => { ['gk', 'cb', 'lb', 'rb', 'cdm', 'cm', 'cam', 'lm', 'rm', 'lw', 'rw', 'st'].forEach(pos => { let el = document.getElementById(`${prefix}_${pos}`); let rEl = document.getElementById(`${prefix}_r_${pos}`); if(savedSq && savedSq[pos]) { let pData = savedSq[pos]; if(typeof pData === 'object') { el.value = pData.name || ''; rEl.value = pData.rating || ''; } else { el.value = pData; rEl.value = ''; } } }); }, 50);
             };
