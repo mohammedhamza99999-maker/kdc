@@ -82,6 +82,7 @@
             <div class="panel">
                 <button onclick="sendManualPush('انطلاق المباراة! ⚽', 'بدأت الآن مباراة ' + document.getElementById('t1Name').value + ' ضد ' + document.getElementById('t2Name').value)" style="background: var(--primary); color:#fff; border:none; font-size: 15px;"><i class="fa-solid fa-bell"></i> تنبيه بدأ المباراة للجمهور</button>
                 <button onclick="clearLiveMatch()" style="background: transparent; color:#ef4444; border:1px solid #ef4444; margin-top:5px;"><i class="fa-solid fa-trash-can"></i> إفراغ وحذف المباراة المباشرة تماماً</button>
+                <button onclick="clearLiveChat()" style="background: transparent; color:#f59e0b; border:1px solid #f59e0b; margin-top:5px;"><i class="fa-solid fa-comment-slash"></i> تفريغ دردشة المباشر (للمراقبة)</button>
                 
                 <div class="sub-panel" style="margin-top:15px;">
                     <div id="autoSaveMsg1" class="auto-save-indicator"><i class="fa-solid fa-check"></i> تم الحفظ</div>
@@ -238,6 +239,9 @@
                     <div><label>🟥 طرد:</label><input type="number" id="esRed" value="0"></div>
                     <div><label>مباريات:</label><input type="number" id="esMatches" value="0"></div>
                 </div>
+                <div class="flex-row" style="justify-content:center;">
+                    <div style="flex:0.5;"><label style="color:var(--accent);">🛡️ كلين شيت (للحارس):</label><input type="number" id="esCs" value="0" style="border-color:var(--accent);"></div>
+                </div>
                 <button onclick="saveSinglePlayerStats()" style="background:#f59e0b; color:#000; border:none; margin-top:10px;"><i class="fa-solid fa-floppy-disk"></i> حفظ وتحديث الإحصائيات</button>
             </div>
 
@@ -380,8 +384,37 @@
         </div>
 
         <div id="tab-settings" class="tab-content">
+            <div class="panel" style="border-color:#8b5cf6; background:rgba(139, 92, 246, 0.05);">
+                <h2 style="color:#8b5cf6;"><i class="fa-solid fa-bolt"></i> إدارة شريط الأخبار العاجلة</h2>
+                <div style="background:rgba(0,0,0,0.2); padding:10px; border-radius:8px; border:1px solid var(--border);">
+                    <label style="color:var(--text); font-size:12px;">نص الخبر العاجل (يظهر كشريط متحرك للجمهور):</label>
+                    <input type="text" id="newsText" placeholder="مثال: قررت اللجنة المنظمة تأجيل مباراة...">
+                    <label style="color:var(--text); font-size:12px;">رابط الخبر (اختياري - يفتح عند الضغط على الشريط):</label>
+                    <input type="url" id="newsLink" placeholder="https://..." dir="ltr">
+                    <label style="color:var(--text); font-size:12px;">سرعة الشريط (بالثواني - كلما قل الرقم زادت السرعة):</label>
+                    <input type="number" id="newsSpeed" value="25" placeholder="مثال: 25">
+                    <div class="flex-row">
+                        <button onclick="saveNewsText()" style="background:#8b5cf6; color:#fff; margin:0;"><i class="fa-solid fa-paper-plane"></i> نشر الأخبار</button>
+                        <button onclick="clearNewsText()" style="background:transparent; color:#ef4444; border:1px solid #ef4444; margin:0;"><i class="fa-solid fa-eye-slash"></i> إخفاء الشريط</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="panel" style="border-color:var(--primary); background:rgba(59, 130, 246, 0.05);">
+                <h2 style="color:var(--primary);"><i class="fa-solid fa-code-compare"></i> مقارنة اللاعبين (عرض للجمهور)</h2>
+                <div style="font-size:12px; color:var(--muted); text-align:center; margin-bottom:15px;">اختر اللاعبين من هنا ليتم عرض مقارنتهم بشكل مميز في تطبيق الجمهور (بقسم الإحصائيات).</div>
+                <div class="flex-row">
+                    <div style="flex:1;"><label>الفريق 1:</label><select id="compT1" onchange="updateCompPlayers(1)"></select><select id="compP1" style="margin-top:5px;"></select></div>
+                    <div style="flex:1;"><label>الفريق 2:</label><select id="compT2" onchange="updateCompPlayers(2)"></select><select id="compP2" style="margin-top:5px;"></select></div>
+                </div>
+                <div class="flex-row" style="margin-top:10px;">
+                    <button onclick="publishComparison()" style="background:var(--primary); color:#fff; margin:0;"><i class="fa-solid fa-eye"></i> عرض للجمهور</button>
+                    <button onclick="hideComparison()" style="background:transparent; color:#ef4444; border:1px solid #ef4444; margin:0;"><i class="fa-solid fa-eye-slash"></i> إخفاء</button>
+                </div>
+            </div>
+
             <div class="panel" style="border-color:#10b981; background:rgba(16, 185, 129, 0.05);">
-                <h2 style="color:#10b981;"><i class="fa-solid fa-image"></i> إدارة الخلفيات والإعلانات</h2>
+                <h2 style="color:#10b981;"><i class="fa-solid fa-images"></i> إدارة الخلفيات والإعلام</h2>
                 <div style="margin-bottom: 20px;">
                     <label style="color:#fff; font-size:13px;">1. خلفية كارت المباشر (تظهر للجمهور أثناء المباراة):</label>
                     <div class="flex-row">
@@ -391,7 +424,7 @@
                     <div id="liveBgGallery" style="display:flex; gap:10px; overflow-x:auto; margin-top:10px; padding-bottom:10px;"></div>
                 </div>
                 <hr style="border-color:rgba(16, 185, 129, 0.2); margin:15px 0;">
-                <div>
+                <div style="margin-bottom: 20px;">
                     <label style="color:#fff; font-size:13px;">2. المساحة الإعلانية (تظهر للجمهور عند عدم وجود مباراة):</label>
                     <div class="flex-row">
                         <input type="file" id="newAdBgFile" accept="image/*" style="margin:0;">
@@ -407,24 +440,35 @@
                         <button onclick="saveAdDetails()" style="background:var(--primary); color:#fff; width:100%; margin:0;"><i class="fa-solid fa-save"></i> حفظ النص والرابط</button>
                     </div>
                 </div>
+                <hr style="border-color:rgba(16, 185, 129, 0.2); margin:15px 0;">
+                
+                <h3 style="color:#f59e0b; margin-top:20px;">3. قسم الإعلام (المنشورات والتصريحات للجمهور)</h3>
+                <div style="background:rgba(255,255,255,0.05); padding:10px; border-radius:8px; margin-bottom:10px;">
+                    <label style="color:var(--accent);">نشر تصريح أو خبر (صورة + نص):</label>
+                    <input type="file" id="mediaImgInput" accept="image/*">
+                    <textarea id="mediaTextInput" placeholder="اكتب التصريح أو تفاصيل الخبر هنا..." rows="2" style="margin-top:5px;"></textarea>
+                    <button onclick="publishMedia('image_text')" style="background:var(--accent); color:#000; margin:0;"><i class="fa-solid fa-paper-plane"></i> نشر التصريح</button>
+                </div>
+                <div style="background:rgba(255,255,255,0.05); padding:10px; border-radius:8px;">
+                    <label style="color:#3b82f6;">تضمين منشور فيسبوك (لجلب التفاعل):</label>
+                    <textarea id="mediaFbInput" placeholder='الصق كود التضمين (Embed) أو رابط المنشور من فيسبوك هنا...' rows="2" dir="ltr"></textarea>
+                    <button onclick="publishMedia('fb')" style="background:#3b82f6; color:#fff; margin:0;"><i class="fa-brands fa-facebook"></i> نشر المنشور</button>
+                </div>
+                <div id="mediaGallery" style="margin-top:15px; border-top:1px solid var(--border); padding-top:10px; display:flex; flex-direction:column; gap:10px; max-height: 250px; overflow-y:auto;"></div>
             </div>
 
             <div class="panel"><label>اسم عرض البطولة:</label><input type="text" id="tourneyName" value="بطولة دوائر خانقين" onchange="updateVisualName()" style="font-weight:bold; font-size:16px; color:var(--accent);"></div>
-            <div class="panel" style="border-color:#ef4444; background:rgba(239, 68, 68, 0.05);"><h2 style="color:#ef4444; margin-bottom:10px; border:none;"><i class="fa-solid fa-wrench"></i> إصلاح بيانات اللاعبين</h2><div style="font-size:12px; color:var(--text); margin-bottom:15px; text-align:center;">إعادة حساب المباريات بناءً على الأرشيف.</div><button onclick="recalculateMatchesPlayed()" style="background:#ef4444; color:#fff; border:none; margin:0;"><i class="fa-solid fa-calculator"></i> إعادة الحساب</button></div>
+            
+            <div class="panel" style="border-color:#ef4444; background:rgba(239, 68, 68, 0.05);">
+                <h2 style="color:#ef4444; margin-bottom:10px; border:none;"><i class="fa-solid fa-wrench"></i> إصلاح ومزامنة بيانات اللاعبين</h2>
+                <div style="font-size:12px; color:var(--text); margin-bottom:15px; text-align:center;">إعادة حساب المباريات، الأهداف، الصناعة، والبطاقات بالكامل بناءً على الأرشيف.</div>
+                <button onclick="recalculateMatchesPlayed()" style="background:#ef4444; color:#fff; border:none; margin:0;"><i class="fa-solid fa-calculator"></i> إعادة الحساب</button>
+            </div>
+            
             <div class="panel" style="border-color:#facc15;"><h2 style="color:#facc15;"><i class="fa-solid fa-flask"></i> وضع التجربة</h2><div style="background:rgba(255,255,255,0.05); padding:15px; border-radius:8px; margin-bottom:15px;"><label style="color:var(--text); font-size:14px;">تفعيل وضع التجربة</label><select id="testModeSelect" onchange="updateAppSettings()" style="border-color:#facc15; margin:0;"><option value="false">🔴 إيقاف (علني)</option><option value="true">🟡 تفعيل (مخفي)</option></select></div><button onclick="document.getElementById('phonePreviewBox').style.display='block'; document.getElementById('previewIframe').src='index.html';" style="background:#fff; color:#000; border:none; padding:12px; margin-bottom:15px;"><i class="fa-solid fa-mobile-screen"></i> فتح تطبيق الجمهور</button><div id="phonePreviewBox" class="phone-preview-container"><div class="phone-notch"></div><button onclick="document.getElementById('phonePreviewBox').style.display='none'" style="position:absolute; top:2px; right:15px; background:transparent; color:#ef4444; border:none; z-index:20; font-size:18px; width:auto; padding:0;"><i class="fa-solid fa-xmark"></i></button><iframe id="previewIframe" src=""></iframe></div></div>
             <div class="panel"><h2 style="color:var(--text);">نجوم الجولة</h2><div style="background:var(--input-bg); border:1px solid var(--border); border-radius:8px; padding:10px; margin-bottom:10px;"><label style="color:var(--accent);"><i class="fa-solid fa-star"></i> لاعب الجولة:</label><input type="file" id="potwImg" accept="image/*" style="border:none; background:transparent; padding:5px; margin:0;"></div><div style="background:var(--input-bg); border:1px solid var(--border); border-radius:8px; padding:10px; margin-bottom:15px;"><label style="color:var(--primary);"><i class="fa-solid fa-users"></i> تشكيلة الجولة:</label><input type="file" id="totwImg" accept="image/*" style="border:none; background:transparent; padding:5px; margin:0;"></div><button onclick="saveRoundStars()" style="background:linear-gradient(45deg, #d4af37, #b48600); color:#000; border:none;"><i class="fa-solid fa-upload"></i> حفظ وتحديث</button></div>
             <div class="panel"><h2 style="color:var(--primary);">إدارة الحكام</h2><div class="flex-row" style="margin-bottom:10px;"><input type="text" id="newRefName" placeholder="اسم الحكم" style="margin:0;"><div style="background:var(--input-bg); border:1px solid var(--border); border-radius:8px; display:flex; align-items:center; padding:0 10px; flex:1;"><span style="font-size:11px; color:var(--muted);">صورة:</span><input type="file" id="newRefPhoto" accept="image/*" style="border:none; background:transparent; padding:5px; margin:0; width:100%;"></div></div><button onclick="addReferee()"><i class="fa-solid fa-user-plus"></i> حفظ الحكم</button><div id="refereesPreview" class="preview-box" style="padding:0; border:none; background:transparent;"></div></div>
             <div class="panel" style="text-align:center; border-color:var(--primary);"><div style="font-size: 13px; color:var(--muted);"><i class="fa-solid fa-chart-line"></i> زيارات التطبيق</div><div id="visitCount" style="font-size: 45px; font-weight: bold; color:var(--text); margin-top:5px;">0</div></div>
-        </div>
-    </div>
-
-    <div id="adminSquadModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.85); z-index:2000; align-items:center; justify-content:center; overflow-y:auto; padding:20px; box-sizing:border-box;">
-        <div style="background:var(--card); width:100%; max-width:400px; padding:20px; border-radius:12px; border:1px solid var(--primary);">
-            <h3 id="sqModalTitle" style="color:var(--primary); text-align:center; margin-top:0;">إدارة تشكيلة الفريق</h3>
-            <div id="liveSquadCtr" style="border:1px solid var(--border); padding:15px; border-radius:8px; margin-bottom:15px; max-height:400px; overflow-y:auto;"></div>
-            <label style="display:flex; align-items:center; gap:8px; font-size:13px; color:var(--accent); margin-bottom:15px; cursor:pointer;"><input type="checkbox" id="notifySquad" checked style="width:20px; height:20px; margin:0;"> إرسال إشعار</label>
-            <button onclick="saveAdminSquad()" style="background:var(--primary); color:#fff; width:100%; padding:12px; border-radius:8px; border:none; margin-bottom:10px; font-weight:bold;"><i class="fa-solid fa-save"></i> حفظ التشكيلة والتقييمات</button>
-            <button onclick="document.getElementById('adminSquadModal').style.display='none'" style="background:transparent; color:#ef4444; width:100%; border:1px solid #ef4444; padding:10px; border-radius:8px;">إلغاء</button>
         </div>
     </div>
 
@@ -444,9 +488,21 @@
                 <div><label>النظام:</label><select id="arcLeg" style="margin-bottom:0;"><option value="">مباراة واحدة</option><option value="ذهاب">ذهاب</option><option value="إياب">إياب</option></select></div>
             </div>
             
-            <label>سجل الأحداث:</label><textarea id="arcEvents" rows="3"></textarea>
+            <label style="color:#10b981;">سجل الأحداث (يمكنك إضافة أو تعديل أو مسح الأهداف والبطاقات من هنا):</label>
+            <textarea id="arcEvents" rows="4" placeholder="مثال: ⚽ 15' اسم اللاعب (فريق)"></textarea>
+            
             <div style="margin-top:15px; padding:10px; border:1px solid var(--primary); border-radius:8px; background:rgba(59, 130, 246, 0.05);"><h4 style="margin:0 0 10px; color:var(--primary); font-size:14px; text-align:center;">التشكيلة والتقييمات</h4><div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;"><div id="arcSq1Ctr"></div><div id="arcSq2Ctr"></div></div></div>
-            <div class="flex-row" style="margin-top:15px;"><button onclick="saveArchiveEdit()" style="background:#10b981; color:#000;">حفظ</button><button onclick="document.getElementById('archiveModal').style.display='none'" style="background:transparent; border-color:#ef4444; color:#ef4444;">إلغاء</button></div>
+            <div class="flex-row" style="margin-top:15px;"><button onclick="saveArchiveEdit()" style="background:#10b981; color:#000;">حفظ التعديلات</button><button onclick="document.getElementById('archiveModal').style.display='none'" style="background:transparent; border-color:#ef4444; color:#ef4444;">إلغاء</button></div>
+        </div>
+    </div>
+
+    <div id="adminSquadModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.85); z-index:2000; align-items:center; justify-content:center; overflow-y:auto; padding:20px; box-sizing:border-box;">
+        <div style="background:var(--card); width:100%; max-width:400px; padding:20px; border-radius:12px; border:1px solid var(--primary);">
+            <h3 id="sqModalTitle" style="color:var(--primary); text-align:center; margin-top:0;">إدارة تشكيلة الفريق</h3>
+            <div id="liveSquadCtr" style="border:1px solid var(--border); padding:15px; border-radius:8px; margin-bottom:15px; max-height:400px; overflow-y:auto;"></div>
+            <label style="display:flex; align-items:center; gap:8px; font-size:13px; color:var(--accent); margin-bottom:15px; cursor:pointer;"><input type="checkbox" id="notifySquad" checked style="width:20px; height:20px; margin:0;"> إرسال إشعار</label>
+            <button onclick="saveAdminSquad()" style="background:var(--primary); color:#fff; width:100%; padding:12px; border-radius:8px; border:none; margin-bottom:10px; font-weight:bold;"><i class="fa-solid fa-save"></i> حفظ التشكيلة والتقييمات</button>
+            <button onclick="document.getElementById('adminSquadModal').style.display='none'" style="background:transparent; color:#ef4444; width:100%; border:1px solid #ef4444; padding:10px; border-radius:8px;">إلغاء</button>
         </div>
     </div>
 
@@ -455,9 +511,7 @@
         firebase.initializeApp(firebaseConfig); const db = firebase.database(); 
         
         let dbPath = "Khanaqin_Tournament_Official";
-        try {
-            dbPath = localStorage.getItem('activeDbPath') || "Khanaqin_Tournament_Official";
-        } catch(e) { console.log("Local storage restricted"); }
+        try { dbPath = localStorage.getItem('activeDbPath') || "Khanaqin_Tournament_Official"; } catch(e) { console.log("Local storage restricted"); }
 
         let testModeActive = false; let allData = {}; let adminClockInterval; let isInternalUpdate = false;
         let posActiveTeam = 0; let posSec1 = 0; let posSec2 = 0;
@@ -506,17 +560,93 @@
             let file = document.getElementById(inputId).files[0]; if(!file) return alert('الرجاء اختيار صورة!');
             document.getElementById('autoSaveMsg1').innerText = "جاري الرفع..."; document.getElementById('autoSaveMsg1').classList.add('show');
             let b64 = await compressImage(file);
-            db.ref(`tournaments/${dbPath}/gallery/${type}`).push(b64).then(() => { document.getElementById(inputId).value = ''; document.getElementById('autoSaveMsg1').classList.remove('show'); alert('تم الرفع بنجاح! اختر الصورة من المعرض.'); });
+            db.ref(`tournaments/${dbPath}/gallery/${type}`).push(b64).then(() => { document.getElementById(inputId).value = ''; document.getElementById('autoSaveMsg1').classList.remove('show'); alert('تم الرفع بنجاح!'); });
         }
         window.setActiveBg = function(type, b64) { db.ref(`tournaments/${dbPath}/settings/active_${type}`).set(b64).then(() => alert('تم التفعيل!')); }
         window.deleteGalleryBg = function(type, key) { if(confirm('متأكد من حذف الصورة؟')) { db.ref(`tournaments/${dbPath}/gallery/${type}/${key}`).remove(); db.ref(`tournaments/${dbPath}/settings/active_${type}`).once('value').then(s => { db.ref(`tournaments/${dbPath}/gallery/${type}/${key}`).once('value').then(imgSnap => { if(s.val() === imgSnap.val()) db.ref(`tournaments/${dbPath}/settings/active_${type}`).remove(); }); }); } }
-        function saveAdDetails() { db.ref(`tournaments/${dbPath}/settings`).update({ adText: document.getElementById('adText').value, adLink: document.getElementById('adLink').value }).then(() => alert('تم حفظ نص ورابط الإعلان!')); }
+        
+        // إعدادات الإعلام (FB & التصاريح)
+        async function publishMedia(type) {
+            document.getElementById('autoSaveMsg1').innerText = "جاري النشر..."; document.getElementById('autoSaveMsg1').classList.add('show');
+            let post = { type: type, time: Date.now() };
+            if(type === 'image_text') {
+                let file = document.getElementById('mediaImgInput').files[0];
+                let text = document.getElementById('mediaTextInput').value.trim();
+                if(!file && !text) return alert("أدخل صورة أو نص للإرسال!");
+                if(file) post.image = await compressImage(file);
+                post.text = text;
+            } else if (type === 'fb') {
+                let embed = document.getElementById('mediaFbInput').value.trim();
+                if(!embed) return alert("أدخل رابط أو كود المنشور!");
+                if(embed.includes('<iframe') || embed.includes('fb-post')) {
+                    post.embedCode = embed;
+                } else if(embed.startsWith('http')) {
+                   post.embedCode = `<iframe src="https://www.facebook.com/plugins/post.php?href=${encodeURIComponent(embed)}&show_text=true&width=500" width="100%" height="400" style="border:none;overflow:hidden" scrolling="no" frameborder="0" allowfullscreen="true" allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share"></iframe>`;
+                } else {
+                    return alert("يرجى وضع رابط فيسبوك صحيح أو كود تضمين!");
+                }
+            }
+            db.ref(`tournaments/${dbPath}/media_posts`).push(post).then(() => {
+                document.getElementById('mediaImgInput').value = '';
+                document.getElementById('mediaTextInput').value = '';
+                document.getElementById('mediaFbInput').value = '';
+                document.getElementById('autoSaveMsg1').classList.remove('show');
+                alert("تم النشر للجمهور بنجاح!");
+            });
+        }
+        
+        db.ref(`tournaments/${dbPath}/media_posts`).on('value', snap => {
+            let cont = document.getElementById('mediaGallery'); if(!cont) return; cont.innerHTML = '';
+            let d = snap.val();
+            if(d) {
+                Object.keys(d).reverse().forEach(k => {
+                    let post = d[k];
+                    let previewHtml = post.type === 'fb' ? `<div style="font-size:11px; color:#3b82f6;"><i class="fab fa-facebook"></i> منشور فيسبوك مدمج</div>` : `<div style="display:flex; gap:10px;"><img src="${post.image||''}" style="width:40px;height:40px;object-fit:cover;border-radius:4px;"> <div style="font-size:11px; overflow:hidden;">${post.text||'صورة فقط'}</div></div>`;
+                    cont.innerHTML += `<div class="preview-item" style="border:1px solid #3f3f46; padding:8px; margin-bottom:5px; border-radius:5px;"><div class="preview-item-header"><div style="flex:1;">${previewHtml}</div><button class="del-btn" onclick="deleteItem('media_posts/${k}')"><i class="fa-solid fa-trash"></i></button></div></div>`;
+                });
+            } else { cont.innerHTML = '<div style="font-size:11px; color:var(--muted); text-align:center;">لا توجد منشورات.</div>'; }
+        });
+
+        function saveAdDetails() { db.ref(`tournaments/${dbPath}/settings`).update({ adText: document.getElementById('adText').value, adLink: document.getElementById('adLink').value }).then(() => alert('تم حفظ الإعلان!')); }
+
+        // الأخبار والسرعة والرابط
+        function saveNewsText() { 
+            db.ref(`tournaments/${dbPath}/settings`).update({ 
+                newsText: document.getElementById('newsText').value,
+                newsLink: document.getElementById('newsLink').value,
+                newsSpeed: parseInt(document.getElementById('newsSpeed').value) || 25
+            }).then(() => alert('تم نشر الخبر العاجل بنجاح!')); 
+        }
+        function clearNewsText() { db.ref(`tournaments/${dbPath}/settings`).update({ newsText: '', newsLink: '' }).then(() => { document.getElementById('newsText').value = ''; document.getElementById('newsLink').value = ''; alert('تم إخفاء شريط الأخبار العاجلة!'); }); }
+        
+        function clearLiveChat() { if(confirm("تأكيد مسح جميع تعليقات الدردشة المباشرة؟")) { db.ref(`tournaments/${dbPath}/live_match/chat`).remove().then(() => alert("تم مسح الدردشة بنجاح!")); } }
+
+        // تحكم مقارنة اللاعبين
+        function updateCompPlayers(num) {
+            let tName = document.getElementById(`compT${num}`).value;
+            let pSelect = document.getElementById(`compP${num}`);
+            let opts = '<option value="">اختر اللاعب...</option>';
+            if(tName && allData.teams && allData.teams[tName] && allData.teams[tName].players) {
+                for(let p in allData.teams[tName].players) opts += `<option value="${p}">${p}</option>`;
+            }
+            pSelect.innerHTML = opts;
+        }
+        function publishComparison() {
+            let t1 = document.getElementById('compT1').value, p1 = document.getElementById('compP1').value;
+            let t2 = document.getElementById('compT2').value, p2 = document.getElementById('compP2').value;
+            if(!t1 || !p1 || !t2 || !p2) return alert("اختر اللاعبين بالكامل!");
+            db.ref(`tournaments/${dbPath}/settings/activeComparison`).set({ t1, p1, t2, p2, active: true }).then(()=>alert("تم عرض المقارنة للجمهور في قسم الإحصائيات!"));
+        }
+        function hideComparison() { db.ref(`tournaments/${dbPath}/settings/activeComparison`).remove().then(()=>alert("تم إخفاء المقارنة عن الجمهور!")); }
 
         db.ref(`tournaments/${dbPath}/settings`).on('value', snap => {
             let s = snap.val() || {}; testModeActive = s.testMode === true; let tmEl = document.getElementById('testModeSelect'); if(tmEl) tmEl.value = testModeActive ? 'true' : 'false';
             document.getElementById('testModeBanner').style.display = testModeActive ? 'block' : 'none'; if(s.systemType && document.getElementById('tourneySystemType')) document.getElementById('tourneySystemType').value = s.systemType;
             window.currentActiveLiveBg = s.active_liveBg; window.currentActiveAdBg = s.active_adBg;
             if(document.getElementById('adText')) document.getElementById('adText').value = s.adText || ''; if(document.getElementById('adLink')) document.getElementById('adLink').value = s.adLink || '';
+            if(document.getElementById('newsText')) document.getElementById('newsText').value = s.newsText || '';
+            if(document.getElementById('newsLink')) document.getElementById('newsLink').value = s.newsLink || '';
+            if(document.getElementById('newsSpeed')) document.getElementById('newsSpeed').value = s.newsSpeed || 25;
         });
 
         db.ref(`tournaments/${dbPath}/gallery`).on('value', snap => {
@@ -635,9 +765,9 @@
         }
 
         function updateEditStatPlayers() { const tName = document.getElementById('editStatTeam').value; let pOpts = '<option value="">اختر اللاعب...</option>'; if(tName && allData.teams && allData.teams[tName] && allData.teams[tName].players) { for(let p in allData.teams[tName].players) pOpts += `<option value="${p}">${p}</option>`; } document.getElementById('editStatPlayer').innerHTML = pOpts; clearSinglePlayerStats(); }
-        function loadSinglePlayerStats() { const tName = document.getElementById('editStatTeam').value; const pName = document.getElementById('editStatPlayer').value; if(!tName || !pName) return clearSinglePlayerStats(); const p = allData.teams[tName].players[pName]; document.getElementById('esGoals').value = p.goals || 0; document.getElementById('esAssists').value = p.assists || 0; document.getElementById('esMotm').value = p.motm || 0; document.getElementById('esYellow').value = p.yellow || 0; document.getElementById('esRed').value = p.red || 0; document.getElementById('esMatches').value = p.matches || 0; }
-        function clearSinglePlayerStats() { document.getElementById('esGoals').value = 0; document.getElementById('esAssists').value = 0; document.getElementById('esMotm').value = 0; document.getElementById('esYellow').value = 0; document.getElementById('esRed').value = 0; document.getElementById('esMatches').value = 0; }
-        function saveSinglePlayerStats() { const tName = document.getElementById('editStatTeam').value; const pName = document.getElementById('editStatPlayer').value; if(!tName || !pName) return alert("الرجاء اختيار الفريق واللاعب أولاً"); const updates = { goals: parseInt(document.getElementById('esGoals').value) || 0, assists: parseInt(document.getElementById('esAssists').value) || 0, motm: parseInt(document.getElementById('esMotm').value) || 0, yellow: parseInt(document.getElementById('esYellow').value) || 0, red: parseInt(document.getElementById('esRed').value) || 0, matches: parseInt(document.getElementById('esMatches').value) || 0 }; db.ref(`tournaments/${dbPath}/teams/${tName}/players/${pName}`).update(updates).then(() => { alert("تم تحديث إحصائيات اللاعب بنجاح! 🚀"); }).catch(e => alert("حدث خطأ أثناء الحفظ")); }
+        function loadSinglePlayerStats() { const tName = document.getElementById('editStatTeam').value; const pName = document.getElementById('editStatPlayer').value; if(!tName || !pName) return clearSinglePlayerStats(); const p = allData.teams[tName].players[pName]; document.getElementById('esGoals').value = p.goals || 0; document.getElementById('esAssists').value = p.assists || 0; document.getElementById('esMotm').value = p.motm || 0; document.getElementById('esYellow').value = p.yellow || 0; document.getElementById('esRed').value = p.red || 0; document.getElementById('esMatches').value = p.matches || 0; document.getElementById('esCs').value = p.cs || 0; }
+        function clearSinglePlayerStats() { document.getElementById('esGoals').value = 0; document.getElementById('esAssists').value = 0; document.getElementById('esMotm').value = 0; document.getElementById('esYellow').value = 0; document.getElementById('esRed').value = 0; document.getElementById('esMatches').value = 0; document.getElementById('esCs').value = 0; }
+        function saveSinglePlayerStats() { const tName = document.getElementById('editStatTeam').value; const pName = document.getElementById('editStatPlayer').value; if(!tName || !pName) return alert("الرجاء اختيار الفريق واللاعب أولاً"); const updates = { goals: parseInt(document.getElementById('esGoals').value) || 0, assists: parseInt(document.getElementById('esAssists').value) || 0, motm: parseInt(document.getElementById('esMotm').value) || 0, yellow: parseInt(document.getElementById('esYellow').value) || 0, red: parseInt(document.getElementById('esRed').value) || 0, matches: parseInt(document.getElementById('esMatches').value) || 0, cs: parseInt(document.getElementById('esCs').value) || 0 }; db.ref(`tournaments/${dbPath}/teams/${tName}/players/${pName}`).update(updates).then(() => { alert("تم تحديث إحصائيات اللاعب بنجاح! 🚀"); }).catch(e => alert("حدث خطأ أثناء الحفظ")); }
 
         window.deleteItem = function(path) { if(confirm('تأكيد: هل أنت متأكد من الحذف نهائياً؟')) { db.ref(`tournaments/${dbPath}/${path}`).remove().then(() => { alert("تم الحذف! 🗑️"); if(typeof renderFullAdminPreviews === "function") renderFullAdminPreviews(); }).catch(err => alert("خطأ: " + err.message)); } };
 
@@ -648,7 +778,7 @@
             document.getElementById('mEvents').value = live.events || ''; document.getElementById('mStatus').value = live.status || 'لم تبدأ'; 
             document.getElementById('mRound').value = live.round || ''; document.getElementById('mLeg').value = live.leg || ''; document.getElementById('mGroup').value = live.groupInfo || '';
             document.getElementById('mRef1').value = live.referee1 || ''; document.getElementById('mRef2').value = live.referee2 || ''; document.getElementById('mRef3').value = live.referee3 || ''; document.getElementById('mRef4').value = live.referee4 || ''; 
-            if(document.getElementById('mCustomLabel')) document.getElementById('mCustomLabel').value = live.customLabel || ''; // <-- تحميل النص المخصص الجديد
+            if(document.getElementById('mCustomLabel')) document.getElementById('mCustomLabel').value = live.customLabel || ''; 
             
             const stats = live.stats || {posSec1: 0, posSec2: 0, possession1: 50, possession2: 50, shots1: 0, shots2: 0, corners1: 0, corners2: 0, fouls1: 0, fouls2: 0};
             posSec1 = stats.posSec1 || 0; posSec2 = stats.posSec2 || 0;
@@ -658,7 +788,7 @@
             document.getElementById('fouls1').value = stats.fouls1 || 0; document.getElementById('fouls2').value = stats.fouls2 || 0;
 
             let opts = '<option value="">اختر الفريق...</option>'; if(allData.teams) for(let t in allData.teams) opts += `<option value="${t}">${t}</option>`;
-            ['t1Name','t2Name','gTeam'].forEach(id => { let el = document.getElementById(id); let currentVal = el.value; el.innerHTML = opts; if(currentVal) el.value = currentVal; });
+            ['t1Name','t2Name','gTeam','compT1','compT2'].forEach(id => { let el = document.getElementById(id); if(!el) return; let currentVal = el.value; el.innerHTML = opts; if(currentVal) el.value = currentVal; });
             let esTeam = document.getElementById('editStatTeam'); let currEsTeam = esTeam.value; esTeam.innerHTML = opts; if(currEsTeam) esTeam.value = currEsTeam;
             filterTeamsByGroup('sGroup', 'sTeam1', 'sTeam2'); filterTeamsByGroup('gmGroup', 'gmTeam1', 'gmTeam2');
             if(live.team1) document.getElementById('t1Name').value = live.team1; if(live.team2) document.getElementById('t2Name').value = live.team2;
@@ -774,7 +904,7 @@
                 let pFile = document.getElementById('pImg'+i).files[0]; 
                 let pPos = document.getElementById('pPos'+i).value;
                 if (pName) { 
-                    let pStats = {goals:0, assists:0, yellow:0, red:0, matches:0, motm:0}; 
+                    let pStats = {goals:0, assists:0, yellow:0, red:0, matches:0, motm:0, cs:0}; 
                     if(allData && allData.teams && allData.teams[tName] && allData.teams[tName].players && allData.teams[tName].players[pName]) { pStats = allData.teams[tName].players[pName]; } 
                     pStats.position = pPos;
                     if(pFile) { try { pStats.photo = await compressImage(pFile); } catch(e){} } 
@@ -989,24 +1119,71 @@
         function loadScheduledToLive(id) { const match = allData.schedule[id]; if(!match) return; if(confirm(`بدء المباراة ونقلها للمباشر؟ (ستُحذف من الجدول)`)) { isInternalUpdate = true; db.ref(`tournaments/${dbPath}/live_match`).update({ team1: match.team1, team2: match.team2, round: match.round || '', leg: match.leg || '', groupInfo: match.group || '', status: 'الشوط الأول', score1: 0, score2: 0, events: '', referee1: match.referee1 || '', referee2: match.referee2 || '', referee3: match.referee3 || '', referee4: match.referee4 || '', timer: { isRunning: false, savedSeconds: 0, startTime: 0 }, stats: {posSec1:0, posSec2:0, possession1: 50, possession2: 50, shots1: 0, shots2: 0, corners1: 0, corners2: 0, fouls1: 0, fouls2: 0} }).then(() => { db.ref(`tournaments/${dbPath}/schedule/${id}`).remove(); alert("بدأت المباراة!"); openTab('tab-live', document.querySelectorAll('.tab-btn')[0]); isInternalUpdate = false; }).catch(e => { alert("حدث خطأ."); isInternalUpdate = false; }); } }
         function loadGroupMatchupToLive(id) { const match = allData.group_matchups[id]; if(!match) return; if(confirm(`بدء المباراة ونقلها للمباشر؟`)) { isInternalUpdate = true; db.ref(`tournaments/${dbPath}/live_match`).update({ team1: match.team1, team2: match.team2, round: match.round || '', leg: match.leg || '', groupInfo: match.group || '', status: 'الشوط الأول', score1: 0, score2: 0, events: '', referee1: '', referee2: '', referee3: '', referee4: '', timer: { isRunning: false, savedSeconds: 0, startTime: 0 }, stats: {posSec1:0, posSec2:0, possession1: 50, possession2: 50, shots1: 0, shots2: 0, corners1: 0, corners2: 0, fouls1: 0, fouls2: 0} }).then(() => { alert("بدأت المباراة!"); openTab('tab-live', document.querySelectorAll('.tab-btn')[0]); isInternalUpdate = false; }); } }
 
+        // التحديث الجديد: إعادة حساب الأهداف والبطاقات بالإضافة للمباريات
         async function recalculateMatchesPlayed() {
-            if(!confirm("إعادة حساب 'المباريات الملعوبة' لجميع اللاعبين؟")) return;
+            if(!confirm("إعادة حساب جميع إحصائيات اللاعبين (أهداف، صناعة، بطاقات، مباريات) بناءً على الأرشيف؟")) return;
             let teamsTemp = JSON.parse(JSON.stringify(allData.teams || {}));
-            for(let t in teamsTemp) { if(teamsTemp[t].players) { for(let p in teamsTemp[t].players) { teamsTemp[t].players[p].matches = 0; } } }
+            
+            // تصفير الإحصائيات
+            for(let t in teamsTemp) {
+                if(teamsTemp[t].players) {
+                    for(let p in teamsTemp[t].players) {
+                        teamsTemp[t].players[p].matches = 0;
+                        teamsTemp[t].players[p].goals = 0;
+                        teamsTemp[t].players[p].assists = 0;
+                        teamsTemp[t].players[p].yellow = 0;
+                        teamsTemp[t].players[p].red = 0;
+                        teamsTemp[t].players[p].motm = 0;
+                        // الكلين شيت يبقى كما هو (يحتاج تعديل يدوي لأنه يعتمد على وقت مشاركة الحارس)
+                    }
+                }
+            }
             
             let archive = allData.saved_matches || {};
             for(let key in archive) {
-                let m = archive[key]; let t1 = m.team1, t2 = m.team2; let sq1 = m.squad1 || {}; let sq2 = m.squad2 || {};
-                if(t1 && teamsTemp[t1] && teamsTemp[t1].players) {
-                    if(Object.keys(sq1).length === 0) { for(let p in teamsTemp[t1].players) teamsTemp[t1].players[p].matches++; } 
-                    else { Object.values(sq1).forEach(pData => { let pName = typeof pData === 'object' ? pData.name : pData; if(pName && teamsTemp[t1].players[pName]) teamsTemp[t1].players[pName].matches++; }); }
+                let m = archive[key]; let t1 = m.team1, t2 = m.team2;
+                let sq1 = m.squad1 || {}; let sq2 = m.squad2 || {};
+                
+                // حساب المباريات
+                const processSquadMatches = (tName, squad) => {
+                     if(tName && teamsTemp[tName] && teamsTemp[tName].players) {
+                        if(Object.keys(squad).length === 0) {
+                            for(let p in teamsTemp[tName].players) teamsTemp[tName].players[p].matches++;
+                        } else {
+                            Object.values(squad).forEach(pData => {
+                                let pName = typeof pData === 'object' ? pData.name : pData;
+                                if(pName && teamsTemp[tName].players[pName]) teamsTemp[tName].players[pName].matches++;
+                            });
+                        }
+                    }
+                };
+                processSquadMatches(t1, sq1); processSquadMatches(t2, sq2);
+
+                // حساب رجل المباراة (MOTM)
+                if(m.motmTeam && m.motm && teamsTemp[m.motmTeam]?.players?.[m.motm]) {
+                    teamsTemp[m.motmTeam].players[m.motm].motm++;
                 }
-                if(t2 && teamsTemp[t2] && teamsTemp[t2].players) {
-                    if(Object.keys(sq2).length === 0) { for(let p in teamsTemp[t2].players) teamsTemp[t2].players[p].matches++; } 
-                    else { Object.values(sq2).forEach(pData => { let pName = typeof pData === 'object' ? pData.name : pData; if(pName && teamsTemp[t2].players[pName]) teamsTemp[t2].players[pName].matches++; }); }
+
+                // حساب الأهداف والصناعة والبطاقات من سجل الأحداث
+                if(m.events) {
+                    let lines = m.events.split('\n');
+                    lines.forEach(line => {
+                        let teamInLine = t1;
+                        if(line.includes(`(${t2})`)) teamInLine = t2;
+                        else if(line.includes(`(${t1})`)) teamInLine = t1;
+
+                        for(let p in teamsTemp[teamInLine]?.players || {}) {
+                            if(line.includes(p)) {
+                                if(line.includes('⚽') && !line.includes('عكسي') && !line.includes('OG')) teamsTemp[teamInLine].players[p].goals++;
+                                if(line.includes('🅰️')) teamsTemp[teamInLine].players[p].assists++;
+                                if(line.includes('🟨')) teamsTemp[teamInLine].players[p].yellow++;
+                                if(line.includes('🟥')) teamsTemp[teamInLine].players[p].red++;
+                            }
+                        }
+                    });
                 }
             }
-            db.ref(`tournaments/${dbPath}/teams`).update(teamsTemp).then(() => { alert("تم الإصلاح بنجاح!"); }).catch(e => alert("حدث خطأ!"));
+            db.ref(`tournaments/${dbPath}/teams`).update(teamsTemp).then(() => { alert("تم إعادة حساب وتحديث كل الإحصائيات بنجاح! ✅"); }).catch(e => alert("حدث خطأ!"));
         }
     </script>
 </body>
