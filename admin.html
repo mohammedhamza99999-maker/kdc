@@ -249,6 +249,19 @@
         </div>
 
         <div id="tab-groups" class="tab-content">
+            <div class="panel" style="border-color:var(--accent);">
+                <h2><i class="fa-solid fa-list-ol"></i> معايير ترتيب المجموعات</h2>
+                <p style="font-size:11px; color:var(--muted); text-align:center;">اختر الترتيب لكسر التعادل، ثم اضغط على زر الإعادة لحساب الترتيب من الصفر بدقة.</p>
+                <div id="criteriaContainer" style="margin-bottom: 15px;">
+                    <div class="flex-row" style="background:var(--input-bg); padding:10px; border-radius:8px; border:1px solid var(--border);"><div style="width:25px;height:25px;background:var(--primary);border-radius:50%;text-align:center;line-height:25px;font-weight:bold;color:#fff;">1</div><select id="crit1" style="margin:0;"><option value="points">النقاط (أساسي)</option></select></div>
+                    <div class="flex-row" style="background:var(--input-bg); padding:10px; border-radius:8px; border:1px solid var(--border);"><div style="width:25px;height:25px;background:var(--primary);border-radius:50%;text-align:center;line-height:25px;font-weight:bold;color:#fff;">2</div><select id="crit2" style="margin:0;"><option value="h2h">المواجهات المباشرة</option><option value="gd">فارق الأهداف</option><option value="gf">الأهداف المسجلة (له)</option><option value="fp">اللعب النظيف</option></select></div>
+                    <div class="flex-row" style="background:var(--input-bg); padding:10px; border-radius:8px; border:1px solid var(--border);"><div style="width:25px;height:25px;background:var(--primary);border-radius:50%;text-align:center;line-height:25px;font-weight:bold;color:#fff;">3</div><select id="crit3" style="margin:0;"><option value="gd">فارق الأهداف</option><option value="h2h">المواجهات المباشرة</option><option value="gf">الأهداف المسجلة (له)</option><option value="fp">اللعب النظيف</option></select></div>
+                    <div class="flex-row" style="background:var(--input-bg); padding:10px; border-radius:8px; border:1px solid var(--border);"><div style="width:25px;height:25px;background:var(--primary);border-radius:50%;text-align:center;line-height:25px;font-weight:bold;color:#fff;">4</div><select id="crit4" style="margin:0;"><option value="gf">الأهداف المسجلة (له)</option><option value="gd">فارق الأهداف</option><option value="h2h">المواجهات المباشرة</option><option value="fp">اللعب النظيف</option></select></div>
+                    <div class="flex-row" style="background:var(--input-bg); padding:10px; border-radius:8px; border:1px solid var(--border);"><div style="width:25px;height:25px;background:var(--primary);border-radius:50%;text-align:center;line-height:25px;font-weight:bold;color:#fff;">5</div><select id="crit5" style="margin:0;"><option value="fp">اللعب النظيف (أقل كروت)</option><option value="gf">الأهداف المسجلة (له)</option><option value="gd">فارق الأهداف</option><option value="h2h">المواجهات المباشرة</option></select></div>
+                </div>
+                <button onclick="recalculateAllGroupsStandings()" style="background:#10b981; color:#000; border:none;"><i class="fa-solid fa-sync"></i> إعادة حساب وبناء المجموعات تلقائياً</button>
+            </div>
+            
             <div class="panel">
                 <div style="font-size:12px; color:var(--accent); text-align:center; margin-bottom:15px; padding:10px; background:rgba(74,222,128,0.1); border-radius:8px; border:1px solid var(--accent);">لإضافة فريق جديد للمجموعة وتصفير أرقامه، اختر الفريق واضغط إرسال.</div>
                 <div class="flex-row">
@@ -451,7 +464,7 @@
                 </div>
                 <div style="background:rgba(255,255,255,0.05); padding:10px; border-radius:8px;">
                     <label style="color:#3b82f6;">تضمين منشور فيسبوك (لجلب التفاعل):</label>
-                    <textarea id="mediaFbInput" placeholder='الصق كود التضمين (Embed) أو رابط المنشور من فيسبوك هنا...' rows="2" dir="ltr"></textarea>
+                    <textarea id="mediaFbInput" placeholder='الصق رابط منشور الفيسبوك هنا (سيتم تحويله تلقائياً)...' rows="2" dir="ltr"></textarea>
                     <button onclick="publishMedia('fb')" style="background:#3b82f6; color:#fff; margin:0;"><i class="fa-brands fa-facebook"></i> نشر المنشور</button>
                 </div>
                 <div id="mediaGallery" style="margin-top:15px; border-top:1px solid var(--border); padding-top:10px; display:flex; flex-direction:column; gap:10px; max-height: 250px; overflow-y:auto;"></div>
@@ -462,7 +475,7 @@
             <div class="panel" style="border-color:#ef4444; background:rgba(239, 68, 68, 0.05);">
                 <h2 style="color:#ef4444; margin-bottom:10px; border:none;"><i class="fa-solid fa-wrench"></i> إصلاح ومزامنة بيانات اللاعبين</h2>
                 <div style="font-size:12px; color:var(--text); margin-bottom:15px; text-align:center;">إعادة حساب المباريات، الأهداف، الصناعة، والبطاقات بالكامل بناءً على الأرشيف.</div>
-                <button onclick="recalculateMatchesPlayed()" style="background:#ef4444; color:#fff; border:none; margin:0;"><i class="fa-solid fa-calculator"></i> إعادة الحساب</button>
+                <button onclick="recalculateMatchesPlayed()" style="background:#ef4444; color:#fff; border:none; margin:0;"><i class="fa-solid fa-calculator"></i> بدء المزامنة الشاملة</button>
             </div>
             
             <div class="panel" style="border-color:#facc15;"><h2 style="color:#facc15;"><i class="fa-solid fa-flask"></i> وضع التجربة</h2><div style="background:rgba(255,255,255,0.05); padding:15px; border-radius:8px; margin-bottom:15px;"><label style="color:var(--text); font-size:14px;">تفعيل وضع التجربة</label><select id="testModeSelect" onchange="updateAppSettings()" style="border-color:#facc15; margin:0;"><option value="false">🔴 إيقاف (علني)</option><option value="true">🟡 تفعيل (مخفي)</option></select></div><button onclick="document.getElementById('phonePreviewBox').style.display='block'; document.getElementById('previewIframe').src='index.html';" style="background:#fff; color:#000; border:none; padding:12px; margin-bottom:15px;"><i class="fa-solid fa-mobile-screen"></i> فتح تطبيق الجمهور</button><div id="phonePreviewBox" class="phone-preview-container"><div class="phone-notch"></div><button onclick="document.getElementById('phonePreviewBox').style.display='none'" style="position:absolute; top:2px; right:15px; background:transparent; color:#ef4444; border:none; z-index:20; font-size:18px; width:auto; padding:0;"><i class="fa-solid fa-xmark"></i></button><iframe id="previewIframe" src=""></iframe></div></div>
@@ -565,7 +578,6 @@
         window.setActiveBg = function(type, b64) { db.ref(`tournaments/${dbPath}/settings/active_${type}`).set(b64).then(() => alert('تم التفعيل!')); }
         window.deleteGalleryBg = function(type, key) { if(confirm('متأكد من حذف الصورة؟')) { db.ref(`tournaments/${dbPath}/gallery/${type}/${key}`).remove(); db.ref(`tournaments/${dbPath}/settings/active_${type}`).once('value').then(s => { db.ref(`tournaments/${dbPath}/gallery/${type}/${key}`).once('value').then(imgSnap => { if(s.val() === imgSnap.val()) db.ref(`tournaments/${dbPath}/settings/active_${type}`).remove(); }); }); } }
         
-        // إعدادات الإعلام (FB & التصاريح)
         async function publishMedia(type) {
             document.getElementById('autoSaveMsg1').innerText = "جاري النشر..."; document.getElementById('autoSaveMsg1').classList.add('show');
             let post = { type: type, time: Date.now() };
@@ -581,7 +593,8 @@
                 if(embed.includes('<iframe') || embed.includes('fb-post')) {
                     post.embedCode = embed;
                 } else if(embed.startsWith('http')) {
-                   post.embedCode = `<iframe src="https://www.facebook.com/plugins/post.php?href=${encodeURIComponent(embed)}&show_text=true&width=500" width="100%" height="400" style="border:none;overflow:hidden" scrolling="no" frameborder="0" allowfullscreen="true" allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share"></iframe>`;
+                   let cleanUrl = embed.split('?')[0];
+                   post.embedCode = `<iframe src="https://www.facebook.com/plugins/post.php?href=${encodeURIComponent(cleanUrl)}&show_text=true&width=500" width="100%" height="400" style="border:none;overflow:hidden" scrolling="no" frameborder="0" allowfullscreen="true" allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share"></iframe>`;
                 } else {
                     return alert("يرجى وضع رابط فيسبوك صحيح أو كود تضمين!");
                 }
@@ -609,7 +622,6 @@
 
         function saveAdDetails() { db.ref(`tournaments/${dbPath}/settings`).update({ adText: document.getElementById('adText').value, adLink: document.getElementById('adLink').value }).then(() => alert('تم حفظ الإعلان!')); }
 
-        // الأخبار والسرعة والرابط
         function saveNewsText() { 
             db.ref(`tournaments/${dbPath}/settings`).update({ 
                 newsText: document.getElementById('newsText').value,
@@ -621,7 +633,6 @@
         
         function clearLiveChat() { if(confirm("تأكيد مسح جميع تعليقات الدردشة المباشرة؟")) { db.ref(`tournaments/${dbPath}/live_match/chat`).remove().then(() => alert("تم مسح الدردشة بنجاح!")); } }
 
-        // تحكم مقارنة اللاعبين
         function updateCompPlayers(num) {
             let tName = document.getElementById(`compT${num}`).value;
             let pSelect = document.getElementById(`compP${num}`);
@@ -647,6 +658,11 @@
             if(document.getElementById('newsText')) document.getElementById('newsText').value = s.newsText || '';
             if(document.getElementById('newsLink')) document.getElementById('newsLink').value = s.newsLink || '';
             if(document.getElementById('newsSpeed')) document.getElementById('newsSpeed').value = s.newsSpeed || 25;
+            
+            if(s.groupCriteria) {
+                let crit = s.groupCriteria;
+                for(let i=1; i<=5; i++) { if(crit[i-1] && document.getElementById('crit'+i)) document.getElementById('crit'+i).value = crit[i-1]; }
+            }
         });
 
         db.ref(`tournaments/${dbPath}/gallery`).on('value', snap => {
@@ -1184,6 +1200,107 @@
                 }
             }
             db.ref(`tournaments/${dbPath}/teams`).update(teamsTemp).then(() => { alert("تم إعادة حساب وتحديث كل الإحصائيات بنجاح! ✅"); }).catch(e => alert("حدث خطأ!"));
+        }
+
+        async function recalculateAllGroupsStandings() {
+            let order = [
+                document.getElementById('crit1').value, document.getElementById('crit2').value,
+                document.getElementById('crit3').value, document.getElementById('crit4').value, document.getElementById('crit5').value
+            ];
+            db.ref(`tournaments/${dbPath}/settings/groupCriteria`).set(order);
+
+            if(!confirm("سيقوم النظام بمسح الترتيب القديم، وفحص كل الأرشيف لحساب النقاط والأهداف بدقة. هل أنت متأكد؟")) return;
+            document.getElementById('autoSaveMsg').innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> جاري الحساب...`; document.getElementById('autoSaveMsg').style.display='block';
+
+            let groups = { A: {}, B: {}, C: {}, D: {} };
+            let archive = allData.saved_matches || {};
+
+            for(let id in archive) {
+                let m = archive[id]; let g = m.groupInfo;
+                if(g && groups[g]) {
+                    if(!groups[g][m.team1]) groups[g][m.team1] = { name: m.team1, played:0, gf:0, ga:0, gd:0, points:0, fp:0, h2h:{} };
+                    if(!groups[g][m.team2]) groups[g][m.team2] = { name: m.team2, played:0, gf:0, ga:0, gd:0, points:0, fp:0, h2h:{} };
+                    
+                    let t1 = groups[g][m.team1], t2 = groups[g][m.team2];
+                    t1.played++; t2.played++;
+                    t1.gf += (parseInt(m.score1)||0); t1.ga += (parseInt(m.score2)||0);
+                    t2.gf += (parseInt(m.score2)||0); t2.ga += (parseInt(m.score1)||0);
+                    t1.gd = t1.gf - t1.ga; t2.gd = t2.gf - t2.ga;
+
+                    if(parseInt(m.score1) > parseInt(m.score2)) { 
+                        t1.points += 3; 
+                        if(!t1.h2h[m.team2]) t1.h2h[m.team2]=0; t1.h2h[m.team2] += 3; 
+                    } else if(parseInt(m.score2) > parseInt(m.score1)) { 
+                        t2.points += 3; 
+                        if(!t2.h2h[m.team1]) t2.h2h[m.team1]=0; t2.h2h[m.team1] += 3; 
+                    } else { 
+                        t1.points += 1; t2.points += 1; 
+                        if(!t1.h2h[m.team2]) t1.h2h[m.team2]=0; t1.h2h[m.team2] += 1; 
+                        if(!t2.h2h[m.team1]) t2.h2h[m.team1]=0; t2.h2h[m.team1] += 1; 
+                    }
+
+                    // اللعب النظيف
+                    let evts = m.events || '';
+                    let t1Escaped = m.team1.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+                    let t2Escaped = m.team2.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+
+                    let y1 = (evts.match(new RegExp('🟨.*\\(' + t1Escaped + '\\)', 'g')) || []).length;
+                    let r1 = (evts.match(new RegExp('🟥.*\\(' + t1Escaped + '\\)', 'g')) || []).length;
+                    let y2 = (evts.match(new RegExp('🟨.*\\(' + t2Escaped + '\\)', 'g')) || []).length;
+                    let r2 = (evts.match(new RegExp('🟥.*\\(' + t2Escaped + '\\)', 'g')) || []).length;
+                    t1.fp -= (y1 + (r1*3)); t2.fp -= (y2 + (r2*3));
+                }
+            }
+
+            for(let g in groups) {
+                let teamsArr = Object.values(groups[g]);
+                teamsArr.sort((a, b) => {
+                    for(let i=0; i<order.length; i++) {
+                        let crit = order[i];
+                        if(crit === 'points' && b.points !== a.points) return b.points - a.points;
+                        if(crit === 'gd' && b.gd !== a.gd) return b.gd - a.gd;
+                        if(crit === 'gf' && b.gf !== a.gf) return b.gf - a.gf;
+                        if(crit === 'fp' && b.fp !== a.fp) return b.fp - a.fp;
+                        if(crit === 'h2h') {
+                            let h2hA = a.h2h[b.name] || 0; let h2hB = b.h2h[a.name] || 0;
+                            if(h2hA !== h2hB) return h2hB - h2hA;
+                        }
+                    }
+                    return 0;
+                });
+                
+                groups[g] = {};
+                teamsArr.forEach((t, idx) => {
+                    t.status = idx < 2 ? 'متأهل' : 'مغادر';
+                    groups[g][t.name] = t;
+                });
+            }
+
+            await db.ref(`tournaments/${dbPath}/groups`).set(groups);
+            document.getElementById('autoSaveMsg').style.display='none';
+            alert("تمت إعادة حساب وبناء المجموعات بنجاح! الترتيب الآن دقيق 100%.");
+        }
+
+        async function publishMedia(type) {
+            let post = { type: type, time: Date.now() };
+            if(type === 'fb') {
+                let embed = document.getElementById('mediaFbInput').value.trim();
+                if(!embed) return alert("أدخل الرابط أولاً!");
+                let cleanUrl = embed.split('?')[0];
+                post.embedCode = `<iframe src="https://www.facebook.com/plugins/post.php?href=${encodeURIComponent(cleanUrl)}&show_text=true&width=500" width="100%" height="450" style="border:none;overflow:hidden" scrolling="no" frameborder="0" allowfullscreen="true" allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share"></iframe>`;
+            } else {
+                let file = document.getElementById('mediaImgInput').files[0];
+                let text = document.getElementById('mediaTextInput').value.trim();
+                if(!file && !text) return alert("أدخل صورة أو نص للإرسال!");
+                if(file) post.image = await compressImage(file);
+                post.text = text;
+            }
+            db.ref(`tournaments/${dbPath}/media_posts`).push(post).then(() => {
+                document.getElementById('mediaImgInput').value = '';
+                document.getElementById('mediaTextInput').value = '';
+                document.getElementById('mediaFbInput').value = '';
+                alert("تم النشر للجمهور بنجاح!");
+            });
         }
     </script>
 </body>
