@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
@@ -16,6 +15,7 @@
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-messaging.js"></script>
 
     <script>
+      let scheduleGlobal = {}, groupMatchupsGlobal = {}, savedMatchesGlobal = {};
       function activateNotifications() { if (typeof setupNotifications === "function") setupNotifications(); }
     </script>
     
@@ -608,7 +608,10 @@
             <div style="background: linear-gradient(180deg, var(--card) 0%, var(--bg) 100%); padding: 30px 20px 20px; text-align:center; border-bottom: 1px solid rgba(255,255,255,0.05); position:relative; overflow:hidden;">
                 <div style="position:absolute; top:-50px; left:50%; transform:translateX(-50%); width:200px; height:200px; background:var(--primary); opacity:0.1; filter:blur(50px); border-radius:50%;"></div>
                 <div class="logo-ph" id="modalLogo" style="width:100px; height:100px; margin:0 auto 15px; border:2px solid rgba(255,255,255,0.1); box-shadow:0 10px 25px rgba(0,0,0,0.5); z-index:2; position:relative; background:#111;"></div>
-                <h2 id="modalTeamName" style="margin:0 0 15px; font-size:26px; font-weight:900; text-shadow:0 2px 4px rgba(0,0,0,0.8); z-index:2; position:relative;">الفريق</h2>
+                <h2 id="modalTeamName" style="margin:0 0 5px; font-size:26px; font-weight:900; text-shadow:0 2px 4px rgba(0,0,0,0.8); z-index:2; position:relative;">الفريق</h2>
+                
+                <div id="modalTeamNickname" style="color:var(--primary); font-size:14px; font-weight:900; margin-bottom:5px; z-index:2; position:relative; display:none;"></div>
+                <div id="modalTeamStadium" style="color:var(--muted); font-size:12px; margin-bottom:15px; z-index:2; position:relative; display:none; font-weight:bold;"><i class="fa-solid fa-location-dot"></i> <span></span></div>
                 
                 <div style="display:flex; gap:15px; justify-content:center; margin-bottom:20px; z-index:2; position:relative;">
                     <div style="background:rgba(59,130,246,0.1); border:1px solid rgba(59,130,246,0.3); padding:10px 25px; border-radius:12px; backdrop-filter:blur(5px);">
@@ -623,7 +626,27 @@
                 <div id="modalStaffArea" style="display:flex; gap:10px; justify-content:center; flex-direction:column; z-index:2; position:relative;"></div>
             </div>
             
-            <div style="padding:20px;"><h3 style="font-size:16px; color:var(--muted); margin:0 0 15px; font-weight:900;" data-trn="التشكيلة">تشكيلة اللاعبين</h3><div id="modalPlayersList"></div></div>
+            <div style="display:flex; gap:5px; margin: 15px; background:rgba(255,255,255,0.05); padding:5px; border-radius:12px; border:1px solid rgba(255,255,255,0.05);">
+                <button class="sub-tab-btn" onclick="openTeamSubTab('team-overview', this)" style="flex:1; background:var(--primary); color:#fff; border:none; padding:10px; border-radius:8px; font-weight:bold; font-family:'Cairo'; cursor:pointer;">نظرة عامة</button>
+                <button class="sub-tab-btn" onclick="openTeamSubTab('team-matches', this)" style="flex:1; background:transparent; color:var(--muted); border:none; padding:10px; border-radius:8px; font-weight:bold; font-family:'Cairo'; cursor:pointer;">المباريات</button>
+            </div>
+
+            <div id="team-overview" class="team-sub-tab" style="display:block; padding:0 20px 20px;">
+                <h3 style="font-size:16px; color:var(--muted); margin:0 0 15px; font-weight:900;" data-trn="التشكيلة">تشكيلة اللاعبين</h3>
+                <div id="modalPlayersList"></div>
+            </div>
+
+            <div id="team-matches" class="team-sub-tab" style="display:none; padding:0 20px 20px;">
+                <div style="background:rgba(59,130,246,0.1); border:1px solid rgba(59,130,246,0.3); padding:8px 12px; border-radius:8px; color:var(--primary); font-weight:bold; font-size:14px; margin-bottom:10px;"><i class="fa-regular fa-calendar-check"></i> المجدولة (القادمة)</div>
+                <div id="teamScheduledList"></div>
+                
+                <div style="background:rgba(245,158,11,0.1); border:1px solid rgba(245,158,11,0.3); padding:8px 12px; border-radius:8px; color:#f59e0b; font-weight:bold; font-size:14px; margin:20px 0 10px;"><i class="fa-solid fa-list-ul"></i> غير المجدولة (بدون موعد)</div>
+                <div id="teamUnscheduledList"></div>
+                
+                <div style="background:rgba(16,185,129,0.1); border:1px solid rgba(16,185,129,0.3); padding:8px 12px; border-radius:8px; color:#10b981; font-weight:bold; font-size:14px; margin:20px 0 10px;"><i class="fa-solid fa-flag-checkered"></i> المنتهية (الأرشيف)</div>
+                <div id="teamFinishedList"></div>
+            </div>
+
         </div>
     </div>
 
@@ -749,7 +772,7 @@
         function shareAsImage(elementId) { 
             const card = document.getElementById(elementId); 
             if(elementId === 'scheduleExportWrapper') document.getElementById('scheduleExportHeader').style.display = 'block'; else if(elementId !== 'compareResults') card.classList.add('premium-poster'); 
-            const actions = card.querySelectorAll('.export-btn, .share-actions, .btn-enter-match, .close-btn, .squad-btn, select, .prediction-box, .chat-input-area, .match-tabs'); actions.forEach(a => { if(a) a.style.display = 'none'; }); 
+            const actions = card.querySelectorAll('.export-btn, .share-actions, .btn-enter-match, .close-btn, .squad-btn, select, .prediction-box, .chat-input-area, .match-tabs, .sub-tab-btn'); actions.forEach(a => { if(a) a.style.display = 'none'; }); 
             triggerNotification('معالجة', 'جاري التصوير 📸'); 
             html2canvas(card, { backgroundColor: '#0a0e12', useCORS: true, scale: 2 }).then(canvas => { 
                 const link = document.createElement('a'); link.download = `Poster.png`; link.href = canvas.toDataURL('image/png'); link.click(); 
@@ -873,7 +896,16 @@
             const tCards = document.getElementById('cardsList'); tCards.innerHTML = ''; allPlayers.filter(p => p.yellow > 0 || p.red > 0).sort((a,b) => (b.red||0) - (a.red||0) || (b.yellow||0) - (a.yellow||0)).forEach(p => { tCards.innerHTML += `<tr class="clickable-player" onclick="window.openPlayerProfile('${p.name}','${p.team}')"><td style="text-align:right; padding-right:15px; display:flex; align-items:center; font-weight:bold;">${getPlayerImageHtml(p.name, p.team, '#ef4444')} <div>${p.name}<br><span style="font-size:10px; color:var(--muted); font-weight:normal;">${p.team}</span></div></td><td style="font-size:14px; color:#facc15; font-family: Arial, sans-serif;">${p.yellow||0}</td><td style="font-size:14px; color:#ef4444; font-family: Arial, sans-serif;">${p.red||0}</td></tr>`; });
         });
 
-        function formatMatchDate(d) { if(!d) return ""; const matchDate = new Date(d); const today = new Date(); const tomorrow = new Date(today); tomorrow.setDate(tomorrow.getDate() + 1); if(matchDate.toDateString() === today.toDateString()) return t("اليوم"); if(matchDate.toDateString() === tomorrow.toDateString()) return t("غداً"); return d; }
+        function formatMatchDate(d) { 
+            if(!d) return t("لم يحدد بعد"); 
+            const matchDate = new Date(d); 
+            if(isNaN(matchDate.getTime())) return d;
+            const today = new Date(); 
+            const tomorrow = new Date(today); tomorrow.setDate(tomorrow.getDate() + 1); 
+            if(matchDate.toDateString() === today.toDateString()) return t("اليوم"); 
+            if(matchDate.toDateString() === tomorrow.toDateString()) return t("غداً"); 
+            return d; 
+        }
 
         function getStarPlayer(teamName) {
             if(!teamsDataGlobal[teamName] || !teamsDataGlobal[teamName].players) return null;
@@ -939,7 +971,13 @@
         function renderSchedule() {
             const list = document.getElementById('scheduleList'); list.innerHTML = ''; let groupedMatches = {};
             for(let id in scheduleGlobal) { let m = scheduleGlobal[id]; let dString = formatMatchDate(m.date); if(!groupedMatches[dString]) groupedMatches[dString] = []; groupedMatches[dString].push({id:id, ...m}); }
-            let sortedDates = Object.keys(groupedMatches).sort((a, b) => { if(a === t("اليوم")) return -1; if(b === t("اليوم")) return 1; if(a === t("غداً")) return -1; if(b === t("غداً")) return 1; return new Date(a) - new Date(b); });
+            let sortedDates = Object.keys(groupedMatches).sort((a, b) => { 
+                if(a === t("اليوم")) return -1; if(b === t("اليوم")) return 1; 
+                if(a === t("غداً")) return -1; if(b === t("غداً")) return 1; 
+                let dA = new Date(a); let dB = new Date(b);
+                if(isNaN(dA.getTime()) || isNaN(dB.getTime())) return 0;
+                return dA - dB; 
+            });
             sortedDates.forEach(dateLabel => {
                 let matches = groupedMatches[dateLabel]; let titleIcon = dateLabel === t("اليوم") ? "fa-bolt" : "fa-calendar-day";
                 list.innerHTML += `<div class="schedule-date-group"><div class="schedule-date-header"><span><i class="fa-solid ${titleIcon}" style="color:var(--primary); margin-left:5px;"></i> ${dateLabel}</span><span class="schedule-match-count">${t('عدد المباريات')}: ${matches.length}</span></div>`;
@@ -966,7 +1004,7 @@
         db.ref(`tournaments/${dbPath}/schedule`).on('value', snap => { scheduleGlobal = snap.val() || {}; renderSchedule(); renderBracket(); });
         
         db.ref(`tournaments/${dbPath}/group_matchups`).on('value', snap => {
-            let gmGlobal = snap.val() || {}; const list = document.getElementById('groupMatchupsList'); if(!list) return; list.innerHTML = '';
+            let gmGlobal = snap.val() || {}; const list = document.getElementById('groupMatchupsList'); if(!list) return; list.innerHTML = ''; groupMatchupsGlobal = gmGlobal;
             if(Object.keys(gmGlobal).length > 0) { for(let id in gmGlobal) { let m = gmGlobal[id]; let info = []; if(m.group) info.push(t('مجموعة') + ' ' + m.group); if(m.round) info.push(t(m.round)); if(m.leg) info.push(t(m.leg)); list.innerHTML += `<div class="card" style="padding:15px; margin-bottom:12px; border-right: 3px solid #f59e0b; background:rgba(255,255,255,0.02);"><div style="font-size:11px; color:#f59e0b; margin-bottom:12px; text-align:center; font-weight:bold; background: rgba(245,158,11,0.05); padding: 6px; border-radius: 6px; border:1px solid #f59e0b;">${info.length > 0 ? info.join(' - ') : t('مواجهة بدون موعد')}</div><div style="display:flex; justify-content:space-between; align-items:center; font-weight:bold; font-size:15px;"><span class="team-clickable" onclick="window.openTeam('${m.team1}')" style="flex:1; text-align:right;">${m.team1}</span><span style="font-size:11px; background:#f59e0b; padding:4px 12px; border-radius:12px; color:#fff;">VS</span><span class="team-clickable" onclick="window.openTeam('${m.team2}')" style="flex:1; text-align:left;">${m.team2}</span></div><div style="display:flex; gap:10px; margin-top:15px;"><button class="btn-enter-match" onclick="window.openGroupMatchup('${id}')" style="flex:1; margin:0; color:#f59e0b; border-color:#f59e0b;"><i class="fa-solid fa-square-poll-horizontal"></i> ${t('التفاصيل')}</button></div></div>`; } } else { list.innerHTML = `<div style="text-align:center; font-size:12px; color:var(--muted); margin-bottom:20px;"></div>`; }
         });
 
@@ -1132,16 +1170,86 @@
 
         window.addEventListener('beforeinstallprompt', (e) => { e.preventDefault(); });
 
+        window.openTeamSubTab = function(tabId, btn) {
+            document.querySelectorAll('.team-sub-tab').forEach(t => t.style.display = 'none');
+            document.querySelectorAll('#teamModalContent .sub-tab-btn').forEach(b => { b.style.background = 'transparent'; b.style.color = 'var(--muted)'; });
+            document.getElementById(tabId).style.display = 'block';
+            btn.style.background = 'var(--primary)'; btn.style.color = '#fff';
+        };
+
+        window.renderTeamMatches = function(tName) {
+            let sList = document.getElementById('teamScheduledList'); sList.innerHTML = '';
+            let uList = document.getElementById('teamUnscheduledList'); uList.innerHTML = '';
+            let fList = document.getElementById('teamFinishedList'); fList.innerHTML = '';
+
+            let sMatches = Object.keys(scheduleGlobal).map(k => ({id:k, ...scheduleGlobal[k]})).filter(m => m.team1 === tName || m.team2 === tName);
+            sMatches.sort((a,b) => new Date((a.date||'2099-01-01')+'T'+(a.time||'00:00')) - new Date((b.date||'2099-01-01')+'T'+(b.time||'00:00')));
+            if(sMatches.length > 0) {
+                sMatches.forEach(m => {
+                    sList.innerHTML += `<div class="card" style="padding:10px; margin-bottom:10px; border-right:3px solid var(--primary); background:rgba(0,0,0,0.2);">
+                        <div style="font-size:11px; color:var(--muted); margin-bottom:5px;">${m.date} | ${m.time}</div>
+                        <div style="font-weight:bold; font-size:14px; display:flex; justify-content:space-between;">
+                            <span style="flex:1; text-align:right;">${m.team1}</span>
+                            <span style="color:var(--primary); font-size:10px; padding:0 5px;">VS</span>
+                            <span style="flex:1; text-align:left;">${m.team2}</span>
+                        </div>
+                        <button onclick="window.closeTeamModal(); setTimeout(()=>window.openScheduledMatch('${m.id}'),300);" style="width:100%; margin-top:8px; background:rgba(59,130,246,0.1); border:1px solid rgba(59,130,246,0.3); color:var(--primary); padding:5px; border-radius:6px; cursor:pointer; font-family:'Cairo'; font-weight:bold;">التفاصيل</button>
+                    </div>`;
+                });
+            } else { sList.innerHTML = `<div style="font-size:12px; color:var(--muted); text-align:center; padding:10px;">لا توجد مباريات مجدولة</div>`; }
+
+            let uMatches = Object.keys(groupMatchupsGlobal).map(k => ({id:k, ...groupMatchupsGlobal[k]})).filter(m => m.team1 === tName || m.team2 === tName);
+            if(uMatches.length > 0) {
+                uMatches.forEach(m => {
+                    uList.innerHTML += `<div class="card" style="padding:10px; margin-bottom:10px; border-right:3px solid #f59e0b; background:rgba(0,0,0,0.2);">
+                        <div style="font-size:11px; color:var(--muted); margin-bottom:5px;">${m.round || 'مواجهة بدون موعد'}</div>
+                        <div style="font-weight:bold; font-size:14px; display:flex; justify-content:space-between;">
+                            <span style="flex:1; text-align:right;">${m.team1}</span>
+                            <span style="color:#f59e0b; font-size:10px; padding:0 5px;">VS</span>
+                            <span style="flex:1; text-align:left;">${m.team2}</span>
+                        </div>
+                        <button onclick="window.closeTeamModal(); setTimeout(()=>window.openGroupMatchup('${m.id}'),300);" style="width:100%; margin-top:8px; background:rgba(245,158,11,0.1); border:1px solid rgba(245,158,11,0.3); color:#f59e0b; padding:5px; border-radius:6px; cursor:pointer; font-family:'Cairo'; font-weight:bold;">التفاصيل</button>
+                    </div>`;
+                });
+            } else { uList.innerHTML = `<div style="font-size:12px; color:var(--muted); text-align:center; padding:10px;">لا توجد مواجهات بدون موعد</div>`; }
+
+            let fMatches = Object.keys(savedMatchesGlobal).map(k => ({id:k, ...savedMatchesGlobal[k]})).filter(m => m.team1 === tName || m.team2 === tName);
+            fMatches.reverse();
+            if(fMatches.length > 0) {
+                fMatches.forEach(m => {
+                    let isWin = (m.team1 === tName && parseInt(m.score1) > parseInt(m.score2)) || (m.team2 === tName && parseInt(m.score2) > parseInt(m.score1));
+                    let isDraw = parseInt(m.score1) === parseInt(m.score2);
+                    let resColor = isWin ? '#10b981' : (isDraw ? '#facc15' : '#ef4444');
+                    fList.innerHTML += `<div class="card" style="padding:10px; margin-bottom:10px; border-right:3px solid ${resColor}; background:rgba(0,0,0,0.2);">
+                        <div style="font-size:11px; color:var(--muted); margin-bottom:5px; display:flex; justify-content:space-between;"><span>${m.round || 'مباراة منتهية'}</span><span>${m.date || ''}</span></div>
+                        <div style="display:flex; justify-content:space-between; align-items:center; font-weight:bold; font-size:14px;">
+                            <span style="flex:1; text-align:right;">${m.team1}</span>
+                            <span style="padding:0 10px; color:${resColor}; font-size:18px; font-family:Arial,sans-serif;">${m.score1} - ${m.score2}</span>
+                            <span style="flex:1; text-align:left;">${m.team2}</span>
+                        </div>
+                        <button onclick="window.closeTeamModal(); setTimeout(()=>window.openMatchDetails('${m.id}'),300);" style="width:100%; margin-top:8px; background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1); color:#fff; padding:5px; border-radius:6px; cursor:pointer; font-family:'Cairo'; font-weight:bold;">التفاصيل والإحصائيات</button>
+                    </div>`;
+                });
+            } else { fList.innerHTML = `<div style="font-size:12px; color:var(--muted); text-align:center; padding:10px;">لا توجد مباريات منتهية</div>`; }
+        };
+
         window.openTeam = function(tName) { 
             try { history.pushState({ modal: 'teamModal' }, "", "#team"); } catch(e){} 
             const d = teamsDataGlobal[tName]; if(!d) return; 
             document.getElementById('modalTeamName').innerText = tName; 
             document.getElementById('modalLogo').innerHTML = d.logo ? `<img src="${d.logo}" style="width:100%; height:100%; object-fit:contain; border-radius:50%;">` : `<i class="fa-solid fa-shield-halved" style="font-size:40px; margin-top:25px; color:var(--muted);"></i>`; 
+            
+            let nickEl = document.getElementById('modalTeamNickname');
+            if(d.nickname && d.nickname.trim() !== "") { nickEl.innerText = `(${d.nickname})`; nickEl.style.display = 'block'; } else { nickEl.style.display = 'none'; }
+            
+            let stadEl = document.getElementById('modalTeamStadium');
+            if(d.stadium && d.stadium.trim() !== "") { stadEl.querySelector('span').innerText = d.stadium; stadEl.style.display = 'block'; } else { stadEl.style.display = 'none'; }
+
             document.getElementById('modalGf').innerText = d.gf || 0; 
             document.getElementById('modalGa').innerText = d.ga || 0; 
             
             let staff = ''; if(d.coach) staff += `<div style="background:rgba(255,255,255,0.05); padding:8px 15px; border-radius:12px; border:1px solid rgba(255,255,255,0.1); font-size:13px; color:var(--text); font-weight:bold;"><i class="fa-solid fa-user-tie" style="color:var(--primary);"></i> ${t('مدرب')}: ${d.coach}</div>`; if(d.assistant) staff += `<div style="background:rgba(255,255,255,0.05); padding:8px 15px; border-radius:12px; border:1px solid rgba(255,255,255,0.1); font-size:13px; color:var(--text); font-weight:bold;"><i class="fa-solid fa-user-tie" style="color:var(--muted);"></i> ${t('مساعد')}: ${d.assistant}</div>`; 
-            let jerseyHtml = ''; if (d.jerseyColor || d.jerseyImage || d.jerseyImage2) { let colorBox = d.jerseyColor ? `<div style="width:18px; height:18px; border-radius:6px; background-color:${d.jerseyColor}; border:1px solid rgba(255,255,255,0.2); display:inline-block; box-shadow:0 2px 5px rgba(0,0,0,0.5);"></div>` : ''; let imgBox1 = d.jerseyImage ? `<img src="${d.jerseyImage}" onclick="openImageViewer('${d.jerseyImage}')" style="width:40px; height:40px; object-fit:contain; border-radius:8px; cursor:pointer; background:rgba(0,0,0,0.5); padding:4px; border:1px solid rgba(255,255,255,0.1);">` : ''; let imgBox2 = d.jerseyImage2 ? `<img src="${d.jerseyImage2}" onclick="openImageViewer('${d.jerseyImage2}')" style="width:40px; height:40px; object-fit:contain; border-radius:8px; cursor:pointer; background:rgba(0,0,0,0.5); padding:4px; border:1px solid rgba(255,255,255,0.1);">` : ''; jerseyHtml = `<div style="background:rgba(255,255,255,0.05); padding:8px 15px; border-radius:12px; border:1px solid rgba(255,255,255,0.1); font-size:13px; color:var(--text); display:flex; align-items:center; gap:10px; font-weight:bold;">${colorBox} ${imgBox1} ${imgBox2}</div>`; }
+            let jerseyHtml = ''; if (d.jerseyColor || d.jerseyImage || d.jerseyImage2) { let colorBox = d.jerseyColor ? `<div style="width:18px; height:18px; border-radius:6px; background-color:${d.jerseyColor}; border:1px solid rgba(255,255,255,0.2); display:inline-block; box-shadow:0 2px 5px rgba(0,0,0,0.5);"></div>` : ''; let imgBox1 = d.jerseyImage ? `<img src="${d.jerseyImage}" onclick="openImageViewer('${d.jerseyImage}')" style="width:40px; height:40px; object-fit:contain; border-radius:8px; cursor:pointer; background:rgba(0,0,0,0.5); padding:4px; border:1px solid rgba(255,255,255,0.1);">` : ''; let imgBox2 = d.jerseyImage2 ? `<img src="${d.jerseyImage2}" onclick="openImageViewer('${d.jerseyImage2}')" style="width:40px; height:40px; object-fit:contain; border-radius:8px; cursor:pointer; background:rgba(0,0,0,0.5); padding:4px; border:1px solid rgba(255,255,255,0.1);">` : ''; jerseyHtml = `<div style="background:rgba(255,255,255,0.05); padding:8px 15px; border-radius:12px; border:1px solid rgba(255,255,255,0.1); font-size:13px; color:var(--text); display:flex; align-items:center; gap:10px; justify-content:center; font-weight:bold;">${colorBox} ${imgBox1} ${imgBox2}</div>`; }
             
             let bestPlayer = getStarPlayer(tName);
             let bestPlayerHtml = '';
@@ -1177,6 +1285,9 @@
             } else {
                 tbody.innerHTML = `<div style="text-align:center; padding:20px; color:var(--muted); font-weight:bold;">لا يوجد لاعبين</div>`;
             }
+
+            renderTeamMatches(tName);
+            openTeamSubTab('team-overview', document.querySelector('#teamModalContent .sub-tab-btn'));
             document.getElementById('teamModal').style.display = 'block'; 
         };
         
@@ -1260,7 +1371,7 @@
 
         window.nav = function(id, el) { try { if(!history.state || history.state.page !== id) history.pushState({ page: id }, "", "#" + id); } catch(e) {} document.querySelectorAll('.page').forEach(p => p.classList.remove('active')); document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active')); document.getElementById('page-' + id).classList.add('active'); if(el) el.classList.add('active'); window.scrollTo(0,0); };
 
-        window.addEventListener('popstate', function(event) {
+       window.addEventListener('popstate', function(event) {
             let isModalOpen = false; const imageViewer = document.getElementById('imageViewerModal'); if(imageViewer && imageViewer.style.display === 'flex') { imageViewer.style.display = 'none'; isModalOpen = true; }
             document.querySelectorAll('.modal').forEach(m => { if(m.style.display === 'block' || m.style.display === 'flex') { m.style.display = 'none'; isModalOpen = true; } }); if(isModalOpen) return;
             if(event.state && event.state.page) {
