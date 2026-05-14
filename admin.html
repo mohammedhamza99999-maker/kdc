@@ -301,6 +301,7 @@
 
             <div class="panel">
                 <h2>جدولة مباراة (بوقت وتاريخ)</h2>
+                <div style="font-size:11px; color:var(--accent); margin-bottom:10px;">💡 ملاحظة: لاضافة المباراة لـ "شجرة البطولة"، فقط اختر الدور (دور الـ 16، ربع النهائي، نصف النهائي، أو النهائي) من القائمة.</div>
                 <div class="flex-row">
                     <select id="sGroup" onchange="filterTeamsByGroup('sGroup', 'sTeam1', 'sTeam2')"><option value="">(بدون مجموعة)</option><option value="A">مجموعة A</option><option value="B">مجموعة B</option><option value="C">مجموعة C</option><option value="D">مجموعة D</option></select>
                     <select id="sRound"><option value="">(بدون جولة)</option><option value="الجولة الأولى">الجولة الأولى</option><option value="الجولة الثانية">الجولة الثانية</option><option value="الجولة الثالثة">الجولة الثالثة</option><option value="الجولة الرابعة">الجولة الرابعة</option><option value="الجولة الخامسة">الجولة الخامسة</option><option value="دور الـ 16">دور الـ 16</option><option value="ربع النهائي">ربع النهائي</option><option value="نصف النهائي">نصف النهائي</option><option value="تحديد المركز الثالث">تحديد المركز الثالث</option><option value="النهائي">النهائي</option></select>
@@ -323,6 +324,7 @@
             
             <div class="panel">
                 <h2>المواجهات المنتظرة (بدون موعد)</h2>
+                <div style="font-size:11px; color:var(--accent); margin-bottom:10px;">💡 ملاحظة: لاضافة المباراة لـ "شجرة البطولة"، فقط اختر الدور (دور الـ 16، ربع النهائي، نصف النهائي، أو النهائي) من القائمة.</div>
                 <div class="flex-row">
                     <select id="gmGroup" onchange="filterTeamsByGroup('gmGroup', 'gmTeam1', 'gmTeam2')">
                         <option value="">(بدون مجموعة / إقصائيات)</option>
@@ -1077,7 +1079,7 @@
                 let html = `<label style="color:var(--muted); font-size:11px;">فريق: ${tName}</label>`;
                 let opts = '<option value="">-- اختر --</option>';
                 if(allData.teams?.[tName]?.players) { for(let p in allData.teams[tName].players) opts += `<option value="${p}">${p}</option>`; }
-                ['gk', 'cb', 'lb', 'rb', 'cdm', 'cm', 'cam', 'lm', 'rm', 'lw', 'rw', 'st'].forEach(pos => { html += `<div class="flex-row" style="margin-bottom:4px;"><select id="${prefix}_${pos}" style="flex:2; font-size:11px; margin:0;">${opts}</select><input type="number" id="${prefix}_r_${pos}" style="flex:1; font-size:11px; margin:0; padding:4px;" placeholder="تقييم" step="0.1" max="10" min="0"></div>`; });
+                ['gk', 'cb', 'lb', 'rb', 'cdm', 'cm', 'cam', 'lm', 'rm', 'lw', 'rw', 'st'].forEach(pos => { html += `<div class="flex-row" style="margin-bottom:4px;"><select id="${prefix}_pos" style="flex:2; font-size:11px; margin:0;">${opts}</select><input type="number" id="${prefix}r${pos}" style="flex:1; font-size:11px; margin:0; padding:4px;" placeholder="تقييم" step="0.1" max="10" min="0"></div>`; });
                 document.getElementById(containerId).innerHTML = html;
                 setTimeout(() => { ['gk', 'cb', 'lb', 'rb', 'cdm', 'cm', 'cam', 'lm', 'rm', 'lw', 'rw', 'st'].forEach(pos => { let el = document.getElementById(`${prefix}_${pos}`); let rEl = document.getElementById(`${prefix}_r_${pos}`); if(savedSq && savedSq[pos]) { let pData = savedSq[pos]; if(typeof pData === 'object') { el.value = pData.name || ''; rEl.value = pData.rating || ''; } else { el.value = pData; rEl.value = ''; } } }); }, 50);
             };
@@ -1157,7 +1159,7 @@
             const motmVal = document.getElementById('arcMotm').value; let motmName = "", motmTeam = "";
             if(motmVal && motmVal !== "") { [motmTeam, motmName] = motmVal.split('|'); }
 
-            const getSq = (prefix) => { let sq = {}; ['gk', 'cb', 'lb', 'rb', 'cdm', 'cm', 'cam', 'lm', 'rm', 'lw', 'rw', 'st'].forEach(pos => { sq[pos] = { name: document.getElementById(`${prefix}_${pos}`).value, rating: document.getElementById(`${prefix}_r_${pos}`).value }; }); return sq; };
+            const getSq = (prefix) => { let sq = {}; ['gk', 'cb', 'lb', 'rb', 'cdm', 'cm', 'cam', 'lm', 'rm', 'lw', 'rw', 'st'].forEach(pos => { sq[pos] = { name: document.getElementById(`${prefix}_${pos}`).value, rating: document.getElementById(`${prefix}r${pos}`).value }; }); return sq; };
 
             let updates = { 
                 score1: parseInt(document.getElementById('arcS1').value) || 0, 
