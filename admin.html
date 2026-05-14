@@ -203,6 +203,10 @@
                 <h2>إضافة / تعديل فريق</h2>
                 <input type="text" id="dbTeamName" placeholder="اسم الفريق (إجباري)">
                 <div class="flex-row">
+                    <input type="text" id="dbNickname" placeholder="لقب الفريق (مثل: النسور، الملوك) - اختياري">
+                    <input type="text" id="dbStadium" placeholder="اسم الملعب المخصص (اختياري)">
+                </div>
+                <div class="flex-row">
                     <input type="text" id="dbCoach" placeholder="اسم المدرب">
                     <div style="background:var(--input-bg); border:1px solid var(--border); border-radius:8px; display:flex; align-items:center; padding:0 10px;"><span style="font-size:11px; color:var(--muted);">صورة:</span><input type="file" id="dbCoachPhoto" accept="image/*" style="border:none; background:transparent; padding:5px; margin:0;"></div>
                 </div>
@@ -335,16 +339,7 @@
                     </select>
                     <select id="gmRound">
                         <option value="">(بدون جولة)</option>
-                        <option value="الجولة الأولى">الجولة الأولى</option>
-                        <option value="الجولة الثانية">الجولة الثانية</option>
-                        <option value="الجولة الثالثة">الجولة الثالثة</option>
-                        <option value="الجولة الرابعة">الجولة الرابعة</option>
-                        <option value="الجولة الخامسة">الجولة الخامسة</option>
-                        <option value="دور الـ 16">دور الـ 16</option>
-                        <option value="ربع النهائي">ربع النهائي</option>
-                        <option value="نصف النهائي">نصف النهائي</option>
-                        <option value="تحديد المركز الثالث">تحديد المركز الثالث</option>
-                        <option value="النهائي">النهائي</option>
+                        <option value="الجولة الأولى">الجولة الأولى</option><option value="الجولة الثانية">الجولة الثانية</option><option value="الجولة الثالثة">الجولة الثالثة</option><option value="الجولة الرابعة">الجولة الرابعة</option><option value="الجولة الخامسة">الجولة الخامسة</option><option value="دور الـ 16">دور الـ 16</option><option value="ربع النهائي">ربع النهائي</option><option value="نصف النهائي">نصف النهائي</option><option value="تحديد المركز الثالث">تحديد المركز الثالث</option><option value="النهائي">النهائي</option>
                     </select>
                     <select id="gmLeg"><option value="">مباراة واحدة</option><option value="ذهاب">ذهاب</option><option value="إياب">إياب</option></select>
                 </div>
@@ -937,6 +932,9 @@
         async function saveFullTeam() { 
             const tName = document.getElementById('dbTeamName').value.trim(); if (!tName) return alert("اكتب اسم الفريق!"); document.getElementById('autoSaveMsg1').innerText = "جاري الحفظ..."; document.getElementById('autoSaveMsg1').classList.add('show');
             let teamObj = { coach: document.getElementById('dbCoach').value || "", assistant: document.getElementById('dbAsst').value || "", players: {} }; 
+            teamObj.nickname = document.getElementById('dbNickname').value || "";
+            teamObj.stadium = document.getElementById('dbStadium').value || "";
+
             for(let i=1; i<=15; i++) { 
                 let pName = document.getElementById('p'+i).value.trim(); 
                 let pFile = document.getElementById('pImg'+i).files[0]; 
@@ -962,9 +960,9 @@
             db.ref(`tournaments/${dbPath}/teams/${tName}`).set(teamObj).then(() => { document.getElementById('autoSaveMsg1').classList.remove('show'); setTimeout(() => { document.getElementById('autoSaveMsg1').innerText = "تم الحفظ"; }, 500); alert("تم حفظ الفريق!"); clearTeamForm(); }).catch(e => alert("خطأ!")); 
         }
 
-        function clearTeamForm() { document.getElementById('dbTeamName').value=''; document.getElementById('dbCoach').value=''; document.getElementById('dbAsst').value=''; document.getElementById('dbLogo').value=''; document.getElementById('dbCoachPhoto').value=''; document.getElementById('dbAsstPhoto').value=''; document.getElementById('dbJerseyColor').value='#ffffff'; document.getElementById('dbJerseyImg').value=''; document.getElementById('dbJerseyImg2').value=''; for(let i=1; i<=15; i++) { document.getElementById('p'+i).value=''; document.getElementById('pImg'+i).value=''; document.getElementById('pIcon'+i).className = 'fa-solid fa-camera'; document.getElementById('pIcon'+i).style.color = 'var(--muted)'; if(document.getElementById('pPos'+i)) document.getElementById('pPos'+i).value=''; } }
+        function clearTeamForm() { document.getElementById('dbTeamName').value=''; document.getElementById('dbNickname').value=''; document.getElementById('dbStadium').value=''; document.getElementById('dbCoach').value=''; document.getElementById('dbAsst').value=''; document.getElementById('dbLogo').value=''; document.getElementById('dbCoachPhoto').value=''; document.getElementById('dbAsstPhoto').value=''; document.getElementById('dbJerseyColor').value='#ffffff'; document.getElementById('dbJerseyImg').value=''; document.getElementById('dbJerseyImg2').value=''; for(let i=1; i<=15; i++) { document.getElementById('p'+i).value=''; document.getElementById('pImg'+i).value=''; document.getElementById('pIcon'+i).className = 'fa-solid fa-camera'; document.getElementById('pIcon'+i).style.color = 'var(--muted)'; if(document.getElementById('pPos'+i)) document.getElementById('pPos'+i).value=''; } }
 
-        window.loadTeamForEdit = function(tName) { const tData = allData.teams[tName]; if(!tData) return; clearTeamForm(); document.getElementById('dbTeamName').value = tName; document.getElementById('dbCoach').value = tData.coach || ''; document.getElementById('dbAsst').value = tData.assistant || ''; document.getElementById('dbJerseyColor').value = tData.jerseyColor || '#ffffff'; if(tData.players) { let i = 1; for(let pName in tData.players) { if(i > 15) break; document.getElementById('p'+i).value = pName; if(tData.players[pName].photo) { document.getElementById('pIcon'+i).className = 'fa-solid fa-check-double'; document.getElementById('pIcon'+i).style.color = '#3b82f6'; } if(tData.players[pName].position && document.getElementById('pPos'+i)) { document.getElementById('pPos'+i).value = tData.players[pName].position; } i++; } } openTab('tab-teams', document.querySelectorAll('.tab-btn')[1]); };
+        window.loadTeamForEdit = function(tName) { const tData = allData.teams[tName]; if(!tData) return; clearTeamForm(); document.getElementById('dbTeamName').value = tName; document.getElementById('dbNickname').value = tData.nickname || ''; document.getElementById('dbStadium').value = tData.stadium || ''; document.getElementById('dbCoach').value = tData.coach || ''; document.getElementById('dbAsst').value = tData.assistant || ''; document.getElementById('dbJerseyColor').value = tData.jerseyColor || '#ffffff'; if(tData.players) { let i = 1; for(let pName in tData.players) { if(i > 15) break; document.getElementById('p'+i).value = pName; if(tData.players[pName].photo) { document.getElementById('pIcon'+i).className = 'fa-solid fa-check-double'; document.getElementById('pIcon'+i).style.color = '#3b82f6'; } if(tData.players[pName].position && document.getElementById('pPos'+i)) { document.getElementById('pPos'+i).value = tData.players[pName].position; } i++; } } openTab('tab-teams', document.querySelectorAll('.tab-btn')[1]); };
 
         window.setGroupStatus = function(g, t, status) {
             db.ref(`tournaments/${dbPath}/groups/${g}/${t}`).update({ status: status });
