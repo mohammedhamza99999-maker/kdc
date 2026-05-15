@@ -668,7 +668,7 @@
             if(msgBox) { 
                 msgBox.innerText = "تم إرسال إشعار: " + title; 
                 msgBox.classList.add('show'); 
-                setTimeout(()=>msgBox.classList.remove('show'), 3000); 
+                setTimeout(()=>msgBox.classList.remove('show'), 2000); 
             }
         }
 
@@ -871,6 +871,7 @@
                 if (yellowCount >= 1) { alert(`تنبيه: هذه البطاقة الصفراء الثانية للاعب ${pName}، سيتم طرده تلقائياً! 🟥`); setTimeout(() => addAutoEvent('red', '🟥'), 500); }
             }
             if(type === 'red') sendManualPush("🟥 بطاقة حمراء!", `طرد للاعب ${pName}`);
+            if(type === 'assists') sendManualPush("🅰️ أسيست!", `صناعة هدف من اللاعب ${pName} (${tName})`);
             
             const currentEvents = document.getElementById('mEvents').value; const newEvent = `${icon} ${min}' ${pName} (${tName})`; document.getElementById('mEvents').value = currentEvents ? currentEvents + '\n' + newEvent : newEvent; db.ref(`tournaments/${dbPath}/live_match/events`).set(document.getElementById('mEvents').value); db.ref(`tournaments/${dbPath}/teams/${tName}/players/${pName}/${type}`).transaction(c => (c||0)+1); autoSaveMatchDetails();
         }
