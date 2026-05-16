@@ -393,10 +393,11 @@
                 <h2 style="color:#ef4444;"><i class="fa-solid fa-bolt"></i> شريط الأخبار العاجلة (متعدد)</h2>
                 <p style="font-size:12px; color:var(--text); text-align:center;">يمكنك إضافة أكثر من خبر عاجل ليظهر كشريط متحرك في التطبيق.</p>
                 <div class="flex-row" style="margin-bottom:10px;">
+                    <select id="multiNewsType" style="flex:1; margin:0;"><option value="urgent">🔴 عاجل</option><option value="news">📰 خبر</option></select>
                     <input type="text" id="multiNewsText" placeholder="نص الخبر العاجل..." style="flex:2; margin:0;">
                     <input type="url" id="multiNewsLink" placeholder="رابط اختياري (https://...)" dir="ltr" style="flex:1; margin:0;">
                 </div>
-                <button onclick="addBreakingNews()" style="background:#ef4444; color:#fff;"><i class="fa-solid fa-plus"></i> إضافة للشريط العاجل</button>
+                <button onclick="addBreakingNews()" style="background:#ef4444; color:#fff;"><i class="fa-solid fa-plus"></i> إضافة للشريط</button>
                 <div id="breakingNewsList" class="preview-box" style="background:var(--card); border:none; padding:0;"></div>
             </div>
 
@@ -590,7 +591,7 @@
                 <div class="flex-row" style="margin-bottom:5px;">
                     <select id="arcEvtTeam" onchange="updateArcPlayerList()" style="flex:1; margin-bottom:0;"><option value="1">فريق 1</option><option value="2">فريق 2</option></select>
                     <select id="arcEvtPlayer" style="flex:2; margin-bottom:0;"><option value="">اختر اللاعب...</option></select>
-                    <input type="number" id="arcEvtMin" placeholder="دقيقة" style="flex:1; margin-bottom:0;">
+                    <input type="number" id="arcEvtMin" placeholder="دقيقة" style="flex:1; margin:bottom:0;">
                 </div>
                 <div style="display:grid; grid-template-columns: repeat(3, 1fr); gap:5px; margin-top:5px;">
                     <button onclick="addArcEventStr('هدف', true, false)" style="background:var(--accent); color:#000; border:none; margin:0; padding:8px;">هدف</button>
@@ -758,20 +759,21 @@
         window.setActiveBg = function(type, b64) { db.ref(`tournaments/${dbPath}/settings/active_${type}`).set(b64).then(() => alert('تم التفعيل')); }
         window.deleteGalleryBg = function(type, key) { if(confirm('متأكد من حذف الصورة؟')) { db.ref(`tournaments/${dbPath}/gallery/${type}/${key}`).remove(); db.ref(`tournaments/${dbPath}/settings/active_${type}`).once('value').then(s => { db.ref(`tournaments/${dbPath}/gallery/${type}/${key}`).once('value').then(imgSnap => { if(s.val() === imgSnap.val()) db.ref(`tournaments/${dbPath}/settings/active_${type}`).remove(); }); }); } }
         
-        // ================= الإعلام والأخبار (Media Center) =================
         function addBreakingNews() {
+            let type = document.getElementById('multiNewsType').value;
             let text = document.getElementById('multiNewsText').value.trim();
             let link = document.getElementById('multiNewsLink').value.trim();
             if(!text) return alert("أدخل نص الخبر العاجل أولاً");
 
             db.ref(`tournaments/${dbPath}/breaking_news`).push({
+                type: type,
                 text: text,
                 link: link,
                 timestamp: Date.now()
             }).then(() => {
                 document.getElementById('multiNewsText').value = '';
                 document.getElementById('multiNewsLink').value = '';
-                alert("تم إضافة الخبر العاجل بنجاح");
+                alert("تم الإضافة بنجاح");
             });
         }
 
@@ -781,17 +783,17 @@
             cont.innerHTML = '';
             let data = snap.val();
             if(data) {
-                // ترتيب الأخبار ليظهر الجديد أولاً (تنازلياً حسب timestamp)
                 let items = [];
                 for(let k in data) items.push({key: k, ...data[k]});
                 items.sort((a,b) => b.timestamp - a.timestamp);
 
                 items.forEach(item => {
+                    let badge = item.type === 'news' ? '<strong style="color:#3b82f6;"><i class="fa-solid fa-newspaper"></i> خبر:</strong>' : '<strong style="color:#ef4444;"><i class="fa-solid fa-bolt"></i> عاجل:</strong>';
                     cont.innerHTML += `
                     <div class="preview-item" style="border:1px solid #3f3f46; border-radius:5px; padding:10px; margin-bottom:5px; background:#18181b;">
                         <div class="preview-item-header">
                             <div>
-                                <strong style="color:#ef4444; font-size:12px;"><i class="fa-solid fa-bolt"></i> عاجل:</strong> 
+                                ${badge} 
                                 <span style="font-size:12px;">${item.text}</span>
                                 ${item.link ? `<br><a href="${item.link}" target="_blank" style="color:var(--primary); font-size:11px;"><i class="fa-solid fa-link"></i> رابط الخبر</a>` : ''}
                             </div>
@@ -800,11 +802,10 @@
                     </div>`;
                 });
             } else {
-                cont.innerHTML = '<div style="font-size:11px; color:var(--muted); text-align:center; padding:10px;">لا توجد أخبار عاجلة حالياً.</div>';
+                cont.innerHTML = '<div style="font-size:11px; color:var(--muted); text-align:center; padding:10px;">لا توجد أخبار حالياً.</div>';
             }
         });
 
-        // مكتبة الفيديو
         function addHighlightVideo() {
             let title = document.getElementById('vidTitle').value.trim();
             let embed = document.getElementById('vidEmbed').value.trim();
@@ -885,7 +886,6 @@
             } else { cont.innerHTML = '<div style="font-size:11px; color:var(--muted); text-align:center;">لا توجد منشورات إعلامية.</div>'; }
         });
 
-        // ================= الرعاة وسجل الأبطال والموسم الجديد =================
         async function addSponsor() {
             let name = document.getElementById('spName').value.trim();
             let link = document.getElementById('spLink').value.trim();
@@ -937,10 +937,8 @@
 
             document.getElementById('autoSaveMsg1').innerText = "جاري الأرشفة والفرمتة..."; document.getElementById('autoSaveMsg1').classList.add('show');
             
-            // أرشفة البيانات الحالية
             await db.ref(`tournaments/${dbPath}/archived_seasons/${y}`).set(allData);
 
-            // تصفير إحصائيات الفرق واللاعبين
             let teamsTemp = JSON.parse(JSON.stringify(allData.teams || {}));
             for(let t in teamsTemp) {
                 teamsTemp[t].gf = 0; teamsTemp[t].ga = 0;
@@ -952,7 +950,6 @@
             }
             await db.ref(`tournaments/${dbPath}/teams`).set(teamsTemp);
 
-            // حذف الجداول والأرشيف والمباشر
             await db.ref(`tournaments/${dbPath}/saved_matches`).remove();
             await db.ref(`tournaments/${dbPath}/schedule`).remove();
             await db.ref(`tournaments/${dbPath}/group_matchups`).remove();
@@ -965,7 +962,6 @@
             location.reload();
         }
 
-        // ================= نظام المواجهات المباشرة H2H والإيقافات =================
         function checkH2H() {
             let t1 = document.getElementById('h2hT1').value;
             let t2 = document.getElementById('h2hT2').value;
@@ -1117,6 +1113,18 @@
         function saveSinglePlayerStats() { const tName = document.getElementById('editStatTeam').value; const pName = document.getElementById('editStatPlayer').value; if(!tName || !pName) return alert("الرجاء اختيار الفريق واللاعب أولاً"); const updates = { goals: parseInt(document.getElementById('esGoals').value) || 0, assists: parseInt(document.getElementById('esAssists').value) || 0, motm: parseInt(document.getElementById('esMotm').value) || 0, yellow: parseInt(document.getElementById('esYellow').value) || 0, red: parseInt(document.getElementById('esRed').value) || 0, matches: parseInt(document.getElementById('esMatches').value) || 0, cs: parseInt(document.getElementById('esCs').value) || 0 }; db.ref(`tournaments/${dbPath}/teams/${tName}/players/${pName}`).update(updates).then(() => { alert("تم تحديث إحصائيات اللاعب بنجاح"); }); }
 
         window.deleteItem = function(path) { if(confirm('تأكيد الحذف نهائياً؟')) { db.ref(`tournaments/${dbPath}/${path}`).remove().then(() => { alert("تم الحذف"); if(typeof renderFullAdminPreviews === "function") renderFullAdminPreviews(); }); } };
+
+        function getTeamForm(tName) {
+            let matches = []; if(allData.saved_matches) { matches = Object.keys(allData.saved_matches).map(k=>allData.saved_matches[k]).filter(m => m.team1 === tName || m.team2 === tName); }
+            let recent = matches.reverse().slice(0, 5); if(recent.length === 0) return '-';
+            let html = '<div style="display:flex; gap:2px; direction:ltr; justify-content:center;">';
+            recent.forEach(m => { let s1 = parseInt(m.score1)||0; let s2 = parseInt(m.score2)||0; let isT1 = m.team1 === tName; let ts = isT1 ? s1 : s2; let os = isT1 ? s2 : s1;
+                if(ts > os) html += '<span style="background:#10b981; color:#fff; border-radius:3px; padding:2px 4px; font-size:8px; font-weight:bold;">W</span>';
+                else if(ts < os) html += '<span style="background:#ef4444; color:#fff; border-radius:3px; padding:2px 4px; font-size:8px; font-weight:bold;">L</span>';
+                else html += '<span style="background:#a1a1aa; color:#fff; border-radius:3px; padding:2px 4px; font-size:8px; font-weight:bold;">D</span>';
+            });
+            return html + '</div>';
+        }
 
         db.ref('tournaments/' + dbPath).on('value', snap => {
             if(isInternalUpdate) return;
@@ -1361,7 +1369,7 @@
                             if(tData.status === 'متأهل') sHtml = '<span style="color:#10b981; font-size:11px; margin-right:5px;">متأهل</span>';
                             else if(tData.status === 'مغادر') sHtml = '<span style="color:#ef4444; font-size:11px; margin-right:5px;">مغادر</span>';
                             
-                            gPreview.innerHTML += `<div class="preview-item"><div class="preview-item-header"><div style="display:flex; flex-direction:column; gap:5px;"><span>مجموعة ${g}: <b>${t}</b> (${tData.points} نقطة) ${sHtml}</span><div style="display:flex; gap:5px;"><button onclick="setGroupStatus('${g}', '${t}', 'متأهل')" style="background:transparent; color:#10b981; border:1px solid #10b981; padding:2px 6px; font-size:10px; border-radius:4px; margin:0;">تأهل</button><button onclick="setGroupStatus('${g}', '${t}', 'مغادر')" style="background:transparent; color:#ef4444; border:1px solid #ef4444; padding:2px 6px; font-size:10px; border-radius:4px; margin:0;">مغادرة</button><button onclick="setGroupStatus('${g}', '${t}', '')" style="background:transparent; color:var(--muted); border:1px solid var(--muted); padding:2px 6px; font-size:10px; border-radius:4px; margin:0;">إلغاء</button></div></div><button class="del-btn" onclick="deleteItem('groups/${g}/${t}')"><i class="fa-solid fa-xmark"></i></button></div></div>`; 
+                            gPreview.innerHTML += `<div class="preview-item"><div class="preview-item-header"><div style="display:flex; flex-direction:column; gap:5px;"><span>مجموعة ${g}: <b>${t}</b> (${tData.points} نقطة) <td>${getTeamForm(t)}</td> ${sHtml}</span><div style="display:flex; gap:5px;"><button onclick="setGroupStatus('${g}', '${t}', 'متأهل')" style="background:transparent; color:#10b981; border:1px solid #10b981; padding:2px 6px; font-size:10px; border-radius:4px; margin:0;">تأهل</button><button onclick="setGroupStatus('${g}', '${t}', 'مغادر')" style="background:transparent; color:#ef4444; border:1px solid #ef4444; padding:2px 6px; font-size:10px; border-radius:4px; margin:0;">مغادرة</button><button onclick="setGroupStatus('${g}', '${t}', '')" style="background:transparent; color:var(--muted); border:1px solid var(--muted); padding:2px 6px; font-size:10px; border-radius:4px; margin:0;">إلغاء</button></div></div><button class="del-btn" onclick="deleteItem('groups/${g}/${t}')"><i class="fa-solid fa-xmark"></i></button></div></div>`; 
                         }); 
                     } 
                 }); 
